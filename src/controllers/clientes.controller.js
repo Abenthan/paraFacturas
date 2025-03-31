@@ -2,45 +2,87 @@ import { pool } from "../db.js";
 import { createAccessToken } from "../libs/jwt.js";
 
 export const getClientes = async (req, res) => {
-    res.json("Get Clientes");
+  try {
+    const [rows] = await pool.query("SELECT * FROM clientes");
+    res.json(rows);
+  } catch (error) {
+    console.log("error en catch", error);
+    res.status(500).json("Error Catch en getClientes: " + error.message);
+  }
 };
 
 export const createCliente = async (req, res) => {
-    const { codigo, cedula, nombreCliente, emailCliente, telefono, direccion } = req.body;
-    try {
-        // Verificar si la cedula ya existe
-        const verifyCedula = await pool.query("SELECT * FROM clientes WHERE cedula = ?", [cedula]);
-        if (verifyCedula[0].length > 0) {
-            return res.status(400).json({ message: "Ya existe un cliente con esa cedula" });
-        } else {
-            // Verificar si el codigo ya existe
-            const verifyCodigo = await pool.query("SELECT * FROM clientes WHERE codigo = ?", [codigo]);
-            if (verifyCodigo[0].length > 0) {
-                return res.status(400).json({ message: "Ya existe un cliente con ese código" });
-            } else {
-                // Guardar cliente en la base de datos
-                const result = await pool.query("INSERT INTO clientes (codigo, cedula, nombreCliente, emailCliente, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?)", [codigo, cedula, nombreCliente, emailCliente, telefono, direccion]);
-                // Crear el token
-                const token = await createAccessToken({ id: result.insertId });
-                // Responder al frontend
-                res.cookie("token", token);
-                res.json({
-                    message: "Cliente creado",
-                    idCliente: result.insertId,
-                    codigo,
-                    cedula,
-                    nombreCliente,
-                    emailCliente,
-                    telefono,
-                    direccion
-                });
-            }
-        }
+  const {
+    codigo,
+    tipoId,
+    numeroId,
+    nombreCliente,
+    emailCliente,
+    telefono,
+    direccion,
+  } = req.body;
 
+  // Validar campos obligatorios
+  if (
+    !codigo ||
+    !tipoId ||
+    !numeroId ||
+    !nombreCliente ||
+    !emailCliente ||
+    !telefono ||
+    !direccion
+  ) {
+    return res
+      .status(400)
+      .json(["Todos los campos son obligatorios"]);
+  } else {
+    try {
+      // Verificar si el cliente ya existe con tipoId y numeroId
+      const [rows] = await pool.query(
+        "SELECT * FROM clientes WHERE tipoId = ? AND numeroId = ?",
+        [tipoId, numeroId]
+      );
+      if (rows.length > 0) {
+        console.log("El cliente ya existe");
+
+        return res.status(400).json(["El cliente ya existe"]);
+
+      } else {
+        // verificar el codigo no existe
+        const [rows] = await pool.query(
+          "SELECT * FROM clientes WHERE codigo = ?",
+          [codigo]
+        );
+        if (rows.length > 0) {
+          return res.status(400).json(["El codigo ya existe"]);
+        } else {
+          // Guardar cliente en la base de datos
+          const result = await pool.query(
+            "INSERT INTO clientes (codigo, tipoId, numeroId, nombreCliente, emailCliente, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+              codigo,
+              tipoId,
+              numeroId,
+              nombreCliente,
+              emailCliente,
+              telefono,
+              direccion,
+            ]
+          );
+
+          // Crear el token
+          const token = await createAccessToken({ id: result.insertId });
+          // responder al frontend
+          res.cookie("token", token);
+          res.json({
+            message: "Cliente creado",
+            id: result.insertId,
+          });
+        }
+      }
     } catch (error) {
-        console.log(error);
+        console.log("error en catch", error);
         res.status(500).json({ message: error.message });
     }
-
+  }
 };
-
