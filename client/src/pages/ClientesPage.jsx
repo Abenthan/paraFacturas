@@ -1,16 +1,15 @@
 import { useClientes } from "../context/ClientesContext";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function ClientesPage() {
   const { getClientes, clientes } = useClientes();
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Obtener los clientes al cargar la página
   useEffect(() => {
     getClientes();
   }, []);
 
-  // Filtrar clientes según el término de búsqueda
   const filteredClientes = clientes.filter((cliente) => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -22,15 +21,22 @@ function ClientesPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
-      {/* Barra de búsqueda */}
-      <div className="max-w-4xl mx-auto mb-6">
+      {/* Barra superior con búsqueda y botón de nuevo cliente */}
+      <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center">
         <input
           type="text"
           placeholder="Buscar por código, identificación o nombre..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-2/3 px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        
+        <Link
+          to="/nuevoCliente"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300"
+        >
+          Nuevo Cliente
+        </Link>
       </div>
 
       {/* Tabla de clientes */}
@@ -40,9 +46,9 @@ function ClientesPage() {
             <tr>
               <th className="px-4 py-3 text-left text-white">Código</th>
               <th className="px-4 py-3 text-left text-white">Identificación</th>
-              <th className="px-4 py-3 text-left text-white">Nombre del Cliente</th>
+              <th className="px-4 py-3 text-left text-white">Nombre</th>
               <th className="px-4 py-3 text-left text-white">Teléfono</th>
-              <th className="px-4 py-3 text-left text-white">Dirección</th>
+              <th className="px-4 py-3 text-left text-white">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -55,7 +61,14 @@ function ClientesPage() {
                 <td className="px-4 py-3 text-white">{cliente.numeroId}</td>
                 <td className="px-4 py-3 text-white">{cliente.nombreCliente}</td>
                 <td className="px-4 py-3 text-white">{cliente.telefono}</td>
-                <td className="px-4 py-3 text-white">{cliente.direccion}</td>
+                <td className="px-4 py-3 text-white">
+                  <Link
+                    to={`/editar-cliente/${cliente.idCliente}`}
+                    className="text-yellow-400 hover:text-yellow-300"
+                  >
+                    Editar
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

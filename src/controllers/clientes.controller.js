@@ -86,3 +86,19 @@ export const createCliente = async (req, res) => {
     }
   }
 };
+
+export const getCliente = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM clientes WHERE idCliente = ?",
+      [id]
+    );
+    if (rows.length <= 0) return res.status(404).json({ message: "Cliente no encontrado" });
+    res.json(rows[0]);
+  } catch (error) {
+    console.log("error en catch getCliente", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+

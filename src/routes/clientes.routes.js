@@ -3,12 +3,18 @@ import { authRequired } from "../middlewares/validateToken.js";
 import {
   getClientes,
   createCliente,
+  getCliente
 } from "../controllers/clientes.controller.js";
 const router = Router();
 
-router.get("/clientes", getClientes);
+//clientes
+router.get("/clientes", authRequired, getClientes);
 
-router.post("/nuevoCliente", createCliente);
+//nuevocliente 
+router.post("/nuevoCliente", authRequired, createCliente);
+
+//cliente
+router.get("/cliente/:id", getCliente);
 
 export default router;
 
