@@ -88,6 +88,7 @@ export const createCliente = async (req, res) => {
 };
 
 export const getCliente = async (req, res) => {
+  console.log("hasta aqui vamos bien");
   const { id } = req.params;
   try {
     const [rows] = await pool.query(

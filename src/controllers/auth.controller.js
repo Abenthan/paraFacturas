@@ -121,6 +121,7 @@ export const verifyToken = async (req, res) => {
       if (rows.length === 0) {
         return res.status(401).json({ message: "¡Desautorizado!, Usuario no encontrado" });
       } else {
+        console.log({message: "usuario autoriazado!"});
         return res.json({
           id: rows[0].idUsuario,
           username: rows[0].username,

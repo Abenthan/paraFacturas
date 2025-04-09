@@ -9,6 +9,8 @@ import RegisterPage from "./pages/RegisterPage";
 import Navbar from "./components/Navbar";
 import NuevoClientePage from "./pages/NuevoClientePage";
 import ClientesPage from "./pages/ClientesPage";
+import ClientePage from "./pages/ClientePage";
+import ProductosPage from "./pages/ProductosPage";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/nuevoCliente" element={<NuevoClientePage />} />
             <Route path="/clientes" element={<ClientesPage />} />
+            <Route path="/cliente/:id" element={<ClientePage />} />
+            <Route path="/productos" element={<ProductosPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<HomePage />} />

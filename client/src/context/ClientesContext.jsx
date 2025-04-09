@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import {
   createClienteRequest,
   getClientesRequest,
+  getClienteRequest,
 } from "../api/clientesApi.js";
 
 export const ClientesContext = createContext();
@@ -28,6 +29,15 @@ export const ClientesProvider = ({ children }) => {
     }
   };
 
+  const getCliente = async (id) => {
+    try {
+      const res = await getClienteRequest(id);
+      return res.data;
+    } catch (error) {
+      console.error("Error Catch en getCliente: ", error);
+    }
+  };
+
   const newCliente = async (cliente) => {
     try {
       const res = await createClienteRequest(clientes);
@@ -40,7 +50,9 @@ export const ClientesProvider = ({ children }) => {
   };
 
   return (
-    <ClientesContext.Provider value={{ clientes, getClientes, newCliente }}>
+    <ClientesContext.Provider
+      value={{ clientes, getClientes, getCliente, newCliente }}
+    >
       {children}
     </ClientesContext.Provider>
   );

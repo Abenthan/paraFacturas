@@ -63,7 +63,7 @@ function ClientesPage() {
                 <td className="px-4 py-3 text-white">{cliente.telefono}</td>
                 <td className="px-4 py-3 text-white">
                   <Link
-                    to={`/editar-cliente/${cliente.idCliente}`}
+                    to={`/cliente/${cliente.idCliente}`}
                     className="text-yellow-400 hover:text-yellow-300"
                   >
                     Editar

@@ -21,7 +21,7 @@ function NuevoClientePage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="bg-zinc-800 max-w-md w-full p-8 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold text-center text-white mb-6">
-          Registro de Cliente
+          Nuevo Cliente
         </h1>
 
         {/* Mensaje de éxito */}

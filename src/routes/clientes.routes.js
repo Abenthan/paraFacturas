@@ -8,7 +8,7 @@ import {
 const router = Router();
 
 //clientes
-router.get("/clientes", authRequired, getClientes);
+router.get("/clientes", getClientes);
 
 //nuevocliente 
 router.post("/nuevoCliente", authRequired, createCliente);
