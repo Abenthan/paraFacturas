@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ClientesProvider } from "./context/ClientesContext";
+import { ProductosProvider } from "./context/ProductosContext";
 
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -16,22 +17,24 @@ function App() {
   return (
     <AuthProvider>
       <ClientesProvider>
-        <BrowserRouter>
-          <Navbar />
+        <ProductosProvider>
+          <BrowserRouter>
+            <Navbar />
 
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/nuevoCliente" element={<NuevoClientePage />} />
-            <Route path="/clientes" element={<ClientesPage />} />
-            <Route path="/cliente/:id" element={<ClientePage />} />
-            <Route path="/productos" element={<ProductosPage />} />
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/nuevoCliente" element={<NuevoClientePage />} />
+              <Route path="/clientes" element={<ClientesPage />} />
+              <Route path="/cliente/:id" element={<ClientePage />} />
+              <Route path="/productos" element={<ProductosPage />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<HomePage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<HomePage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ProductosProvider>
       </ClientesProvider>
     </AuthProvider>
   );

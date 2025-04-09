@@ -1,4 +1,5 @@
 import { pool } from "../db.js";
+
 export const createProducto = async (req, res) => {
     const { nombreProducto, precioProducto } = req.body;
 
@@ -19,3 +20,13 @@ export const createProducto = async (req, res) => {
         }
     }
 };
+
+export const getProductos = async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM productos");
+        return res.status(200).json(rows);
+    } catch (error) {
+        console.log("error en catch de getProductos", error);
+        return res.status(500).json("Error Catch en getProductos", error.message);
+    }
+}
