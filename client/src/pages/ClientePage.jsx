@@ -45,6 +45,8 @@ function ClientePage() {
   return (
     <div className="min-h-screen bg-gray-900 p-6">
       {/* Enlaces de navegación */}
+
+      {/* Enlace para volver al listado */}
       <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center">
         <Link
           to="/clientes"
@@ -65,13 +67,16 @@ function ClientePage() {
           Volver al listado
         </Link>
 
+        {/* Enlace para Suscripciones */}
         <div className="flex gap-4">
           <Link
-            to={`/clientes/${params.id}/suscripciones`}
+            to={`/Suscripciones/${params.id}`}
             className="text-purple-400 hover:text-purple-300 font-medium"
           >
             Suscripciones
           </Link>
+
+          {/* Enlace para Estado de cuenta */}
           <Link
             to={`/clientes/${params.id}/estado-cuenta`}
             className="text-blue-400 hover:text-blue-300 font-medium"

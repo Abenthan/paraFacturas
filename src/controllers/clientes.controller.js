@@ -6,7 +6,7 @@ export const getClientes = async (req, res) => {
     const [rows] = await pool.query("SELECT * FROM clientes");
     res.json(rows);
   } catch (error) {
-    console.log("error en catch", error);
+    console.log("error en catch de getClientes", error);
     res.status(500).json("Error Catch en getClientes: " + error.message);
   }
 };
