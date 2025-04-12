@@ -12,7 +12,6 @@ function NuevoClientePage() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log("Datos del cliente:", data);
     setSuccessMessage("Cliente registrado exitosamente!");
     newCliente(data);
   });

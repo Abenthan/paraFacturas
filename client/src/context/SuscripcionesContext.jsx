@@ -31,6 +31,7 @@ export const SuscripcionesProvider = ({ children }) => {
       console.error("Error fetching suscripciones:", error);
     }
   };
+  
 
   const getSuscripcion = async (id) => {
     try {

@@ -14,6 +14,8 @@ import ClientesPage from "./pages/ClientesPage";
 import ClientePage from "./pages/ClientePage";
 import ProductosPage from "./pages/ProductosPage";
 import SuscripcionesPage from "./pages/SuscripcionesPage";
+import SuscripcionPage from "./pages/SuscripcionPage";
+import CrearSuscripcionPage from "./pages/CrearSuscripcionPage";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
                 <Route path="/cliente/:id" element={<ClientePage />} />
                 <Route path="/productos" element={<ProductosPage />} />
                 <Route path="/suscripciones/:id" element={<SuscripcionesPage />} />
+                <Route path="/crearSuscripcion/:id" element={<CrearSuscripcionPage />} />
+                <Route path="/suscripcion/:id" element={<SuscripcionPage />} />
 
                 <Route element={<ProtectedRoute />}>
                   <Route path="/" element={<HomePage />} />

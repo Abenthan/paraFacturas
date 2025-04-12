@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
 import clientesRoutes from './routes/clientes.routes.js';
 import productosRoutes from './routes/productos.routes.js';
+import suscripcionesRoutes from './routes/suscripciones.routes.js';
 
 
 const app = express();
@@ -23,5 +24,6 @@ app.use(cookieParser());
 app.use("/api", authRoutes);
 app.use("/api", clientesRoutes);
 app.use("/api", productosRoutes);
+app.use("/api", suscripcionesRoutes);
 
 export default app;
