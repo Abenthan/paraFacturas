@@ -3,7 +3,8 @@ import { authRequired } from "../middlewares/validateToken.js";
 import {
   getClientes,
   createCliente,
-  getCliente
+  getCliente,
+  updateCliente,
 } from "../controllers/clientes.controller.js";
 const router = Router();
 
@@ -15,6 +16,9 @@ router.post("/nuevoCliente", authRequired, createCliente);
 
 //cliente
 router.get("/cliente/:id", getCliente);
+
+//actualizar cliente
+router.put("/cliente/:id", authRequired, updateCliente);
 
 export default router;
 

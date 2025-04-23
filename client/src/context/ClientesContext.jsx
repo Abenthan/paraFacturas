@@ -3,6 +3,7 @@ import {
   createClienteRequest,
   getClientesRequest,
   getClienteRequest,
+  updateClienteRequest,
 } from "../api/clientesApi.js";
 
 export const ClientesContext = createContext();
@@ -51,6 +52,16 @@ export const ClientesProvider = ({ children }) => {
     }
   };
 
+  const updateCliente = async (id, cliente) => {
+    try {
+      const res = await updateClienteRequest(id, cliente);
+      setCliente(res.data);
+      console.log("Cliente actualizado:", res.data);
+    } catch (error) {
+      console.error("Error Catch en updateCliente: ", error);
+    }
+  };
+
   return (
     <ClientesContext.Provider
       value={{
@@ -60,6 +71,7 @@ export const ClientesProvider = ({ children }) => {
         getClientes,
         getCliente,
         newCliente,
+        updateCliente,
       }}
     >
       {children}

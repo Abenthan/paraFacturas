@@ -103,3 +103,37 @@ export const getCliente = async (req, res) => {
   }
 }
 
+export const updateCliente = async (req, res) => {
+  const { id } = req.params;
+  const {
+    codigo,
+    tipoId,
+    numeroId,
+    nombreCliente,
+    emailCliente,
+    telefono,
+    direccion,
+  } = req.body;
+
+  try {
+    const [result] = await pool.query(
+      "UPDATE clientes SET codigo = ?, tipoId = ?, numeroId = ?, nombreCliente = ?, emailCliente = ?, telefono = ?, direccion = ? WHERE idCliente = ?",
+      [
+        codigo,
+        tipoId,
+        numeroId,
+        nombreCliente,
+        emailCliente,
+        telefono,
+        direccion,
+        id,
+      ]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Cliente no encontrado" });
+    res.json({ message: "Cliente actualizado" });
+  } catch (error) {
+    console.log("error en catch updateCliente", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
