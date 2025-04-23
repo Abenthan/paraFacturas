@@ -6,26 +6,31 @@ import { useParams, Link } from "react-router-dom";
 function Suscripciones() {
   const params = useParams();
   const { getCliente } = useClientes();
+  const { getSuscripciones, suscripciones } = useSuscripciones();
   const [cliente, setCliente] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { getSuscripciones, suscripciones } = useSuscripciones();
 
+  // Cargar cliente y suscripciones en paralelo
   useEffect(() => {
-    async function loadCliente() {
+    async function loadData() {
       if (params.id) {
         try {
-          const clienteData = await getCliente(params.id);
+          const [clienteData] = await Promise.all([
+            getCliente(params.id),
+            getSuscripciones(params.id),
+          ]);
+
           if (clienteData) {
             setCliente(clienteData);
           }
         } catch (error) {
-          console.error("Error al cargar el cliente:", error);
+          console.error("Error al cargar datos:", error);
         } finally {
           setLoading(false);
         }
       }
     }
-    loadCliente();
+    loadData();
   }, [params.id]);
 
   if (loading) {
@@ -43,7 +48,6 @@ function Suscripciones() {
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
@@ -64,7 +68,7 @@ function Suscripciones() {
           </Link>
         </div>
 
-        <p className="text-gray-300">Suscripciónes de:</p>
+        <p className="text-gray-300">Suscripciones de:</p>
         <h2 className="text-2xl font-bold text-white mb-4">
           {cliente.nombreCliente}
         </h2>
@@ -80,6 +84,52 @@ function Suscripciones() {
                 <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
+            <tbody>
+              {suscripciones && suscripciones.length > 0 ? (
+                suscripciones.map((suscripcion) => (
+                  <tr
+                    key={suscripcion.id}
+                    className="border-b border-zinc-700 hover:bg-zinc-700"
+                  >
+                    <td className="px-4 py-3">{suscripcion.producto}</td>
+                    <td className="px-4 py-3">
+                      {suscripcion.direccionServicio}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          suscripcion.estado === "Activa"
+                            ? "bg-green-900 text-green-300"
+                            : "bg-red-900 text-red-300"
+                        }`}
+                      >
+                        {suscripcion.estado}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        to={`/editarSuscripcion/${suscripcion.id}`}
+                        className="text-blue-400 hover:text-blue-300 mr-2"
+                      >
+                        Editar
+                      </Link>
+                      <button className="text-red-400 hover:text-red-300">
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="px-4 py-3 text-center text-gray-400"
+                  >
+                    No hay suscripciones registradas
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
       </div>

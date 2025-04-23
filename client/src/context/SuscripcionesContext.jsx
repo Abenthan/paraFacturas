@@ -27,6 +27,7 @@ export const SuscripcionesProvider = ({ children }) => {
     try {
       const response = await getSuscripcionesRequest(id);
       setSuscripciones(response.data);
+      console.log("Suscripciones: ", suscripciones);
     } catch (error) {
       console.error("Error fetching suscripciones:", error);
     }

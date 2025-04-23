@@ -18,6 +18,7 @@ export const useClientes = () => {
 
 export const ClientesProvider = ({ children }) => {
   const [clientes, setClientes] = useState([]);
+  const [cliente, setCliente] = useState({});
 
   const getClientes = async () => {
     try {
@@ -32,7 +33,8 @@ export const ClientesProvider = ({ children }) => {
   const getCliente = async (id) => {
     try {
       const res = await getClienteRequest(id);
-      return res.data;
+      setCliente(res.data);
+      console.log("Cliente obtenido:", cliente);
     } catch (error) {
       console.error("Error Catch en getCliente: ", error);
     }
@@ -40,7 +42,7 @@ export const ClientesProvider = ({ children }) => {
 
   const newCliente = async (cliente) => {
     try {
-      const res = await createClienteRequest(clientes);
+      const res = await createClienteRequest(cliente);
       setClientes(res.data);
 
       console.log("Cliente creado:", res.data);
@@ -51,7 +53,14 @@ export const ClientesProvider = ({ children }) => {
 
   return (
     <ClientesContext.Provider
-      value={{ clientes, getClientes, getCliente, newCliente }}
+      value={{
+        clientes,
+        cliente,
+        setCliente,
+        getClientes,
+        getCliente,
+        newCliente,
+      }}
     >
       {children}
     </ClientesContext.Provider>

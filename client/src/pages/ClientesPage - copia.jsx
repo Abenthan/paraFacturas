@@ -1,29 +1,23 @@
 import { useClientes } from "../context/ClientesContext";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function ClientesPage() {
-  const { getClientes, clientes, setCliente } = useClientes();
+  const { getClientes, clientes } = useClientes();
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     getClientes();
   }, []);
 
-  const filteredClientes = clientes.filter((clienteDatos) => {
+  const filteredClientes = clientes.filter((cliente) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      clienteDatos.codigo.toLowerCase().includes(searchLower) ||
-      clienteDatos.numeroId.toLowerCase().includes(searchLower) ||
-      clienteDatos.nombreCliente.toLowerCase().includes(searchLower)
+      cliente.codigo.toLowerCase().includes(searchLower) ||
+      cliente.numeroId.toLowerCase().includes(searchLower) ||
+      cliente.nombreCliente.toLowerCase().includes(searchLower)
     );
   });
-
-  const handleEditar = (clienteDatos) => {
-    setCliente(clienteDatos);
-    navigate(`/cliente/${clienteDatos.idCliente}`);
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
@@ -36,7 +30,7 @@ function ClientesPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-2/3 px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
+        
         <Link
           to="/nuevoCliente"
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300"
@@ -58,28 +52,22 @@ function ClientesPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredClientes.map((clienteDatos) => (
+            {filteredClientes.map((cliente) => (
               <tr
-                key={clienteDatos.idCliente}
+                key={cliente.idCliente}
                 className="border-b border-zinc-700 hover:bg-zinc-700 transition duration-300"
               >
-                <td className="px-4 py-3 text-white">{clienteDatos.codigo}</td>
+                <td className="px-4 py-3 text-white">{cliente.codigo}</td>
+                <td className="px-4 py-3 text-white">{cliente.numeroId}</td>
+                <td className="px-4 py-3 text-white">{cliente.nombreCliente}</td>
+                <td className="px-4 py-3 text-white">{cliente.telefono}</td>
                 <td className="px-4 py-3 text-white">
-                  {clienteDatos.numeroId}
-                </td>
-                <td className="px-4 py-3 text-white">
-                  {clienteDatos.nombreCliente}
-                </td>
-                <td className="px-4 py-3 text-white">
-                  {clienteDatos.telefono}
-                </td>
-                <td className="px-4 py-3 text-white">
-                  <button
-                    onClick={() => handleEditar(clienteDatos)}
+                  <Link
+                    to={`/cliente/${cliente.idCliente}`}
                     className="text-yellow-400 hover:text-yellow-300"
                   >
                     Editar
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))}

@@ -39,10 +39,6 @@ function CrearSuscripcionPage() {
     loadCliente();
   }, [params.id]);
 
-  useEffect(() => {
-    getProductos();
-  }, []);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -58,6 +54,11 @@ function CrearSuscripcionPage() {
       </div>
     );
   }
+
+  useEffect(() => {
+    getProductos();
+  }, []);
+
   const onSubmit = handleSubmit(async (data) => {
     // confirmacion
     const confirmacion = window.confirm(
