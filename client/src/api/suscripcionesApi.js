@@ -1,8 +1,8 @@
 import axios from "./axios.js";
 
 export const getSuscripcionesRequest = (id) =>
-  axios.get(`/suscripcion/${id}`);
-export const getSuscripcionRequest = (id) => axios.get(`/suscripcion/${id}`);
+  axios.get(`/suscripciones/${id}`);
+export const getSuscripcionRequest = (id) => axios.get(`/suscripciones/${id}`);
 
 export const createSuscripcionRequest = (suscripcion) =>
   axios.post(`/suscripcion`, suscripcion);

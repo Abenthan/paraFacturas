@@ -5,45 +5,25 @@ import { useParams, Link } from "react-router-dom";
 
 function Suscripciones() {
   const params = useParams();
-  const { getCliente } = useClientes();
-  const [cliente, setCliente] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { cliente } = useClientes();
   const { getSuscripciones, suscripciones } = useSuscripciones();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadCliente() {
-      if (params.id) {
-        try {
-          const clienteData = await getCliente(params.id);
-          if (clienteData) {
-            setCliente(clienteData);
-          }
-        } catch (error) {
-          console.error("Error al cargar el cliente:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }
-    loadCliente();
-  }, [params.id]);
+    const fetchSuscripciones = async () => {
+      await getSuscripciones(params.id);
+      setLoading(false);
+    };
+    fetchSuscripciones();
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        Cargando información del cliente...
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Cargando suscripciones...</div>
       </div>
     );
   }
-
-  if (!cliente) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        No se encontró el cliente solicitado.
-      </div>
-    );
-  }
-
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
@@ -64,9 +44,9 @@ function Suscripciones() {
           </Link>
         </div>
 
-        <p className="text-gray-300">Suscripciónes de:</p>
+        <p className="text-gray-300">Suscripciones de:</p>
         <h2 className="text-2xl font-bold text-white mb-4">
-          {cliente.nombreCliente}
+          {cliente?.nombreCliente}
         </h2>
 
         {/* Tabla de suscripciones */}
@@ -80,6 +60,52 @@ function Suscripciones() {
                 <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
+            <tbody>
+              {suscripciones.length > 0 ? (
+                suscripciones.map((suscripcion) => (
+                  <tr 
+                    key={suscripcion.idSuscripcion} 
+                    className="border-b border-zinc-700 hover:bg-zinc-700/50"
+                  >
+                    <td className="px-4 py-3">{suscripcion.nombreProducto}</td>
+                    <td className="px-4 py-3">{suscripcion.direccionServicio}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        suscripcion.estado === 'Activa' 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : suscripcion.estado === 'Pendiente'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-red-500/20 text-red-400'
+                      }`}>
+                        {suscripcion.estado}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex space-x-2">
+                        <Link
+                          to={`/editar-suscripcion/${suscripcion.idSuscripcion}`}
+                          className="text-blue-400 hover:text-blue-300"
+                        >
+                          Editar
+                        </Link>
+                        <button
+                          className="text-red-400 hover:text-red-300"
+                          onClick={() => console.log('Eliminar', suscripcion.idSuscripcion)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-4 py-6 text-center text-gray-400">
+                    No hay suscripciones registradas para este cliente
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
       </div>

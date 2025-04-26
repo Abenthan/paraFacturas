@@ -4,19 +4,27 @@ import { pool } from "../db.js";
 export const getSuscripciones = async (req, res) => {
   try {
     const { id } = req.params;
+
     const consulta = `SELECT s.*, c.nombreCliente, p.nombreProducto
-    FROM suscripciones s
+    FROM suscripciones s 
     JOIN clientes c ON s.cliente_id = c.idCliente
-    JOIN productos p ON s.producto:id = p.idProducto
+    JOIN productos p ON s.producto_id = p.idProducto
     WHERE s.cliente_id = ?`;
+    //const consulta = `SELECT s.*, c.nombreCliente, p.nombreProducto
+    //FROM suscripciones s
+    //JOIN clientes c ON s.cliente_id = c.idCliente
+    //JOIN productos p ON s.producto_id = p.idProducto
+    //WHERE s.cliente_id = ?`;
 
     const [rows] = await pool.query(consulta, [id]);
+    //console.log("rows", rows);
+
     return res.status(200).json(rows);
   } catch (error) {
     console.log("error en catch de getSuscripciones", error);
-    return res
-      .status(500)
-      .json("Error Catch en getSuscripciones", error.message);
+    return res;
+    console.log("error en catch de getSuscripciones", error);
+    res.status(500).json("Error Catch en getSuscripciones: " + error.message);
   }
 };
 
@@ -74,11 +82,9 @@ export const createSuscripcion = async (req, res) => {
       .json({ message: "Suscripción creada", id: result.insertId });
   } catch (error) {
     console.log("error en catch de createSuscripcion", error);
-    return res
-      .status(500)
-      .json({
-        message: "Error Catch en createSuscripcion",
-        error: error.message,
-      });
+    return res.status(500).json({
+      message: "Error Catch en createSuscripcion",
+      error: error.message,
+    });
   }
 };

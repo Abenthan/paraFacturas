@@ -112,7 +112,7 @@ function ClientePage() {
                   className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Seleccionar...</option>
-                  <option value="Cédula">Cédula</option>
+                  <option value="Cedula">Cédula</option>
                   <option value="NIT">NIT</option>
                   <option value="Pasaporte">Pasaporte</option>
                 </select>

@@ -14,13 +14,14 @@ function CrearSuscripcionPage() {
   } = useForm();
 
   const params = useParams();
-  const { getCliente } = useClientes();
+  const { getCliente, cliente, setCliente } = useClientes();
   const { productos, getProductos } = useProductos();
   const { createSuscripcion } = useSuscripciones();
-  const [cliente, setCliente] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Hook para cargar el cliente
   useEffect(() => {
     async function loadCliente() {
       if (params.id) {
@@ -37,7 +38,12 @@ function CrearSuscripcionPage() {
       }
     }
     loadCliente();
-  }, [params.id]);
+  }, []);
+
+  // Hook para cargar los productos
+  useEffect(() => {
+    getProductos();
+  }, []);
 
   if (loading) {
     return (
@@ -55,12 +61,7 @@ function CrearSuscripcionPage() {
     );
   }
 
-  useEffect(() => {
-    getProductos();
-  }, []);
-
   const onSubmit = handleSubmit(async (data) => {
-    // confirmacion
     const confirmacion = window.confirm(
       `¿Está seguro que desea crear la suscripción para ${cliente.nombreCliente}?`
     );
@@ -128,7 +129,7 @@ function CrearSuscripcionPage() {
             )}
           </div>
 
-          {/* direccionServicio */}
+          {/* Dirección del servicio */}
           <div>
             <label
               htmlFor="direccionServicio"

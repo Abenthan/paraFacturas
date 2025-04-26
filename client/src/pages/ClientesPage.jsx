@@ -76,7 +76,7 @@ function ClientesPage() {
                 <td className="px-4 py-3 text-white">
                   <button
                     onClick={() => handleEditar(clienteDatos)}
-                    className="text-yellow-400 hover:text-yellow-300"
+                    className="text-yellow-400 hover:text-yellow-300 hover:underline cursor-pointer transition duration-300"
                   >
                     Editar
                   </button>
