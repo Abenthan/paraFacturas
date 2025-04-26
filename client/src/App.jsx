@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ClientesProvider } from "./context/ClientesContext";
 import { ProductosProvider } from "./context/ProductosContext";
 import { SuscripcionesProvider } from "./context/SuscripcionesContext";
+import { FacturacionProvider } from "./context/FacturacionContext.jsx";
 
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -16,6 +17,8 @@ import ProductosPage from "./pages/ProductosPage";
 import SuscripcionesPage from "./pages/SuscripcionesPage";
 import SuscripcionPage from "./pages/SuscripcionPage";
 import CrearSuscripcionPage from "./pages/CrearSuscripcionPage";
+import FacturacionPage from "./pages/FacturacionPage.jsx";
+import PrefacturacionPage from "./pages/PrefacturacionPage.jsx";
 
 function App() {
   return (
@@ -23,25 +26,41 @@ function App() {
       <ClientesProvider>
         <ProductosProvider>
           <SuscripcionesProvider>
-            <BrowserRouter>
-              <Navbar />
+            <FacturacionProvider>
+              <BrowserRouter>
+                <Navbar />
 
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/nuevoCliente" element={<NuevoClientePage />} />
-                <Route path="/clientes" element={<ClientesPage />} />
-                <Route path="/cliente/:id" element={<ClientePage />} />
-                <Route path="/productos" element={<ProductosPage />} />
-                <Route path="/suscripciones/:id" element={<SuscripcionesPage />} />
-                <Route path="/crearSuscripcion/:id" element={<CrearSuscripcionPage />} />
-                <Route path="/suscripcion/:id" element={<SuscripcionPage />} />
+                <Routes>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/nuevoCliente" element={<NuevoClientePage />} />
+                  <Route path="/clientes" element={<ClientesPage />} />
+                  <Route path="/cliente/:id" element={<ClientePage />} />
+                  <Route path="/productos" element={<ProductosPage />} />
+                  <Route
+                    path="/suscripciones/:id"
+                    element={<SuscripcionesPage />}
+                  />
+                  <Route
+                    path="/crearSuscripcion/:id"
+                    element={<CrearSuscripcionPage />}
+                  />
+                  <Route
+                    path="/suscripcion/:id"
+                    element={<SuscripcionPage />}
+                  />
+                  <Route path="/facturacion" element={<FacturacionPage />} />
+                  <Route
+                    path="/prefacturacion"
+                    element={<PrefacturacionPage />}
+                  />
 
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<HomePage />} />
-                </Route>
-              </Routes>
-            </BrowserRouter>
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/" element={<HomePage />} />
+                  </Route>
+                </Routes>
+              </BrowserRouter>
+            </FacturacionProvider>
           </SuscripcionesProvider>
         </ProductosProvider>
       </ClientesProvider>

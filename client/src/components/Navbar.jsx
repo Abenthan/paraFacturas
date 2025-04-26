@@ -65,10 +65,10 @@ function Navbar() {
               <ul className="absolute hidden bg-zinc-700 rounded-lg py-2 px-4 space-y-2 group-hover:block">
                 <li>
                   <Link
-                    to="/facturas"
+                    to="/facturacion"
                     className="text-white hover:text-blue-500 transition duration-300"
                   >
-                    Facturas
+                    Facturación
                   </Link>
                 </li>
                 <li>
