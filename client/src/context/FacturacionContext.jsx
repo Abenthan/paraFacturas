@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getFacturasRequest } from "../api/facturacionApi";
+import {
+  getFacturasRequest,
+  getPrefacturacionRequest,
+} from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
 
@@ -12,24 +15,43 @@ export const useFacturacion = () => {
 };
 
 export const FacturacionProvider = ({ children }) => {
-    const [facturas, setFacturas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    const getFacturas = async (filtro) => {
-        try {
-        const res = await getFacturasRequest(filtro);
-        setFacturas(res.data);
-        } catch (error) {
-        console.error("Error al obtener las facturas:", error);
-        } finally {
-        setLoading(false);
-        }
-    };
-    
-    return (
-        <FacturacionContext.Provider value={{ facturas, loading, getFacturas }}>
-        {children}
-        </FacturacionContext.Provider>
-    );
-    };
+  const [facturas, setFacturas] = useState([]);
+  const [prefacturacionRegistros, setPrefacturacionRegistros] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const getFacturas = async (filtro) => {
+    try {
+      const res = await getFacturasRequest(filtro);
+      setFacturas(res.data);
+    } catch (error) {
+      console.error("Error al obtener las facturas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const obtenerRegistrosPrefacturacion = async (year, mes) => {
+    try {
+      const res = await getPrefacturacionRequest(year, mes);
+      setPrefacturacionRegistros(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener los registros de prefacturación:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  };
+
+  return (
+    <FacturacionContext.Provider
+      value={{
+        facturas,
+        loading,
+        getFacturas,
+        prefacturacionRegistros,
+        obtenerRegistrosPrefacturacion,
+      }}
+    >
+      {children}
+    </FacturacionContext.Provider>
+  );
+};

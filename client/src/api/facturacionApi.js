@@ -7,3 +7,15 @@ export const getFacturasRequest = async (year, mes) =>
       mes,
     },
   });
+
+export const getPrefacturacionRequest = async (year, mes) =>
+  await axios.get("/prefacturacion", {
+    params: {
+      year,
+      mes,
+    },
+  });
+  
+
+
+

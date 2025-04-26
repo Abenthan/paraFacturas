@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFacturacion } from "../context/FacturacionContext"; // Asumimos que vas a usar este context
+import { useFacturacion } from "../context/FacturacionContext";
 import { useNavigate } from "react-router-dom";
 
 function PrefacturacionPage() {
@@ -30,7 +30,7 @@ function PrefacturacionPage() {
     if (seleccionados.length === registros.length) {
       setSeleccionados([]);
     } else {
-      setSeleccionados(registros.map((r) => r.idSuscripcion)); // o el id que manejes
+      setSeleccionados(registros.map((r) => r.idSuscripcion));
     }
   };
 
@@ -57,7 +57,7 @@ function PrefacturacionPage() {
     try {
       await generarFacturas(seleccionados, year, mes);
       alert("Facturación generada exitosamente.");
-      navigate("/facturacion"); // Opcional, volver a la página principal
+      navigate("/facturacion");
     } catch (error) {
       console.error("Error generando facturación:", error);
     } finally {
@@ -66,79 +66,114 @@ function PrefacturacionPage() {
   };
 
   return (
-    <div className="container">
-      <h1>Generar Facturación del Mes</h1>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center">Generar Facturación del Mes</h1>
 
       {/* Filtros */}
-      <div>
-        <select value={year} onChange={(e) => setYear(e.target.value)}>
+      <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-8">
+        <select
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+
+        >
           <option value="">Seleccione Año</option>
           <option value="2024">2024</option>
           <option value="2025">2025</option>
-          {/* Más años si quieres */}
         </select>
 
-        <select value={mes} onChange={(e) => setMes(e.target.value)}>
+      
+
+        <select
+          value={mes}
+          onChange={(e) => setMes(e.target.value)}
+          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+
+        >
           <option value="">Seleccione Mes</option>
           <option value="01">Enero</option>
           <option value="02">Febrero</option>
-          {/* Más meses */}
+          <option value="03">Marzo</option>
+          <option value="04">Abril</option>
+          <option value="05">Mayo</option>
+          <option value="06">Junio</option>
+          <option value="07">Julio</option>
+          <option value="08">Agosto</option>
+          <option value="09">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
         </select>
 
-        <button onClick={handleBuscar}>Buscar registros para facturar</button>
+        <button
+          onClick={handleBuscar}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Buscar registros
+        </button>
       </div>
 
       {/* Tabla */}
       {loading ? (
-        <p>Cargando...</p>
+        <div className="text-center text-xl">Cargando...</div>
       ) : (
         registros.length > 0 && (
-          <>
-            <table>
-              <thead>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-gray-800 border border-gray-600 rounded-lg shadow">
+              <thead className="bg-gray-700">
                 <tr>
-                  <th>
+                  <th className="p-3 text-left">
                     <input
                       type="checkbox"
                       checked={seleccionados.length === registros.length}
                       onChange={handleSeleccionarTodos}
+                      className="w-4 h-4"
                     />
                   </th>
-                  <th>Cliente</th>
-                  <th>Producto</th>
-                  <th>Dirección</th>
-                  <th>Valor</th>
-                  <th>Estado</th>
+                  <th className="p-3 text-left">Cliente</th>
+                  <th className="p-3 text-left">Producto</th>
+                  <th className="p-3 text-left">Dirección</th>
+                  <th className="p-3 text-left">Valor</th>
+                  <th className="p-3 text-left">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {registros.map((registro) => (
-                  <tr key={registro.idSuscripcion}>
-                    <td>
+                  <tr
+                    key={registro.idSuscripcion}
+                    className="border-t hover:bg-gray-50"
+                  >
+                    <td className="p-3">
                       <input
                         type="checkbox"
                         checked={seleccionados.includes(registro.idSuscripcion)}
-                        onChange={() =>
-                          handleSeleccionar(registro.idSuscripcion)
-                        }
+                        onChange={() => handleSeleccionar(registro.idSuscripcion)}
+                        className="w-4 h-4"
                       />
                     </td>
-                    <td>{registro.nombreCliente}</td>
-                    <td>{registro.nombreProducto}</td>
-                    <td>{registro.direccionServicio}</td>
-                    <td>{registro.valor}</td>
-                    <td>{registro.estado}</td>
+                    <td className="p-3">{registro.nombreCliente}</td>
+                    <td className="p-3">{registro.nombreProducto}</td>
+                    <td className="p-3">{registro.direccionServicio}</td>
+                    <td className="p-3">${registro.valor.toLocaleString()}</td>
+                    <td className="p-3">{registro.estado}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* Resumen y Botón de Facturar */}
-            <div>
-              <p>Registros seleccionados: {seleccionados.length}</p>
-              <button onClick={handleFacturar}>Facturar seleccionados</button>
+            {/* Resumen y botón */}
+            <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+              <p className="text-lg font-semibold">
+                Registros seleccionados: {seleccionados.length}
+              </p>
+              <button
+                onClick={handleFacturar}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+              >
+                Facturar seleccionados
+              </button>
             </div>
-          </>
+          </div>
         )
       )}
     </div>
