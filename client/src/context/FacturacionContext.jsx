@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import {
   getFacturasRequest,
   getPrefacturacionRequest,
+  crearFacturasRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -41,6 +42,16 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
+  const generarFacturas = async (suscripciones, year, mes) => {
+    try {
+      const res = await crearFacturasRequest(suscripciones, year, mes);
+      return res.data;
+    } catch (error) {
+      console.error("Error al generar las facturas:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  };
+
   return (
     <FacturacionContext.Provider
       value={{
@@ -49,6 +60,7 @@ export const FacturacionProvider = ({ children }) => {
         getFacturas,
         prefacturacionRegistros,
         obtenerRegistrosPrefacturacion,
+        generarFacturas,
       }}
     >
       {children}

@@ -15,7 +15,10 @@ export const getPrefacturacionRequest = async (year, mes) =>
       mes,
     },
   });
-  
 
-
-
+export const crearFacturasRequest = async (suscripciones, year, mes) =>
+  await axios.post("/facturas", {
+    suscripciones,
+    year,
+    mes,
+  });
