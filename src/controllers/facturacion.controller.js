@@ -161,9 +161,8 @@ export const crearFacturas = async (req, res) => {
 // Obtener facturas
 export const getFacturas = async (req, res) => {
   try {
-    const { year, mes, estado, cliente } = req.query;
+    const { year, mes, estado, cliente, codigoFactura } = req.query;
 
-    // Armamos condiciones dinámicamente
     const condiciones = [];
     const valores = [];
 
@@ -177,35 +176,39 @@ export const getFacturas = async (req, res) => {
       valores.push(Number(mes));
     }
 
-    if (estado && estado !== "") {
+    if (estado) {
       condiciones.push("f.estado = ?");
       valores.push(estado);
     }
 
-    if (cliente && cliente !== "") {
+    if (cliente) {
       condiciones.push("LOWER(c.nombreCliente) LIKE ?");
       valores.push(`%${cliente.toLowerCase()}%`);
     }
 
-    // Consulta principal con joins
+    if (codigoFactura) {
+      condiciones.push("f.codigoFactura LIKE ?");
+      valores.push(`%${codigoFactura}%`);
+    }
+
     const sql = `
-      SELECT 
-        f.idFactura,
-        f.valor,
-        f.estado,
-        f.year,
-        f.mes,
-        f.codigoFactura,
-        c.nombreCliente,
-        s.direccionServicio,
-        p.nombreProducto
-      FROM facturas f
-      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
-      INNER JOIN clientes c ON s.cliente_id = c.idCliente
-      INNER JOIN productos p ON s.producto_id = p.idProducto
-      ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
-      ORDER BY f.idFactura DESC
-    `;
+        SELECT 
+          f.idFactura,
+          f.codigoFactura,
+          f.valor,
+          f.estado,
+          f.year,
+          f.mes,
+          c.nombreCliente,
+          s.direccionServicio,
+          p.nombreProducto
+        FROM facturas f
+        INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+        INNER JOIN clientes c ON s.cliente_id = c.idCliente
+        INNER JOIN productos p ON s.producto_id = p.idProducto
+        ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
+        ORDER BY f.idFactura DESC
+      `;
 
     const [rows] = await pool.query(sql, valores);
 
