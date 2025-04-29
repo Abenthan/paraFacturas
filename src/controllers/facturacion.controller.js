@@ -270,3 +270,72 @@ export const getFactura = async (req, res) => {
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+// Registrar pago
+export const registrarPago = async (req, res) => {
+  const { idFactura, valorPago } = req.body;
+
+  if (!idFactura || !valorPago || valorPago <= 0) {
+    return res
+      .status(400)
+      .json({ message: "Datos inválidos para registrar el pago." });
+  }
+
+  try {
+    // Verificar si la factura existe
+    const [facturaRows] = await pool.query(
+      "SELECT valor FROM facturas WHERE idFactura = ?",
+      [idFactura]
+    );
+
+    if (facturaRows.length === 0) {
+      return res.status(404).json({ message: "Factura no encontrada." });
+    }
+
+    const valorFactura = Number(facturaRows[0].valor);
+
+    // Calcular total pagado hasta ahora
+    const [pagosRows] = await pool.query(
+      "SELECT SUM(valorPago) AS totalPagado FROM pagos WHERE factura_id = ?",
+      [idFactura]
+    );
+
+    const totalPagado = Number(pagosRows[0].totalPagado) || 0;
+    const saldoPendiente = valorFactura - totalPagado;
+
+    if (valorPago > saldoPendiente) {
+      return res
+        .status(400)
+        .json({ message: "El valor a pagar excede el saldo pendiente." });
+    }
+
+    // Registrar el nuevo pago
+    await pool.query(
+      "INSERT INTO pagos (factura_id, valorPago) VALUES (?, ?)",
+      [idFactura, valorPago]
+    );
+
+    // Actualizar el estado de la factura si es necesario
+    const nuevoTotalPagado = totalPagado + Number(valorPago);
+    let nuevoEstado = "Pendiente por pagar";
+
+    console.log("Nuevo total pagado:", nuevoTotalPagado);
+    console.log("Valor de la factura:", valorFactura);
+
+    if (nuevoTotalPagado >= valorFactura) {
+      nuevoEstado = "Cancelada";
+    } else if (nuevoTotalPagado > 0 && nuevoTotalPagado < valorFactura) {
+      nuevoEstado = "Pago Parcial";
+    }
+
+    await pool.query("UPDATE facturas SET estado = ? WHERE idFactura = ?", [
+      nuevoEstado,
+      idFactura,
+    ]);
+
+    res.json({ message: "Pago registrado con éxito.", nuevoEstado });
+  } catch (error) {
+    console.error("Error al registrar el pago:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
+};

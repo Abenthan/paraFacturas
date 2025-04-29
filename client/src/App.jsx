@@ -21,6 +21,7 @@ import FacturacionPage from "./pages/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/FacturasPage.jsx";
 import FacturaPage from "./pages/FacturaPage.jsx";
+import PagarFacturaPage from "./pages/PagarFacturaPage.jsx";
 
 function App() {
   return (
@@ -58,6 +59,10 @@ function App() {
                   />
                   <Route path="/facturas" element={<FacturasPage />} />
                   <Route path="/factura/:id" element={<FacturaPage />} />
+                  <Route
+                    path="/pagarFactura/:id"
+                    element={<PagarFacturaPage />}
+                  />
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />

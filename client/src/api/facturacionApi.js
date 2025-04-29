@@ -21,3 +21,7 @@ export const crearFacturasRequest = async (suscripciones, year, mes) =>
 export const getFacturaRequest = async (idFactura) =>
   await axios.get(`/factura/${idFactura}`);
 
+export const registrarPagoRequest = async (idFactura, valorPago) =>
+  await axios.post(`/pagarFactura`, { idFactura, valorPago });
+
+

@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
 import { useFacturacion } from "../context/FacturacionContext";
 
 function FacturaPage() {
   const { id } = useParams();
   const { obtenerFactura } = useFacturacion(); // usamos el contexto
+  const navigate = useNavigate();
   const [factura, setFactura] = useState(null);
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +75,9 @@ function FacturaPage() {
             Descargar PDF
           </button>
           <button
+            onClick={() =>
+              puedePagar && navigate(`/pagarFactura/${factura.idFactura}`)
+            }
             disabled={!puedePagar}
             className={`${
               puedePagar
