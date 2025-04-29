@@ -19,6 +19,7 @@ import SuscripcionPage from "./pages/SuscripcionPage";
 import CrearSuscripcionPage from "./pages/CrearSuscripcionPage";
 import FacturacionPage from "./pages/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/PrefacturacionPage.jsx";
+import FacturasPage from "./pages/FacturasPage.jsx";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
                     path="/prefacturacion"
                     element={<PrefacturacionPage />}
                   />
+                  <Route path="/facturas" element={<FacturasPage />} />
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />

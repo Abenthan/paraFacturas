@@ -1,12 +1,7 @@
 import axios from "./axios.js";
 
-export const getFacturasRequest = async (year, mes) =>
-  await axios.get("/facturas", {
-    params: {
-      year,
-      mes,
-    },
-  });
+export const getFacturasRequest = async (filtros) =>
+  await axios.get("/facturas", { params: filtros });
 
 export const getPrefacturacionRequest = async (year, mes) =>
   await axios.get("/prefacturacion", {

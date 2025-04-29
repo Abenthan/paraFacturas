@@ -1,3 +1,4 @@
+import e from "express";
 import { pool } from "../db.js";
 
 // Obtener registros pendientes por facturar
@@ -155,5 +156,63 @@ export const crearFacturas = async (req, res) => {
   } catch (error) {
     console.error("Error generando facturas:", error);
     res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Obtener facturas
+export const getFacturas = async (req, res) => {
+  try {
+    const { year, mes, estado, cliente } = req.query;
+
+    // Armamos condiciones dinámicamente
+    const condiciones = [];
+    const valores = [];
+
+    if (year) {
+      condiciones.push("f.year = ?");
+      valores.push(Number(year));
+    }
+
+    if (mes) {
+      condiciones.push("f.mes = ?");
+      valores.push(Number(mes));
+    }
+
+    if (estado && estado !== "") {
+      condiciones.push("f.estado = ?");
+      valores.push(estado);
+    }
+
+    if (cliente && cliente !== "") {
+      condiciones.push("LOWER(c.nombreCliente) LIKE ?");
+      valores.push(`%${cliente.toLowerCase()}%`);
+    }
+
+    // Consulta principal con joins
+    const sql = `
+      SELECT 
+        f.idFactura,
+        f.valor,
+        f.estado,
+        f.year,
+        f.mes,
+        f.codigoFactura,
+        c.nombreCliente,
+        s.direccionServicio,
+        p.nombreProducto
+      FROM facturas f
+      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      INNER JOIN clientes c ON s.cliente_id = c.idCliente
+      INNER JOIN productos p ON s.producto_id = p.idProducto
+      ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
+      ORDER BY f.idFactura DESC
+    `;
+
+    const [rows] = await pool.query(sql, valores);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error obteniendo facturas:", error);
+    res.status(500).json({ message: "Error al obtener facturas" });
   }
 };

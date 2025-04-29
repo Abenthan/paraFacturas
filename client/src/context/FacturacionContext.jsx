@@ -16,18 +16,15 @@ export const useFacturacion = () => {
 };
 
 export const FacturacionProvider = ({ children }) => {
-  const [facturas, setFacturas] = useState([]);
   const [prefacturacionRegistros, setPrefacturacionRegistros] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const getFacturas = async (filtro) => {
+  const obtenerFacturas = async (filtros) => {
     try {
-      const res = await getFacturasRequest(filtro);
-      setFacturas(res.data);
+      const res = await getFacturasRequest(filtros);
+      return res.data;
     } catch (error) {
       console.error("Error al obtener las facturas:", error);
-    } finally {
-      setLoading(false);
+      throw error; // Propagar el error para manejarlo en el componente
     }
   };
 
@@ -55,10 +52,8 @@ export const FacturacionProvider = ({ children }) => {
   return (
     <FacturacionContext.Provider
       value={{
-        facturas,
-        loading,
-        getFacturas,
         prefacturacionRegistros,
+        obtenerFacturas,
         obtenerRegistrosPrefacturacion,
         generarFacturas,
       }}

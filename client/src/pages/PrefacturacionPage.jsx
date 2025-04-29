@@ -69,7 +69,9 @@ function PrefacturacionPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center text-white">Generar Facturación del Mes</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-white">
+        Generar Facturación del Mes
+      </h1>
 
       {/* Filtros */}
       <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-8">
@@ -149,7 +151,11 @@ function PrefacturacionPage() {
               </thead>
               <tbody>
                 {registros
-                  .filter(r => r.nombreCliente.toLowerCase().includes(buscarCliente.toLowerCase()))
+                  .filter((r) =>
+                    r.nombreCliente
+                      .toLowerCase()
+                      .includes(buscarCliente.toLowerCase())
+                  )
                   .sort((a, b) => {
                     if (ordenAscendente) {
                       return a.nombreCliente.localeCompare(b.nombreCliente);
@@ -158,19 +164,28 @@ function PrefacturacionPage() {
                     }
                   })
                   .map((registro) => (
-                    <tr key={registro.idSuscripcion} className="border-t border-gray-700 hover:bg-gray-800">
+                    <tr
+                      key={registro.idSuscripcion}
+                      className="border-t border-gray-700 hover:bg-gray-800"
+                    >
                       <td className="p-3">
                         <input
                           type="checkbox"
-                          checked={seleccionados.includes(registro.idSuscripcion)}
-                          onChange={() => handleSeleccionar(registro.idSuscripcion)}
+                          checked={seleccionados.includes(
+                            registro.idSuscripcion
+                          )}
+                          onChange={() =>
+                            handleSeleccionar(registro.idSuscripcion)
+                          }
                           className="w-4 h-4"
                         />
                       </td>
                       <td className="p-3">{registro.nombreCliente}</td>
                       <td className="p-3">{registro.nombreProducto}</td>
                       <td className="p-3">{registro.direccionServicio}</td>
-                      <td className="p-3">${registro.valor.toLocaleString()}</td>
+                      <td className="p-3">
+                        ${registro.valor.toLocaleString()}
+                      </td>
                     </tr>
                   ))}
               </tbody>
