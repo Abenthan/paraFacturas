@@ -17,3 +17,7 @@ export const crearFacturasRequest = async (suscripciones, year, mes) =>
     year,
     mes,
   });
+
+export const getFacturaRequest = async (idFactura) =>
+  await axios.get(`/factura/${idFactura}`);
+

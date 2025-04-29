@@ -1,4 +1,3 @@
-import e from "express";
 import { pool } from "../db.js";
 
 // Obtener registros pendientes por facturar
@@ -214,5 +213,60 @@ export const getFacturas = async (req, res) => {
   } catch (error) {
     console.error("Error obteniendo facturas:", error);
     res.status(500).json({ message: "Error al obtener facturas" });
+  }
+};
+
+// Obtener factura por ID
+export const getFactura = async (req, res) => {
+  const { id } = req.params;
+  console.log("ID de factura:", id);
+
+  try {
+    // Consultar la factura con cliente, producto y dirección
+    const [facturaRows] = await pool.query(
+      `
+      SELECT 
+        f.idFactura,
+        f.codigoFactura,
+        f.valor,
+        f.estado,
+        f.year,
+        f.mes,
+        c.nombreCliente,
+        p.nombreProducto,
+        s.direccionServicio
+      FROM facturas f
+      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      INNER JOIN clientes c ON s.cliente_id = c.idCliente
+      INNER JOIN productos p ON s.producto_id = p.idProducto
+      WHERE f.idFactura = ?
+      `,
+      [id]
+    );
+
+    if (facturaRows.length === 0) {
+      return res.status(404).json({ message: "Factura no encontrada" });
+    }
+
+    const factura = facturaRows[0];
+
+    // Consultar los pagos asociados
+    const [pagos] = await pool.query(
+      `
+      SELECT idPagos, fechaPago, valorPago
+      FROM pagos
+      WHERE factura_id = ?
+      ORDER BY fechaPago ASC
+      `,
+      [id]
+    );
+
+    res.json({
+      factura,
+      pagos,
+    });
+  } catch (error) {
+    console.error("Error al obtener detalle de factura:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };

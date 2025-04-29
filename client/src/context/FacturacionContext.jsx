@@ -3,6 +3,7 @@ import {
   getFacturasRequest,
   getPrefacturacionRequest,
   crearFacturasRequest,
+  getFacturaRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -49,6 +50,16 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
+  const obtenerFactura = async (idFactura) => {
+    try {
+      const res = await getFacturaRequest(idFactura);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener la factura:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  }
+
   return (
     <FacturacionContext.Provider
       value={{
@@ -56,6 +67,7 @@ export const FacturacionProvider = ({ children }) => {
         obtenerFacturas,
         obtenerRegistrosPrefacturacion,
         generarFacturas,
+        obtenerFactura,
       }}
     >
       {children}
