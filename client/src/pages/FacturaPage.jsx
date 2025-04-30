@@ -1,18 +1,21 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import html2pdf from "html2pdf.js";
 import { useFacturacion } from "../context/FacturacionContext";
+import { useReactToPrint } from "react-to-print";
 
 function FacturaPage() {
   const { id } = useParams();
-  const { obtenerFactura } = useFacturacion(); // usamos el contexto
   const navigate = useNavigate();
+  const { obtenerFactura } = useFacturacion();
+
   const [factura, setFactura] = useState(null);
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Referencia al bloque que se imprimirá/convertirá en PDF
   const printRef = useRef();
 
-  // Consultar la factura usando el contexto
+  // Cargar datos de la factura al montarse
   useEffect(() => {
     const cargarFactura = async () => {
       try {
@@ -28,24 +31,21 @@ function FacturaPage() {
     cargarFactura();
   }, [id, obtenerFactura]);
 
+  // Cálculos de totales
   const totalPagado = pagos.reduce((sum, p) => sum + p.valorPago, 0);
   const saldoPendiente = factura ? factura.valor - totalPagado : 0;
 
-  const handleDescargarPDF = () => {
-    const element = printRef.current;
-    const options = {
-      margin: 10,
-      filename: `${factura.codigoFactura}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-    html2pdf().set(options).from(element).save();
-  };
-
+  // Determinar si el botón "Pagar" está habilitado
   const puedePagar =
     factura?.estado === "Pendiente por pagar" ||
     factura?.estado === "Pago Parcial";
+
+  // Hook para imprimir o guardar como PDF el contenido referenciado
+  const handleImprimirPDF = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: `Factura-${factura?.codigoFactura || "sin-codigo"}`,
+    onAfterPrint: () => console.log("PDF generado"),
+  });
 
   if (loading) {
     return (
@@ -65,15 +65,18 @@ function FacturaPage() {
 
   return (
     <div className="container mx-auto p-6 text-white">
+      {/* Encabezado con botones */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Factura #{factura.codigoFactura}</h1>
         <div className="flex gap-4">
+          {/* Botón para imprimir o guardar PDF */}
           <button
-            onClick={handleDescargarPDF}
+            onClick={handleImprimirPDF}
             className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white"
           >
-            Descargar PDF
+            Imprimir / Guardar PDF
           </button>
+          {/* Botón Pagar, condicionado por estado */}
           <button
             onClick={() =>
               puedePagar && navigate(`/pagarFactura/${factura.idFactura}`)
@@ -93,8 +96,19 @@ function FacturaPage() {
       {/* Zona imprimible */}
       <div
         ref={printRef}
-        className="bg-gray-900 p-6 rounded-lg shadow-md text-white"
+        className="bg-white text-black p-6 rounded-lg shadow-md max-w-2xl mx-auto"
       >
+        {/* Cabecera de la factura */}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold mb-1">
+            Factura #{factura.codigoFactura}
+          </h2>
+          <p>
+            Periodo: {factura.year}/{factura.mes.toString().padStart(2, "0")}
+          </p>
+        </div>
+
+        {/* Datos principales */}
         <div className="mb-4">
           <p>
             <strong>Cliente:</strong> {factura.nombreCliente}
@@ -106,14 +120,11 @@ function FacturaPage() {
             <strong>Dirección Servicio:</strong> {factura.direccionServicio}
           </p>
           <p>
-            <strong>Periodo:</strong> {factura.year}/
-            {factura.mes.toString().padStart(2, "0")}
-          </p>
-          <p>
             <strong>Estado:</strong> {factura.estado}
           </p>
         </div>
 
+        {/* Totales y saldos */}
         <div className="mb-4">
           <p>
             <strong>Valor Total:</strong> ${factura.valor.toLocaleString()}
@@ -126,23 +137,30 @@ function FacturaPage() {
           </p>
         </div>
 
+        {/* Tabla de pagos */}
         {pagos.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-2">Pagos realizados</h2>
-            <table className="min-w-full bg-gray-800 border border-gray-700 rounded-lg">
-              <thead className="bg-gray-700">
+            <h3 className="text-lg font-semibold mb-2">Pagos realizados</h3>
+            <table className="min-w-full border border-gray-400">
+              <thead className="bg-gray-200">
                 <tr>
-                  <th className="text-left p-2">Fecha</th>
-                  <th className="text-left p-2">Valor</th>
+                  <th className="text-left p-2 border border-gray-400">
+                    Fecha
+                  </th>
+                  <th className="text-left p-2 border border-gray-400">
+                    Valor
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {pagos.map((pago) => (
-                  <tr key={pago.idPagos} className="border-t border-gray-600">
-                    <td className="p-2">
+                  <tr key={pago.idPagos}>
+                    <td className="p-2 border border-gray-400">
                       {new Date(pago.fechaPago).toLocaleDateString()}
                     </td>
-                    <td className="p-2">${pago.valorPago.toLocaleString()}</td>
+                    <td className="p-2 border border-gray-400">
+                      ${pago.valorPago.toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

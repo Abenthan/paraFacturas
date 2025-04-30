@@ -342,3 +342,53 @@ export const registrarPago = async (req, res) => {
     res.status(500).json({ message: "Error interno del servidor." });
   }
 };
+
+// ontener pagos
+export const getPagos = async (req, res) => {
+  try {
+    const { fechaDesde, fechaHasta, cliente, codigoFactura } = req.query;
+
+    const condiciones = [];
+    const valores = [];
+
+    if (fechaDesde) {
+      condiciones.push("p.fechaPago >= ?");
+      valores.push(fechaDesde);
+    }
+
+    if (fechaHasta) {
+      condiciones.push("p.fechaPago <= ?");
+      valores.push(fechaHasta);
+    }
+
+    if (cliente) {
+      condiciones.push("LOWER(c.nombreCliente) LIKE ?");
+      valores.push(`%${cliente.toLowerCase()}%`);
+    }
+
+    if (codigoFactura) {
+      condiciones.push("f.codigoFactura LIKE ?");
+      valores.push(`%${codigoFactura}%`);
+    }
+
+    const sql = `
+      SELECT 
+        p.idPagos,
+        p.fechaPago,
+        p.valorPago,
+        f.codigoFactura
+      FROM pagos p
+      INNER JOIN facturas f ON p.factura_id = f.idFactura
+      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      INNER JOIN clientes c ON s.cliente_id = c.idCliente
+      ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
+      ORDER BY p.fechaPago DESC
+    `;
+
+    const [rows] = await pool.query(sql, valores);
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener pagos:", error);
+    res.status(500).json({ message: "Error interno del servidor." });
+  }
+};

@@ -25,3 +25,5 @@ export const registrarPagoRequest = async (idFactura, valorPago) =>
   await axios.post(`/pagarFactura`, { idFactura, valorPago });
 
 
+export const obtenerPagosRequest = async (filtros) =>
+  await axios.get("/pagos", { params: filtros });
