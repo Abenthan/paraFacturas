@@ -6,6 +6,7 @@ import {
   getFacturaRequest,
   registrarPagoRequest,
   obtenerPagosRequest,
+  obtenerPagoRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -82,6 +83,17 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
+  const obtenerPago = async (idPago) => {
+    try {
+      console.log("estamos ene el contexto obtenerPago", idPago);
+      const res = await obtenerPagoRequest(idPago);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener el pago:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  };
+
   return (
     <FacturacionContext.Provider
       value={{
@@ -91,6 +103,8 @@ export const FacturacionProvider = ({ children }) => {
         generarFacturas,
         obtenerFactura,
         registrarPago,
+        obtenerPagos,
+        obtenerPago,
       }}
     >
       {children}

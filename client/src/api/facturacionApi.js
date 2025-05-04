@@ -27,3 +27,6 @@ export const registrarPagoRequest = async (idFactura, valorPago) =>
 
 export const obtenerPagosRequest = async (filtros) =>
   await axios.get("/pagos", { params: filtros });
+
+export const obtenerPagoRequest = async (idPago) =>
+  await axios.get(`/pago/${idPago}`);

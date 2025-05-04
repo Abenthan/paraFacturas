@@ -343,7 +343,7 @@ export const registrarPago = async (req, res) => {
   }
 };
 
-// ontener pagos
+// obtener pagos
 export const getPagos = async (req, res) => {
   try {
     const { fechaDesde, fechaHasta, cliente, codigoFactura } = req.query;
@@ -352,12 +352,12 @@ export const getPagos = async (req, res) => {
     const valores = [];
 
     if (fechaDesde) {
-      condiciones.push("p.fechaPago >= ?");
+      condiciones.push("DATE(p.fechaPago) >= ?");
       valores.push(fechaDesde);
     }
 
     if (fechaHasta) {
-      condiciones.push("p.fechaPago <= ?");
+      condiciones.push("DATE(p.fechaPago) <= ?");
       valores.push(fechaHasta);
     }
 
@@ -376,7 +376,8 @@ export const getPagos = async (req, res) => {
         p.idPagos,
         p.fechaPago,
         p.valorPago,
-        f.codigoFactura
+        f.codigoFactura,
+        c.nombreCliente
       FROM pagos p
       INNER JOIN facturas f ON p.factura_id = f.idFactura
       INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
@@ -385,10 +386,49 @@ export const getPagos = async (req, res) => {
       ORDER BY p.fechaPago DESC
     `;
 
+    console.log("Consulta SQL:", sql);
+    console.log("Valores:", valores);
+
     const [rows] = await pool.query(sql, valores);
     res.json(rows);
   } catch (error) {
     console.error("Error al obtener pagos:", error);
     res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+
+// Obtener pago por ID
+export const getPago = async (req, res) => {
+  const { id } = req.params;
+
+  console.log("estamos en backend con el idPago :) ", id);
+
+  try {
+    const [pagoRows] = await pool.query(
+      `
+      SELECT 
+        p.idPagos,
+        p.fechaPago,
+        p.valorPago,
+        f.codigoFactura,
+        c.nombreCliente
+      FROM pagos p
+      INNER JOIN facturas f ON p.factura_id = f.idFactura
+      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      INNER JOIN clientes c ON s.cliente_id = c.idCliente
+      WHERE p.idPagos = ?
+    `,
+      [id]
+    );
+
+    if (pagoRows.length === 0) {
+      return res.status(404).json({ message: "Pago no encontrado" });
+    }
+
+    
+    res.json(pagoRows[0]);
+  } catch (error) {
+    console.error("Error al obtener pago:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
