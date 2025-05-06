@@ -14,7 +14,6 @@ function ClientesPage() {
   const filteredClientes = clientes.filter((clienteDatos) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      clienteDatos.codigo.toLowerCase().includes(searchLower) ||
       clienteDatos.numeroId.toLowerCase().includes(searchLower) ||
       clienteDatos.nombreCliente.toLowerCase().includes(searchLower)
     );
@@ -31,7 +30,7 @@ function ClientesPage() {
       <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center">
         <input
           type="text"
-          placeholder="Buscar por código, identificación o nombre..."
+          placeholder="Buscar por identificación o nombre..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-2/3 px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -50,7 +49,6 @@ function ClientesPage() {
         <table className="w-full">
           <thead className="bg-zinc-700">
             <tr>
-              <th className="px-4 py-3 text-left text-white">Código</th>
               <th className="px-4 py-3 text-left text-white">Identificación</th>
               <th className="px-4 py-3 text-left text-white">Nombre</th>
               <th className="px-4 py-3 text-left text-white">Teléfono</th>
@@ -63,7 +61,6 @@ function ClientesPage() {
                 key={clienteDatos.idCliente}
                 className="border-b border-zinc-700 hover:bg-zinc-700 transition duration-300"
               >
-                <td className="px-4 py-3 text-white">{clienteDatos.codigo}</td>
                 <td className="px-4 py-3 text-white">
                   {clienteDatos.numeroId}
                 </td>

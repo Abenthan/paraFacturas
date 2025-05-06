@@ -57,7 +57,6 @@ export const ClientesProvider = ({ children }) => {
     try {
       const res = await updateClienteRequest(id, cliente);
       setCliente(res.data);
-      console.log("Cliente actualizado:", res.data);
     } catch (error) {
       console.error("Error Catch en updateCliente: ", error);
     }
