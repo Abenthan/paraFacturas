@@ -20,6 +20,7 @@ export const useClientes = () => {
 export const ClientesProvider = ({ children }) => {
   const [clientes, setClientes] = useState([]);
   const [cliente, setCliente] = useState({});
+  const [errors, setErrors] = useState([]);
 
   const getClientes = async () => {
     try {
@@ -45,11 +46,9 @@ export const ClientesProvider = ({ children }) => {
   const newCliente = async (cliente) => {
     try {
       const res = await createClienteRequest(cliente);
-      setClientes(res.data);
-
-      console.log("Cliente creado:", res.data);
+      return res;
     } catch (error) {
-      console.error("Error Catch en newCliente: ", error);
+      setErrors(error.response.data);
     }
   };
 
@@ -62,6 +61,15 @@ export const ClientesProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    if (errors.length > 0) {
+      const timer = setTimeout(() => {
+        setErrors([]);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+
   return (
     <ClientesContext.Provider
       value={{
@@ -72,6 +80,7 @@ export const ClientesProvider = ({ children }) => {
         getCliente,
         newCliente,
         updateCliente,
+        errors,
       }}
     >
       {children}

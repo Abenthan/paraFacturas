@@ -1,6 +1,8 @@
-import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { set, useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
 import { useClientes } from "../context/ClientesContext";
+import { useAuth } from "../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 function NuevoClientePage() {
   const {
@@ -8,27 +10,80 @@ function NuevoClientePage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { newCliente } = useClientes();
+  const { user } = useAuth();
+  const { newCliente, setCliente, errors: newClienteError } = useClientes();
   const [successMessage, setSuccessMessage] = useState("");
+  const usuarioId = user.id;
+  const navigate = useNavigate();
+  
+  {/* Sube la pagina cuando guarda*/}
+  useEffect(() => {
+    if (successMessage) {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [successMessage]);
 
   const onSubmit = handleSubmit(async (data) => {
-    setSuccessMessage("Cliente registrado exitosamente!");
-    newCliente(data);
+    const res = await newCliente(data);
+    if (res.status === 201) {
+      setCliente(data);
+      setSuccessMessage(res.data.message);
+      setTimeout(() => {
+        setSuccessMessage("");
+        // enviar a cliente/idCliente
+        navigate(`/cliente/${res.data.idCliente}`);
+      }, 2000);
+    }
   });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="bg-zinc-800 max-w-md w-full p-8 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold text-center text-white mb-6">
+        {/* Enlace de navegacion */}
+        <div>
+          <Link
+            to="/clientes"
+            className="flex items-center text-blue-400 hover:text-blue-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Volver al listado
+          </Link>
+        </div>
+
+        <h2 className="text-2xl font-bold text-center text-white m-4">
           Nuevo Cliente
-        </h1>
+        </h2>
 
         {/* Mensaje de éxito */}
         {successMessage && (
-          <div className="bg-green-500 text-white p-3 rounded-lg mb-4">
+          <div className="bg-green-600 text-white p-3 rounded-lg mb-4">
             {successMessage}
           </div>
         )}
+
+        {/* Mensaje de error */}
+        {newClienteError.map((error, index) => (
+          <div
+            key={index}
+            className="bg-red-600 text-white p-3 rounded-lg mb-4"
+          >
+            {error}
+          </div>
+        ))}
 
         <form onSubmit={onSubmit} className="space-y-4">
           {/* Campo: Identificación */}
@@ -61,35 +116,13 @@ function NuevoClientePage() {
               className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccione un tipo</option>
-              <option value="Cédula">Cédula</option>
+              <option value="Cedula">Cédula</option>
               <option value="Nit">Nit</option>
               <option value="Otros">Otros</option>
             </select>
             {errors.tipoId && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.tipoId.message}
-              </p>
-            )}
-          </div>
-
-          {/* Campo: Código */}
-          <div>
-            <label className="block text-white mb-2">Código</label>
-            <input
-              type="text"
-              placeholder="Ingrese el código"
-              {...register("codigo", {
-                required: "Este campo es obligatorio",
-                maxLength: {
-                  value: 10,
-                  message: "El código no puede tener más de 10 caracteres",
-                },
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.codigo && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.codigo.message}
               </p>
             )}
           </div>
@@ -119,7 +152,6 @@ function NuevoClientePage() {
               type="email"
               placeholder="Ingrese el correo electrónico"
               {...register("emailCliente", {
-                required: "Este campo es obligatorio",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                   message: "Ingrese un correo electrónico válido",
@@ -169,6 +201,9 @@ function NuevoClientePage() {
               </p>
             )}
           </div>
+
+          {/* Campo: usuarioId, oculto */}
+          <input type="hidden" value={usuarioId} {...register("usuarioId")} />
 
           {/* Botón de envío */}
           <button

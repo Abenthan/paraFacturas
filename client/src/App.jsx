@@ -68,11 +68,13 @@ function App() {
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/register" element={<RegisterPage />} />
+
                     <Route
                       path="/nuevoCliente"
                       element={<NuevoClientePage />}
                     />
+                    <Route path="/register" element={<RegisterPage />} />
+
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
                     <Route path="/productos" element={<ProductosPage />} />

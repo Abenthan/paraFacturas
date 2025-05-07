@@ -1,7 +1,7 @@
 import { useClientes } from "../context/ClientesContext";
 import { useParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 function ClientePage() {
@@ -23,6 +23,7 @@ function ClientePage() {
   } = useForm();
   const params = useParams();
   const usuarioId = user.id; // Obtener el id del cliente desde la URL
+  const [successMessage, setSuccessMessage] = useState(""); // Estado para el mensaje de éxito
   const onSubmit = async (data) => {
     const confirmed = window.confirm(
       "¿Estás seguro de que deseas actualizar los datos del cliente?"
@@ -31,7 +32,7 @@ function ClientePage() {
 
     try {
       await updateCliente(params.id, data);
-      alert("Cliente actualizado exitosamente");
+      setSuccessMessage("Cliente actualizado con éxito");
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
       alert("Error al actualizar el cliente");
@@ -82,8 +83,14 @@ function ClientePage() {
       {/* formulario del cliente */}
       <div className="max-w-2xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-white mb-4">
-          Actualizar Cliente
+          Informacion del cliente
         </h2>
+        {/* Mensaje de éxito */}
+        {successMessage && (
+          <div className="bg-green-600 text-white p-3 rounded-lg mb-4">
+            {successMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Sección de campos del formulario */}
           <div>
