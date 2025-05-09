@@ -5,16 +5,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 function ClientePage() {
-  const { cliente, updateCliente } = useClientes();
-  const { user } = useAuth(); // Obtener el usuario autenticado
-  useEffect(() => {
-    if (cliente) {
-      Object.entries(cliente).forEach(([key, value]) => {
-        setValue(key, value); // Llenamos cada campo con setValue
-      });
-    }
-  }, [cliente]);
-
+  const { user } = useAuth();
+  const {
+    cliente,
+    setCliente,
+    updateCliente,
+    errors: updateClienteError,
+    setErrors,
+  } = useClientes();
   const {
     handleSubmit,
     setValue,
@@ -22,235 +20,407 @@ function ClientePage() {
     formState: { errors },
   } = useForm();
   const params = useParams();
-  const usuarioId = user.id; // Obtener el id del cliente desde la URL
-  const [successMessage, setSuccessMessage] = useState(""); // Estado para el mensaje de éxito
+  const usuarioId = user.id;
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Llenar formulario con datos del cliente
+  useEffect(() => {
+    if (cliente) {
+      Object.entries(cliente).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+    }
+  }, [cliente, setValue]);
+
+  // Scroll to top en mensaje de error o éxito
+  useEffect(() => {
+    if (updateClienteError.length > 0 || successMessage) {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [updateClienteError, successMessage]);
+
   const onSubmit = async (data) => {
     const confirmed = window.confirm(
       "¿Estás seguro de que deseas actualizar los datos del cliente?"
     );
+
     if (!confirmed) return;
 
     try {
-      await updateCliente(params.id, data);
-      setSuccessMessage("Cliente actualizado con éxito");
+      const res = await updateCliente(params.id, data);
+      if (res.status === 200) {
+        setCliente(data);
+        setSuccessMessage(res.data.message);
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 3000);
+      }
     } catch (error) {
-      console.error("Error al actualizar cliente:", error);
-      alert("Error al actualizar el cliente");
+      console.error("Error al actualizar el cliente:", error);
+      setErrors(error.response?.data || ["Error al actualizar el cliente"]);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
-      {/* Enlaces de navegación */}
-      <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center">
-        <Link
-          to="/clientes"
-          className="flex items-center text-blue-400 hover:text-blue-300"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-1"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Volver al listado
-        </Link>
-        {/* Enlace para Suscripciones */}
-        <div className="flex gap-4">
+    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Navigation and Links */}
+        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <Link
-            to={`/Suscripciones/${params.id}`}
-            className="text-purple-400 hover:text-purple-300 font-medium"
+            to="/clientes"
+            className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-200"
           >
-            Suscripciones
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Volver al listado
           </Link>
 
-          {/* Enlace para Estado de cuenta */}
-          <Link
-            to={`/clientes/${params.id}/estado-cuenta`}
-            className="text-blue-400 hover:text-blue-300 font-medium"
-          >
-            Estado de cuenta
-          </Link>
-        </div>
-      </div>
+          <div className="flex flex-wrap gap-3 sm:gap-4">
+            <Link
+              to={`/Suscripciones/${params.id}`}
+              className="inline-flex items-center px-3 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 hover:text-purple-200 rounded-lg transition-colors duration-200 border border-purple-600/50"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Suscripciones
+            </Link>
 
-      {/* formulario del cliente */}
-      <div className="max-w-2xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Informacion del cliente
-        </h2>
-        {/* Mensaje de éxito */}
-        {successMessage && (
-          <div className="bg-green-600 text-white p-3 rounded-lg mb-4">
-            {successMessage}
+            <Link
+              to={`/clientes/${params.id}/estado-cuenta`}
+              className="inline-flex items-center px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-blue-200 rounded-lg transition-colors duration-200 border border-blue-600/50"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+              Estado de cuenta
+            </Link>
           </div>
-        )}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Sección de campos del formulario */}
-          <div>
-            {/* campo nombreCliente*/}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Nombre del Cliente
+        </div>
+
+        {/* Client Form */}
+        <div className="bg-zinc-800 p-6 sm:p-8 rounded-xl shadow-lg border border-zinc-700">
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              Información del Cliente
+            </h2>
+            <p className="text-zinc-400">Actualiza los datos del cliente</p>
+          </div>
+
+          {/* Messages Section */}
+          <div className="space-y-3 mb-6">
+            {successMessage && (
+              <div className="bg-green-600/90 text-white p-4 rounded-lg flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                {successMessage}
+              </div>
+            )}
+
+            {updateClienteError.map((error, index) => (
+              <div
+                key={index}
+                className="bg-red-600/90 text-white p-4 rounded-lg flex items-center"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {error}
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Client Name */}
+            <div>
+              <label className="block text-white mb-2 font-medium">
+                Nombre del Cliente <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
+                placeholder="Ej: Juan Pérez"
                 {...register("nombreCliente", {
-                  required: "Campo obligatorio",
+                  required: "Este campo es obligatorio",
                 })}
-                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
               />
               {errors.nombreCliente && (
-                <p className="mt-1 text-sm text-red-400">
+                <p className="mt-2 text-sm text-red-400 flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
                   {errors.nombreCliente.message}
                 </p>
               )}
             </div>
 
-            {/* tipoId y Cedula */}
-            <div className="flex gap-4">
-              {/* tipoId */}
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Tipo de ID
+            {/* ID Type and Number */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* ID Type */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Tipo de Identificación <span className="text-red-500">*</span>
                 </label>
                 <select
                   {...register("tipoId", { required: "Seleccione una opción" })}
-                  className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
                 >
                   <option value="">Seleccionar...</option>
                   <option value="Cedula">Cédula</option>
                   <option value="NIT">NIT</option>
-                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Otros">Otros</option>
                 </select>
                 {errors.tipoId && (
-                  <p className="mt-1 text-sm text-red-400">
+                  <p className="mt-2 text-sm text-red-400 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
                     {errors.tipoId.message}
                   </p>
                 )}
               </div>
 
-              {/* numeroId */}
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Número de ID
+              {/* ID Number */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Número de Identificación{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  {...register("numeroId", { required: "Campo obligatorio" })}
-                  className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ej: 1234567890"
+                  {...register("numeroId", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
                 />
                 {errors.numeroId && (
-                  <p className="mt-1 text-sm text-red-400">
+                  <p className="mt-2 text-sm text-red-400 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
                     {errors.numeroId.message}
                   </p>
                 )}
               </div>
             </div>
 
-            {/* campo telefono */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Teléfono
-              </label>
-              <input
-                type="tel"
-                {...register("telefono", { required: "Campo obligatorio" })}
-                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.telefono && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.telefono.message}
-                </p>
-              )}
+            {/* Contact Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Phone */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Teléfono <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Ej: 3001234567"
+                  {...register("telefono", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                />
+                {errors.telefono && (
+                  <p className="mt-2 text-sm text-red-400 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.telefono.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Correo Electrónico
+                </label>
+                <input
+                  type="email"
+                  placeholder="Ej: cliente@example.com"
+                  {...register("emailCliente", {
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Ingrese un correo válido",
+                    },
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                />
+                {errors.emailCliente && (
+                  <p className="mt-2 text-sm text-red-400 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.emailCliente.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* campo emailCliente */}
+            {/* Address */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Correo
-              </label>
-              <input
-                type="email"
-                {...register("emailCliente", {
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Correo inválido",
-                  },
-                })}
-                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.emailCliente && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.emailCliente.message}
-                </p>
-              )}
-            </div>
-
-            {/* direccion */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Dirección
+              <label className="block text-white mb-2 font-medium">
+                Dirección <span className="text-red-500">*</span>
               </label>
               <textarea
-                {...register("direccion", { required: "Campo obligatorio" })}
+                {...register("direccion", {
+                  required: "Este campo es obligatorio",
+                })}
                 rows={3}
-                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: Calle 123 #45-67, Ciudad"
+                className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
               />
               {errors.direccion && (
-                <p className="mt-1 text-sm text-red-400">
+                <p className="mt-2 text-sm text-red-400 flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
                   {errors.direccion.message}
                 </p>
               )}
             </div>
 
-            {/* campo usuarioId */}
-            <div className="hidden">
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                ID de Usuario
-              </label>
-              <input
-                type="text"
-                {...register("usuarioId")}
-                defaultValue={usuarioId}
-                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.usuarioId && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.usuarioId.message}
-                </p>
-              )}
-            </div>
-          </div>
+            {/* Hidden User ID Field */}
+            <input type="hidden" {...register("usuarioId")} value={usuarioId} />
 
-          {/* Solo botón de guardar */}
-          <div className="pt-6 border-t border-zinc-700 flex justify-center">
-            <button
-              type="submit"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+            {/* Submit Button */}
+            <div className="pt-6 border-t border-zinc-700">
+              <button
+                type="submit"
+                className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-800 flex items-center justify-center"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Actualizar
-            </button>
-          </div>
-        </form>
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

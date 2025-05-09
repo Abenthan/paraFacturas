@@ -48,16 +48,19 @@ export const ClientesProvider = ({ children }) => {
       const res = await createClienteRequest(cliente);
       return res;
     } catch (error) {
+
       setErrors(error.response.data);
     }
   };
 
   const updateCliente = async (id, cliente) => {
     try {
-      const res = await updateClienteRequest(id, cliente);
-      setCliente(res.data);
+      const respuestaUpdate = await updateClienteRequest(id, cliente);
+      console.log("respuestaUpdate:", respuestaUpdate);
+      return respuestaUpdate;
     } catch (error) {
-      console.error("Error Catch en updateCliente: ", error);
+      setErrors(error.response.data);
+      return error.response.data;
     }
   };
 
@@ -81,6 +84,7 @@ export const ClientesProvider = ({ children }) => {
         newCliente,
         updateCliente,
         errors,
+        setErrors,
       }}
     >
       {children}

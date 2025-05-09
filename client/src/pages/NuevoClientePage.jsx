@@ -1,8 +1,9 @@
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useClientes } from "../context/ClientesContext";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { use } from "react";
 
 function NuevoClientePage() {
   const {
@@ -15,8 +16,8 @@ function NuevoClientePage() {
   const [successMessage, setSuccessMessage] = useState("");
   const usuarioId = user.id;
   const navigate = useNavigate();
-  
-  {/* Sube la pagina cuando guarda*/}
+
+  // Scroll to top when success message appears
   useEffect(() => {
     if (successMessage) {
       window.scrollTo({
@@ -27,30 +28,38 @@ function NuevoClientePage() {
   }, [successMessage]);
 
   const onSubmit = handleSubmit(async (data) => {
-    const res = await newCliente(data);
-    if (res.status === 201) {
-      setCliente(data);
-      setSuccessMessage(res.data.message);
-      setTimeout(() => {
-        setSuccessMessage("");
-        // enviar a cliente/idCliente
-        navigate(`/cliente/${res.data.idCliente}`);
-      }, 2000);
+    const confirmed = window.confirm(
+      "¿Está seguro de que desea registrar este cliente?"
+    );
+    if (!confirmed) return;
+    try {
+      const res = await newCliente(data);
+      if (res.status === 201) {
+        setCliente(data);
+        setSuccessMessage(res.data.message);
+        setTimeout(() => {
+          setSuccessMessage("");
+          navigate(`/cliente/${res.data.idCliente}`);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error al registrar el cliente:", error);
+      alert("Error al registrar el cliente. Por favor, inténtelo de nuevo.");
     }
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-zinc-800 max-w-md w-full p-8 rounded-lg shadow-lg">
-        {/* Enlace de navegacion */}
-        <div>
+    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        {/* Navigation Link */}
+        <div className="mb-8">
           <Link
             to="/clientes"
-            className="flex items-center text-blue-400 hover:text-blue-300"
+            className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-200"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-1"
+              className="h-5 w-5 mr-2"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -60,159 +69,299 @@ function NuevoClientePage() {
                 clipRule="evenodd"
               />
             </svg>
-            Volver al listado
+            Volver al listado de clientes
           </Link>
         </div>
 
-        <h2 className="text-2xl font-bold text-center text-white m-4">
-          Nuevo Cliente
-        </h2>
+        {/* Form Container */}
+        <div className="bg-zinc-800 p-8 rounded-lg shadow-xl border border-zinc-700">
+          <h2 className="text-3xl font-bold text-center text-white mb-6">
+            Nuevo Cliente
+          </h2>
 
-        {/* Mensaje de éxito */}
-        {successMessage && (
-          <div className="bg-green-600 text-white p-3 rounded-lg mb-4">
-            {successMessage}
-          </div>
-        )}
-
-        {/* Mensaje de error */}
-        {newClienteError.map((error, index) => (
-          <div
-            key={index}
-            className="bg-red-600 text-white p-3 rounded-lg mb-4"
-          >
-            {error}
-          </div>
-        ))}
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          {/* Campo: Identificación */}
-          <div>
-            <label className="block text-white mb-2">Identificación</label>
-            <input
-              type="text"
-              placeholder="Ingrese la identificación"
-              {...register("numeroId", {
-                required: "Este campo es obligatorio",
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.numeroId && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.numeroId.message}
-              </p>
+          {/* Messages Section */}
+          <div className="space-y-3 mb-6">
+            {successMessage && (
+              <div className="bg-green-600/90 text-white p-4 rounded-lg flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                {successMessage}
+              </div>
             )}
+
+            {newClienteError.map((error, index) => (
+              <div
+                key={index}
+                className="bg-red-600/90 text-white p-4 rounded-lg flex items-center"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {error}
+              </div>
+            ))}
           </div>
 
-          {/* Campo: Tipo de identificación */}
-          <div>
-            <label className="block text-white mb-2">
-              Tipo de identificación
-            </label>
-            <select
-              {...register("tipoId", {
-                required: "Este campo es obligatorio",
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccione un tipo</option>
-              <option value="Cedula">Cédula</option>
-              <option value="Nit">Nit</option>
-              <option value="Otros">Otros</option>
-            </select>
-            {errors.tipoId && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.tipoId.message}
-              </p>
-            )}
-          </div>
+          {/* Form */}
+          <form onSubmit={onSubmit} className="space-y-6">
+            {/* ID Type and Number */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* ID Type */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Tipo de identificación <span className="text-red-500">*</span>
+                </label>
+                <select
+                  {...register("tipoId", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                >
+                  <option value="">Seleccione un tipo</option>
+                  <option value="Cedula">Cédula</option>
+                  <option value="Nit">Nit</option>
+                  <option value="Otros">Otros</option>
+                </select>
+                {errors.tipoId && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.tipoId.message}
+                  </p>
+                )}
+              </div>
 
-          {/* Campo: Nombre del Cliente */}
-          <div>
-            <label className="block text-white mb-2">Nombre del Cliente</label>
-            <input
-              type="text"
-              placeholder="Ingrese el nombre del cliente"
-              {...register("nombreCliente", {
-                required: "Este campo es obligatorio",
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.nombreCliente && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.nombreCliente.message}
-              </p>
-            )}
-          </div>
+              {/* ID Number */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Identificación <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 1234567890"
+                  {...register("numeroId", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                />
+                {errors.numeroId && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.numeroId.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          {/* Campo: Correo electrónico */}
-          <div>
-            <label className="block text-white mb-2">Correo electrónico</label>
-            <input
-              type="email"
-              placeholder="Ingrese el correo electrónico"
-              {...register("emailCliente", {
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Ingrese un correo electrónico válido",
-                },
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.emailCliente && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.emailCliente.message}
-              </p>
-            )}
-          </div>
+            {/* Client Name */}
+            <div>
+              <label className="block text-white mb-2 font-medium">
+                Nombre del Cliente <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: Juan Pérez"
+                {...register("nombreCliente", {
+                  required: "Este campo es obligatorio",
+                })}
+                className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+              />
+              {errors.nombreCliente && (
+                <p className="text-red-400 text-sm mt-1 flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {errors.nombreCliente.message}
+                </p>
+              )}
+            </div>
 
-          {/* Campo: Teléfono */}
-          <div>
-            <label className="block text-white mb-2">Teléfono</label>
-            <input
-              type="text"
-              placeholder="Ingrese el teléfono"
-              {...register("telefono", {
-                required: "Este campo es obligatorio",
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.telefono && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.telefono.message}
-              </p>
-            )}
-          </div>
+            {/* Contact Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Email */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Correo electrónico
+                </label>
+                <input
+                  type="email"
+                  placeholder="Ej: cliente@example.com"
+                  {...register("emailCliente", {
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Ingrese un correo electrónico válido",
+                    },
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                />
+                {errors.emailCliente && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.emailCliente.message}
+                  </p>
+                )}
+              </div>
 
-          {/* Campo: Dirección */}
-          <div>
-            <label className="block text-white mb-2">Dirección</label>
-            <input
-              type="text"
-              placeholder="Ingrese la dirección"
-              {...register("direccion", {
-                required: "Este campo es obligatorio",
-              })}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.direccion && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.direccion.message}
-              </p>
-            )}
-          </div>
+              {/* Phone */}
+              <div>
+                <label className="block text-white mb-2 font-medium">
+                  Teléfono <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 3001234567"
+                  {...register("telefono", {
+                    required: "Este campo es obligatorio",
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+                />
+                {errors.telefono && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {errors.telefono.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          {/* Campo: usuarioId, oculto */}
-          <input type="hidden" value={usuarioId} {...register("usuarioId")} />
+            {/* Address */}
+            <div>
+              <label className="block text-white mb-2 font-medium">
+                Dirección <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: Calle 123 #45-67"
+                {...register("direccion", {
+                  required: "Este campo es obligatorio",
+                })}
+                className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-600 transition-colors duration-200"
+              />
+              {errors.direccion && (
+                <p className="text-red-400 text-sm mt-1 flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {errors.direccion.message}
+                </p>
+              )}
+            </div>
 
-          {/* Botón de envío */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Registrar Cliente
-          </button>
-        </form>
+            {/* Hidden User ID Field */}
+            <input type="hidden" value={usuarioId} {...register("usuarioId")} />
+
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-800 font-medium flex items-center justify-center"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Registrar Cliente
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
