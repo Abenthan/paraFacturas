@@ -54,6 +54,7 @@ function Suscripciones() {
           <table className="w-full table-auto text-sm text-left text-gray-300">
             <thead className="text-xs uppercase bg-zinc-700 text-gray-400">
               <tr>
+                <th className="px-4 py-3">Número</th>
                 <th className="px-4 py-3">Producto</th>
                 <th className="px-4 py-3">Dirección de Servicio</th>
                 <th className="px-4 py-3">Estado</th>
@@ -63,44 +64,34 @@ function Suscripciones() {
             <tbody>
               {suscripciones.length > 0 ? (
                 suscripciones.map((suscripcion) => (
-                  <tr 
-                    key={suscripcion.idSuscripcion} 
+                  <tr
+                    key={suscripcion.idSuscripcion}
                     className="border-b border-zinc-700 hover:bg-zinc-700/50"
                   >
+                    <td className="px-4 py-3">{suscripcion.idSuscripcion}</td>
                     <td className="px-4 py-3">{suscripcion.nombreProducto}</td>
-                    <td className="px-4 py-3">{suscripcion.direccionServicio}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        suscripcion.estado === 'Activa' 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : suscripcion.estado === 'Pendiente'
-                            ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {suscripcion.estado}
-                      </span>
+                      {suscripcion.direccionServicio}
                     </td>
+                    <td className="px-4 py-3">{suscripcion.Estado}</td>
                     <td className="px-4 py-3">
                       <div className="flex space-x-2">
                         <Link
-                          to={`/editar-suscripcion/${suscripcion.idSuscripcion}`}
+                          to={`/suscripcion/${suscripcion.idSuscripcion}`}
                           className="text-blue-400 hover:text-blue-300"
                         >
                           Editar
                         </Link>
-                        <button
-                          className="text-red-400 hover:text-red-300"
-                          onClick={() => console.log('Eliminar', suscripcion.idSuscripcion)}
-                        >
-                          Eliminar
-                        </button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="px-4 py-6 text-center text-gray-400">
+                  <td
+                    colSpan="4"
+                    className="px-4 py-6 text-center text-gray-400"
+                  >
                     No hay suscripciones registradas para este cliente
                   </td>
                 </tr>

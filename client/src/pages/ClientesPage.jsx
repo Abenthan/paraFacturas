@@ -23,6 +23,10 @@ function ClientesPage() {
     setCliente(clienteDatos);
     navigate(`/cliente/${clienteDatos.idCliente}`);
   };
+  const handleSuscripciones = (clienteDatos) => {
+    setCliente(clienteDatos);
+    navigate(`/suscripciones/${clienteDatos.idCliente}`);
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
@@ -76,6 +80,13 @@ function ClientesPage() {
                     className="text-yellow-400 hover:text-yellow-300 hover:underline cursor-pointer transition duration-300"
                   >
                     Editar
+                  </button>
+                  <span className="mx-2">|</span>
+                  <button
+                    onClick={() => handleSuscripciones(clienteDatos)}
+                    className="text-purple-400 hover:text-purple-300 hover:underline cursor-pointer transition duration-300"
+                  >
+                    Suscripciones
                   </button>
                 </td>
               </tr>

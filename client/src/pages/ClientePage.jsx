@@ -182,6 +182,7 @@ function ClientePage() {
                 {error}
               </div>
             ))}
+            
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

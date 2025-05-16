@@ -1,23 +1,27 @@
+import { useAuth } from "../context/AuthContext";
 import { useClientes } from "../context/ClientesContext";
 import { useProductos } from "../context/ProductosContext.jsx";
 import { useSuscripciones } from "../context/SuscripcionesContext";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 function CrearSuscripcionPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm();
 
   const params = useParams();
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
   const { getCliente, cliente, setCliente } = useClientes();
   const { productos, getProductos } = useProductos();
   const { createSuscripcion } = useSuscripciones();
 
+  const usuarioId = user.id;
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -45,6 +49,13 @@ function CrearSuscripcionPage() {
     getProductos();
   }, []);
 
+  // Scroll to top en mensaje de éxito
+  useEffect(() => {
+    if (successMessage) {
+      window.scrollTo(0, 0);
+    }
+  }, [successMessage]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -71,8 +82,11 @@ function CrearSuscripcionPage() {
 
     try {
       await createSuscripcion(data);
-      console.log("Datos de la suscripción:", data);
       setSuccessMessage("Suscripción creada con éxito.");
+      setTimeout(() => {
+        setSuccessMessage("");
+        navigate(`/suscripciones/${params.id}`);
+      }, 2000); // Redirigir después de 2 segundos
     } catch (error) {
       console.error("Error al crear la suscripción:", error);
     }
@@ -212,6 +226,9 @@ function CrearSuscripcionPage() {
 
           {/* Campo oculto del cliente */}
           <input type="hidden" value={params.id} {...register("cliente_id")} />
+
+          {/* Campo oculto del usuarioId */}
+          <input type="hidden" value={usuarioId} {...register("usuarioId")} />
 
           {/* Botón */}
           <div className="flex justify-end">

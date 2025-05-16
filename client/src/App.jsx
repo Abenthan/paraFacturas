@@ -38,19 +38,6 @@ function App() {
 
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />
-
-                  <Route
-                    path="/suscripciones/:id"
-                    element={<SuscripcionesPage />}
-                  />
-                  <Route
-                    path="/crearSuscripcion/:id"
-                    element={<CrearSuscripcionPage />}
-                  />
-                  <Route
-                    path="/suscripcion/:id"
-                    element={<SuscripcionPage />}
-                  />
                   <Route path="/facturacion" element={<FacturacionPage />} />
                   <Route
                     path="/prefacturacion"
@@ -78,6 +65,18 @@ function App() {
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
                     <Route path="/productos" element={<ProductosPage />} />
+                    <Route
+                      path="/suscripciones/:id"
+                      element={<SuscripcionesPage />}
+                    />
+                    <Route
+                      path="/crearSuscripcion/:id"
+                      element={<CrearSuscripcionPage />}
+                    />
+                    <Route
+                      path="/suscripcion/:id"
+                      element={<SuscripcionPage />}
+                    />
                   </Route>
                 </Routes>
               </BrowserRouter>

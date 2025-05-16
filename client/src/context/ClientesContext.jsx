@@ -26,7 +26,6 @@ export const ClientesProvider = ({ children }) => {
     try {
       const res = await getClientesRequest();
       setClientes(res.data);
-      console.log("Clientes obtenidos:", res.data);
     } catch (error) {
       console.error("Error Catch en getClientes: ", error);
     }
@@ -36,8 +35,6 @@ export const ClientesProvider = ({ children }) => {
     try {
       const res = await getClienteRequest(id);
       setCliente(res.data);
-      console.log("res.data:", res.data);
-      console.log("Cliente obtenido:", cliente);
     } catch (error) {
       console.error("Error Catch en getCliente: ", error);
     }
@@ -56,7 +53,6 @@ export const ClientesProvider = ({ children }) => {
   const updateCliente = async (id, cliente) => {
     try {
       const respuestaUpdate = await updateClienteRequest(id, cliente);
-      console.log("respuestaUpdate:", respuestaUpdate);
       return respuestaUpdate;
     } catch (error) {
       setErrors(error.response.data);

@@ -21,7 +21,6 @@ export const ProductosProvider = ({ children }) => {
     try {
       const res = await getProductosRequest();
       setProductos(res.data);
-      console.log("Productos obtenidos:", res.data);
     } catch (error) {
       console.error("Error Catch en getProductos: ", error);
     }

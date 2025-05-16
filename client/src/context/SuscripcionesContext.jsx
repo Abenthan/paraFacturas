@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import {
   getSuscripcionesRequest,
@@ -21,23 +21,23 @@ export const useSuscripciones = () => {
 
 export const SuscripcionesProvider = ({ children }) => {
   const [suscripciones, setSuscripciones] = useState([]);
-  const [suscripcion, setSuscripcion] = useState(null);
+  const [suscripcion, setSuscripcion] = useState({});
+  const [errors, setErrors] = useState([]);
 
   const getSuscripciones = async (id) => {
     try {
       const response = await getSuscripcionesRequest(id);
       setSuscripciones(response.data);
-      console.log("Suscripciones: 2.0 ", response.data);
     } catch (error) {
       console.error("Error fetching suscripciones:", error);
     }
   };
-  
 
   const getSuscripcion = async (id) => {
     try {
       const response = await getSuscripcionRequest(id);
       setSuscripcion(response.data);
+      return response.data;
     } catch (error) {
       console.error("Error fetching suscripcion:", error);
     }
@@ -52,6 +52,25 @@ export const SuscripcionesProvider = ({ children }) => {
     }
   };
 
+  const updateSuscripcion = async (id, suscripcion) => {
+    try {
+      const response = await updateSuscripcionRequest(id, suscripcion);
+      setSuscripcion(response.data);
+      return response;
+    } catch (error) {
+      setErrors(error.response.data);
+      return error.response.data;
+    }
+  };
+  useEffect(() => {
+    if (errors.length > 0) {
+      const timer = setTimeout(() => {
+        setErrors([]);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+
   return (
     <SuscripcionesContext.Provider
       value={{
@@ -60,6 +79,9 @@ export const SuscripcionesProvider = ({ children }) => {
         getSuscripciones,
         getSuscripcion,
         createSuscripcion,
+        updateSuscripcion,
+        errors,
+        setErrors,
       }}
     >
       {children}
