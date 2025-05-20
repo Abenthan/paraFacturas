@@ -9,13 +9,13 @@ import {
 const router = Router();
 
 //clientes
-router.get("/clientes", getClientes);
+router.get("/clientes", authRequired, getClientes);
 
 //nuevocliente 
 router.post("/nuevoCliente", authRequired, createCliente);
 
 //cliente
-router.get("/cliente/:id", getCliente);
+router.get("/cliente/:id", authRequired, getCliente);
 
 //actualizar cliente
 router.put("/cliente/:id", authRequired, updateCliente);

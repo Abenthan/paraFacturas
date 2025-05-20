@@ -1,4 +1,4 @@
-import { useProductos } from "../context/ProductosContext.jsx";
+import { useProductos } from "../../context/ProductosContext.jsx";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -15,7 +15,7 @@ function ProductosPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-white">Productos</h1>
           <Link
-            to="/productos/nuevo"
+            to="/crearProducto"
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
           >
             + Nuevo Producto

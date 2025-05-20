@@ -10,21 +10,22 @@ import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import Navbar from "./components/Navbar";
-import NuevoClientePage from "./pages/NuevoClientePage";
-import ClientesPage from "./pages/ClientesPage";
-import ClientePage from "./pages/ClientePage";
-import ProductosPage from "./pages/ProductosPage";
-import SuscripcionesPage from "./pages/SuscripcionesPage";
-import SuscripcionPage from "./pages/SuscripcionPage";
-import CrearSuscripcionPage from "./pages/CrearSuscripcionPage";
-import FacturacionPage from "./pages/FacturacionPage.jsx";
-import PrefacturacionPage from "./pages/PrefacturacionPage.jsx";
-import FacturasPage from "./pages/FacturasPage.jsx";
-import FacturaPage from "./pages/FacturaPage.jsx";
-import PagarFacturaPage from "./pages/PagarFacturaPage.jsx";
-import PagosPage from "./pages/PagosPage.jsx";
-import PagoPage from "./pages/PagoPage.jsx";
-import Impresion from "./pages/Impresion.jsx";
+import NuevoClientePage from "./pages/clientes/NuevoClientePage";
+import ClientesPage from "./pages/clientes/ClientesPage";
+import ClientePage from "./pages/clientes/ClientePage";
+import ProductosPage from "./pages/productos/ProductosPage.jsx";
+import CrearProductoPage from "./pages/productos/CrearProductoPage.jsx";
+import ProductoPage from "./pages/productos/ProductoPage.jsx";
+import SuscripcionesPage from "./pages/suscripciones/SuscripcionesPage";
+import SuscripcionPage from "./pages/suscripciones/SuscripcionPage";
+import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
+import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
+import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
+import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
+import FacturaPage from "./pages/facturacion/FacturaPage.jsx";
+import PagarFacturaPage from "./pages/facturacion/PagarFacturaPage.jsx";
+import PagosPage from "./pages/facturacion/PagosPage.jsx";
+import PagoPage from "./pages/facturacion/PagoPage.jsx";
 
 function App() {
   return (
@@ -51,7 +52,6 @@ function App() {
                   />
                   <Route path="/pagos" element={<PagosPage />} />
                   <Route path="/pago/:id" element={<PagoPage />} />
-                  <Route path="/impresion" element={<Impresion />} />
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />
@@ -65,6 +65,9 @@ function App() {
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
                     <Route path="/productos" element={<ProductosPage />} />
+                    <Route path="/crearProducto" element={<CrearProductoPage />} />
+                    <Route path="/producto/:id" element={<ProductoPage />} />
+
                     <Route
                       path="/suscripciones/:id"
                       element={<SuscripcionesPage />}

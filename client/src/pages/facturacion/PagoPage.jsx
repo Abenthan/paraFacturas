@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import html2pdf from "html2pdf.js";
-import { useFacturacion } from "../context/FacturacionContext";
+import { useFacturacion } from "../../context/FacturacionContext.jsx";
 
 const PagoPage = () => {
   const { obtenerPago } = useFacturacion();

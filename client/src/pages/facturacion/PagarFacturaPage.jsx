@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useFacturacion } from "../context/FacturacionContext";
+import { useFacturacion } from "../../context/FacturacionContext";
 
 function PagarFacturaPage() {
   const { id } = useParams();

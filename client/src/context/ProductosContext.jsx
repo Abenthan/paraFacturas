@@ -3,8 +3,8 @@ import {
   getProductoRequest,
   getProductosRequest,
   createProductoRequest,
+  updateProductoRequest,
 } from "../api/productosApi.js";
-
 export const ProductosContext = createContext();
 export const useProductos = () => {
   const context = useContext(ProductosContext);
@@ -16,6 +16,8 @@ export const useProductos = () => {
 
 export const ProductosProvider = ({ children }) => {
   const [productos, setProductos] = useState([]);
+  const [producto, setProducto] = useState({});
+  const [errors, setErrors] = useState([]);
 
   const getProductos = async () => {
     try {
@@ -29,8 +31,7 @@ export const ProductosProvider = ({ children }) => {
   const newProducto = async (producto) => {
     try {
       const res = await createProductoRequest(producto);
-      setProductos(res.data);
-      console.log("Producto creado:", res.data);
+      return res;
     } catch (error) {
       console.error("Error Catch en newProducto: ", error);
     }
@@ -39,15 +40,26 @@ export const ProductosProvider = ({ children }) => {
   const getProducto = async (id) => {
     try {
       const res = await getProductoRequest(id);
+      setProducto(res.data);
       return res.data;
     } catch (error) {
       console.error("Error Catch en getProducto: ", error);
     }
   };
 
+  const updateProducto = async (id, producto) => {
+    try {
+      const res = await updateProductoRequest(id, producto);
+      return res;
+    } catch (error) {
+      console.error("Error Catch en updateProducto: ", error);
+      setErrors(error.response.data);
+      return error.response.data;    }
+  }
+
   return (
     <ProductosContext.Provider
-      value={{ productos, getProductos, newProducto, getProducto }}
+      value={{ productos, producto, errors, getProductos, newProducto, getProducto, updateProducto }}
     >
       {children}
     </ProductosContext.Provider>

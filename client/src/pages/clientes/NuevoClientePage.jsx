@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { useClientes } from "../context/ClientesContext";
-import { useAuth } from "../context/AuthContext";
+import { useClientes } from "../../context/ClientesContext";
+import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { use } from "react";
 
 function NuevoClientePage() {
   const {

@@ -1,5 +1,5 @@
-import { useClientes } from "../context/ClientesContext";
-import { useSuscripciones } from "../context/SuscripcionesContext";
+import { useClientes } from "../../context/ClientesContext";
+import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 

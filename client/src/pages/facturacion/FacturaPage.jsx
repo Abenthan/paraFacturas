@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useFacturacion } from "../context/FacturacionContext";
+import { useFacturacion } from "../../context/FacturacionContext";
 import { useReactToPrint } from "react-to-print";
 
 function FacturaPage() {

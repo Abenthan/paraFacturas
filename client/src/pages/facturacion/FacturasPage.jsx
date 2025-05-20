@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFacturacion } from "../context/FacturacionContext"; 
+import { useFacturacion } from "../../context/FacturacionContext"; 
 import { useNavigate } from "react-router-dom";
 
 function FacturasPage() {

@@ -17,16 +17,14 @@ export const getSuscripciones = async (req, res) => {
     //WHERE s.cliente_id = ?`;
 
     const [rows] = await pool.query(consulta, [id]);
-    //console.log("rows", rows);
-
-    console.log("rows", rows);
 
     return res.status(200).json(rows);
   } catch (error) {
     console.log("error en catch de getSuscripciones", error);
-    return res;
-    console.log("error en catch de getSuscripciones", error);
-    res.status(500).json("Error Catch en getSuscripciones: " + error.message);
+    return res.status(500).json({
+      message: "Error al obtener las suscripciones, porfavor intente de nuevo",
+      error: error.message,
+    });
   }
 };
 
@@ -93,6 +91,7 @@ export const createSuscripcion = async (req, res) => {
     return res
       .status(201)
       .json({ message: "Suscripción creada", id: result.insertId });
+      
   } catch (error) {
     console.log("error en catch de createSuscripcion", error);
     return res.status(500).json({
@@ -137,8 +136,6 @@ export const updateSuscripcion = async (req, res) => {
       Observaciones,
       usuarioId,
     } = req.body;
-
-    console.log("req.body", req.body);
 
     // validar que el cliente exista
     const [cliente] = await pool.query(

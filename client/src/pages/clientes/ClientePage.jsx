@@ -1,8 +1,8 @@
-import { useClientes } from "../context/ClientesContext";
+import { useAuth } from "../../context/AuthContext";
+import { useClientes } from "../../context/ClientesContext.jsx";
 import { useParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 
 function ClientePage() {
   const { user } = useAuth();
@@ -67,6 +67,7 @@ function ClientePage() {
   return (
     <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+       
         {/* Navigation and Links */}
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <Link
@@ -142,6 +143,7 @@ function ClientePage() {
 
           {/* Messages Section */}
           <div className="space-y-3 mb-6">
+            
             {successMessage && (
               <div className="bg-green-600/90 text-white p-4 rounded-lg flex items-center">
                 <svg
@@ -182,7 +184,6 @@ function ClientePage() {
                 {error}
               </div>
             ))}
-            
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

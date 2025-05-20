@@ -1,7 +1,7 @@
-import { useAuth } from "../context/AuthContext";
-import { useClientes } from "../context/ClientesContext";
-import { useProductos } from "../context/ProductosContext.jsx";
-import { useSuscripciones } from "../context/SuscripcionesContext";
+import { useAuth } from "../../context/AuthContext";
+import { useClientes } from "../../context/ClientesContext";
+import { useProductos } from "../../context/ProductosContext.jsx";
+import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -192,7 +192,7 @@ function CrearSuscripcionPage() {
               htmlFor="estado"
               className="block text-sm text-gray-300 mb-1"
             >
-              Estado
+              Estado de la suscripción
             </label>
             <select
               id="estado"
