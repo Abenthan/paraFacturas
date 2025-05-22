@@ -6,7 +6,9 @@ import {
   getFactura,
   registrarPago,
   getPagos,
-  getPago
+  getPago,
+  getCartera,
+
 } from "../controllers/facturacion.controller.js";
 
 const router = Router();
@@ -24,5 +26,7 @@ router.post("/pagarFactura", registrarPago);
 router.get("/pagos", getPagos);
 
 router.get("/pago/:id", getPago);
+
+router.get("/cartera", getCartera);
 
 export default router;

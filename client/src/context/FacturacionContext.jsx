@@ -7,6 +7,7 @@ import {
   registrarPagoRequest,
   obtenerPagosRequest,
   obtenerPagoRequest,
+  obtenerCarteraRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -94,6 +95,17 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
+const obtenerCartera = async (filtros) => {
+  try {
+    const res = await obtenerCarteraRequest(filtros);
+    return res.data;
+  } catch (error) {
+    console.error("Error al obtener la cartera:", error);
+    throw error; // Propagar el error para manejarlo en el componente
+  }
+}
+
+
   return (
     <FacturacionContext.Provider
       value={{
@@ -105,6 +117,7 @@ export const FacturacionProvider = ({ children }) => {
         registrarPago,
         obtenerPagos,
         obtenerPago,
+        obtenerCartera,
       }}
     >
       {children}

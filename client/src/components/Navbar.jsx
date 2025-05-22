@@ -16,6 +16,26 @@ function Navbar() {
       <ul className="flex gap-x-6 items-center">
         {isAuthenticated ? (
           <>
+            {/* Link a Clientes */}
+            <li>
+              <Link
+                to="/clientes"
+                className="text-white hover:text-blue-500 transition duration-300"
+              >
+                Clientes
+              </Link>
+            </li>
+            {/* Link a Facturacion */}
+            <li>
+              <Link
+                to="/facturacion"
+                className="text-white hover:text-blue-500 transition duration-300"
+              >
+                Facturación
+              </Link>
+            </li>
+
+
             {/* Menú desplegable: Bases de datos */}
             <li className="relative group">
               <span className="text-white hover:text-blue-500 cursor-pointer transition duration-300">
@@ -77,6 +97,14 @@ function Navbar() {
                     className="text-white hover:text-blue-500 transition duration-300"
                   >
                     Pagos
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/cartera"
+                    className="text-white hover:text-blue-500 transition duration-300"
+                  >
+                    Cartera
                   </Link>
                 </li>
               </ul>

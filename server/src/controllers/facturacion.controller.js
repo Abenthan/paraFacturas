@@ -425,10 +425,57 @@ export const getPago = async (req, res) => {
       return res.status(404).json({ message: "Pago no encontrado" });
     }
 
-    
     res.json(pagoRows[0]);
   } catch (error) {
     console.error("Error al obtener pago:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+// Obtener cartera
+export const getCartera = async (req, res) => {
+  const { estado, cliente, idSuscripcion } = req.query;
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT 
+        s.idSuscripcion,
+        c.nombreCliente,
+        p.nombreProducto,
+        s.direccionServicio,
+        s.Estado AS estadoSuscripcion,
+        SUM(f.valor) AS totalFacturado,
+        SUM(IFNULL(p.totalPagado, 0)) AS totalPagado,
+        SUM(f.valor) - SUM(IFNULL(p.totalPagado, 0)) AS saldoPendiente,
+        COUNT(f.idFactura) AS cantidadFacturas
+      FROM suscripciones s
+      JOIN clientes c ON s.cliente_id = c.idCliente
+      JOIN productos p ON s.producto_id = p.idProducto
+      JOIN facturas f ON f.suscripcion_id = s.idSuscripcion
+      LEFT JOIN (
+        SELECT factura_id, SUM(valorPago) AS totalPagado
+        FROM pagos
+        GROUP BY factura_id
+      ) p ON p.factura_id = f.idFactura
+      WHERE f.estado IN ('Pendiente por pagar', 'Pago Parcial')
+      ${estado ? "AND f.estado = ?" : ""}
+      ${cliente ? "AND c.nombreCliente LIKE ?" : ""}
+      ${idSuscripcion ? "AND s.idSuscripcion = ?" : ""}
+      GROUP BY s.idSuscripcion
+      HAVING saldoPendiente > 0
+      ORDER BY s.idSuscripcion
+    `,
+      [
+        ...(estado ? [estado] : []),
+        ...(cliente ? [`%${cliente}%`] : []),
+        ...(idSuscripcion ? [idSuscripcion] : []),
+      ]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error obteniendo cartera:", error);
+    res.status(500).json({ message: "Error obteniendo cartera" });
+  }
+};
+
