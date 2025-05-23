@@ -16,7 +16,8 @@ import ClientePage from "./pages/clientes/ClientePage";
 import ProductosPage from "./pages/productos/ProductosPage.jsx";
 import CrearProductoPage from "./pages/productos/CrearProductoPage.jsx";
 import ProductoPage from "./pages/productos/ProductoPage.jsx";
-import SuscripcionesPage from "./pages/suscripciones/SuscripcionesPage";
+import SuscripcionesPage from "./pages/suscripciones/SuscripcionesPage.jsx";
+import SuscripcionesClientePage from "./pages/suscripciones/SuscripcionesClientePage";
 import SuscripcionPage from "./pages/suscripciones/SuscripcionPage";
 import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
@@ -72,10 +73,11 @@ function App() {
                     <Route path="/productos" element={<ProductosPage />} />
                     <Route path="/crearProducto" element={<CrearProductoPage />} />
                     <Route path="/producto/:id" element={<ProductoPage />} />
+                    <Route path="/suscripciones" element={<SuscripcionesPage />} />
 
                     <Route
                       path="/suscripciones/:id"
-                      element={<SuscripcionesPage />}
+                      element={<SuscripcionesClientePage />}
                     />
                     <Route
                       path="/crearSuscripcion/:id"

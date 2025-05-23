@@ -1,7 +1,7 @@
 import { pool } from "../db.js";
 
 // buscar las suscripciones de un cliente
-export const getSuscripciones = async (req, res) => {
+export const getSuscripcionesCliente = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -27,6 +27,24 @@ export const getSuscripciones = async (req, res) => {
     });
   }
 };
+
+export const getSuscripciones = async (req, res) => {
+  try {
+    const consulta = `SELECT s.*, c.nombreCliente, p.nombreProducto
+    FROM suscripciones s 
+    JOIN clientes c ON s.cliente_id = c.idCliente
+    JOIN productos p ON s.producto_id = p.idProducto`;
+    const [rows] = await pool.query(consulta);
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.log("error en catch de getSuscripciones", error);
+    return res.status(500).json({
+      message: "Error al obtener las suscripciones, porfavor intente de nuevo",
+      error: error.message,
+    });
+  }
+}
 
 export const createSuscripcion = async (req, res) => {
   try {

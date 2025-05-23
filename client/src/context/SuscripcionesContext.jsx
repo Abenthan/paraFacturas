@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 import {
   getSuscripcionesRequest,
+  getSuscripcionesClienteRequest,
   getSuscripcionRequest,
   createSuscripcionRequest,
   updateSuscripcionRequest,
@@ -24,9 +25,18 @@ export const SuscripcionesProvider = ({ children }) => {
   const [suscripcion, setSuscripcion] = useState({});
   const [errors, setErrors] = useState([]);
 
-  const getSuscripciones = async (id) => {
+  const getSuscripciones = async () => {
     try {
-      const response = await getSuscripcionesRequest(id);
+      const response = await getSuscripcionesRequest();
+      setSuscripciones(response.data);
+    } catch (error) {
+      console.error("Error fetching suscripciones:", error);
+    }
+  };
+
+  const getSuscripcionesCliente = async (id) => {
+    try {
+      const response = await getSuscripcionesClienteRequest(id);
       setSuscripciones(response.data);
     } catch (error) {
       console.error("Error fetching suscripciones:", error);
@@ -62,6 +72,7 @@ export const SuscripcionesProvider = ({ children }) => {
       return error.response.data;
     }
   };
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -77,6 +88,7 @@ export const SuscripcionesProvider = ({ children }) => {
         suscripciones,
         suscripcion,
         getSuscripciones,
+        getSuscripcionesCliente,
         getSuscripcion,
         createSuscripcion,
         updateSuscripcion,

@@ -110,7 +110,7 @@ function SuscripcionPage() {
           to={`/suscripciones/${suscripcion.cliente_id}`}
           className="text-blue-400 hover:text-blue-300"
         >
-          ← Volver a la lista de suscripciones
+          ← Ver suscripciones del cliente
         </Link>
       </div>
 

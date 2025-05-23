@@ -86,7 +86,7 @@ function ClientePage() {
                 clipRule="evenodd"
               />
             </svg>
-            Volver al listado
+            Listado de Clientes
           </Link>
 
           <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -111,7 +111,7 @@ function ClientePage() {
             </Link>
 
             <Link
-              to={`/clientes/${params.id}/estado-cuenta`}
+              to={`/estadoCuentaCliente/${params.id}`}
               className="inline-flex items-center px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-blue-200 rounded-lg transition-colors duration-200 border border-blue-600/50"
             >
               <svg

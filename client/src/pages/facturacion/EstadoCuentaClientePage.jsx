@@ -49,6 +49,14 @@ function EstadoCuentaClientePage() {
   return (
     <div className="min-h-screen bg-gray-900 p-6 text-white">
       <div className="max-w-6xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
+        <div className="mb-6">
+          <Link
+            to={`/cliente/${cliente?.idCliente}`}
+            className="text-blue-400 hover:text-blue-300 text-sm"
+          >
+            ← Ver Cliente
+          </Link>
+        </div>
         <h1 className="text-2xl font-bold mb-4">
           Estado de cuenta de: {cliente?.nombreCliente}
         </h1>
@@ -62,7 +70,10 @@ function EstadoCuentaClientePage() {
             <table className="w-full text-sm text-left text-gray-300">
               <thead className="text-xs uppercase bg-zinc-700 text-gray-400">
                 <tr>
-                  <th className="px-4 py-3">Numero de<br /> Suscripción</th>
+                  <th className="px-4 py-3">
+                    Numero de
+                    <br /> Suscripción
+                  </th>
                   <th className="px-4 py-3">Código Factura</th>
                   <th className="px-4 py-3">Valor Factura</th>
                   <th className="px-4 py-3">Total Pagado</th>
@@ -115,15 +126,6 @@ function EstadoCuentaClientePage() {
             </table>
           </div>
         )}
-
-        <div className="mt-6">
-          <Link
-            to="/clientes"
-            className="text-blue-400 hover:text-blue-300 text-sm"
-          >
-            ← Volver al listado de clientes
-          </Link>
-        </div>
       </div>
     </div>
   );
