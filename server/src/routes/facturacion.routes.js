@@ -8,6 +8,7 @@ import {
   getPagos,
   getPago,
   getCartera,
+  getEstadoCuentaCliente,
 
 } from "../controllers/facturacion.controller.js";
 
@@ -28,5 +29,7 @@ router.get("/pagos", getPagos);
 router.get("/pago/:id", getPago);
 
 router.get("/cartera", getCartera);
+
+router.get("/estadoCuentaCliente/:idCliente", getEstadoCuentaCliente);
 
 export default router;

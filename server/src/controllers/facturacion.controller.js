@@ -478,4 +478,37 @@ export const getCartera = async (req, res) => {
     res.status(500).json({ message: "Error obteniendo cartera" });
   }
 };
+// Obtener estado de cuenta del cliente
+export const getEstadoCuentaCliente = async (req, res) => {
+  const { idCliente } = req.params;
 
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT  
+        f.idFactura,
+        f.codigoFactura,
+        f.suscripcion_id,
+        f.valor AS valorFactura, 
+        COALESCE(SUM(p.valorPago), 0) AS totalPagado
+      FROM facturas f
+      JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      LEFT JOIN pagos p ON f.idFactura = p.factura_id
+      WHERE s.cliente_id = ?
+      AND (f.estado = 'Pendiente por pagar' OR f.estado = 'Pago Parcial')
+      GROUP BY f.idFactura
+      ORDER BY f.idFactura DESC
+    `,
+      [idCliente]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No se encontraron facturas." });
+    }
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error obteniendo estado de cuenta:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};

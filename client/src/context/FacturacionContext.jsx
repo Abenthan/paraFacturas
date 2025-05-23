@@ -8,6 +8,7 @@ import {
   obtenerPagosRequest,
   obtenerPagoRequest,
   obtenerCarteraRequest,
+  getEstadoCuentaClienteRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -95,16 +96,25 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
-const obtenerCartera = async (filtros) => {
-  try {
-    const res = await obtenerCarteraRequest(filtros);
-    return res.data;
-  } catch (error) {
-    console.error("Error al obtener la cartera:", error);
-    throw error; // Propagar el error para manejarlo en el componente
-  }
-}
+  const obtenerCartera = async (filtros) => {
+    try {
+      const res = await obtenerCarteraRequest(filtros);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener la cartera:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  };
 
+  const getEstadoCuentaCliente = async (idCliente) => {
+    try {
+      const res = await getEstadoCuentaClienteRequest(idCliente);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener el estado de cuenta del cliente:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  };
 
   return (
     <FacturacionContext.Provider
@@ -118,6 +128,7 @@ const obtenerCartera = async (filtros) => {
         obtenerPagos,
         obtenerPago,
         obtenerCartera,
+        getEstadoCuentaCliente,
       }}
     >
       {children}
