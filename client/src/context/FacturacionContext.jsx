@@ -9,6 +9,7 @@ import {
   obtenerPagoRequest,
   obtenerCarteraRequest,
   getEstadoCuentaClienteRequest,
+  getCarteraSuscripcionRequest,
 } from "../api/facturacionApi";
 
 export const FacturacionContext = createContext();
@@ -116,6 +117,16 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
+  const getCarteraSuscripcion = async (idSuscripcion) => {
+    try {
+      const res = await getCarteraSuscripcionRequest(idSuscripcion);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener la cartera de la suscripción:", error);
+      throw error; // Propagar el error para manejarlo en el componente
+    }
+  }
+
   return (
     <FacturacionContext.Provider
       value={{
@@ -129,6 +140,7 @@ export const FacturacionProvider = ({ children }) => {
         obtenerPago,
         obtenerCartera,
         getEstadoCuentaCliente,
+        getCarteraSuscripcion,
       }}
     >
       {children}

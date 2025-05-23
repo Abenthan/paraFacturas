@@ -37,3 +37,6 @@ export const obtenerCarteraRequest = async (filtros) =>
 export const getEstadoCuentaClienteRequest = async (idCliente) =>
   await axios.get(`/estadoCuentaCliente/${idCliente}`);
 
+export const getCarteraSuscripcionRequest = async (idSuscripcion) =>
+  await axios.get(`/carteraSuscripcion/${idSuscripcion}`);
+

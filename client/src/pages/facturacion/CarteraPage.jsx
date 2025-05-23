@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useFacturacion } from "../../context/FacturacionContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function CarteraPage() {
   const { obtenerCartera } = useFacturacion();
@@ -44,12 +44,7 @@ function CarteraPage() {
     });
   };
 
-  // Ir a la página de facturas con filtros aplicados
-  const handleVer = (suscripcionId, nombreCliente) => {
-    navigate(`/facturas?cliente=${nombreCliente}&suscripcion=${suscripcionId}`);
-  };
-
-  // Ordenamiento de columnas
+ // Ordenamiento de columnas
   const handleSort = (campo) => {
     if (campo === sortBy) {
       setSortAsc(!sortAsc);
@@ -122,7 +117,7 @@ function CarteraPage() {
             <thead className="bg-gray-800">
               <tr>
                 {[
-                  { label: "ID Suscripción", campo: "idSuscripcion" },
+                  { label: "Número de Suscripcion", campo: "idSuscripcion" },
                   { label: "Cliente", campo: "nombreCliente" },
                   { label: "Producto", campo: "nombreProducto" },
                   { label: "Dirección", campo: "direccionServicio" },
@@ -156,12 +151,12 @@ function CarteraPage() {
                   <td className="p-3">${Number(item.saldoPendiente).toLocaleString()}</td>
                   <td className="p-3">{item.cantidadFacturas}</td>
                   <td className="p-3">
-                    <button
-                      onClick={() => handleVer(item.idSuscripcion, item.nombreCliente)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                    <Link
+                      to={`/carteraSuscripcion/${item.idSuscripcion}`}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg"
                     >
                       Ver
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
