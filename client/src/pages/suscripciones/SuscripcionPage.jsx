@@ -107,11 +107,12 @@ function SuscripcionPage() {
     <div className="max-w-xl mx-auto p-6 bg-gray-900 text-white rounded shadow">
       <div className="flex justify-between items-center mb-6">
         <Link
-          to={`/suscripciones/${suscripcion.cliente_id}`}
+          to={`/carterasuscripcion/${suscripcion.idSuscripcion}`}
           className="text-blue-400 hover:text-blue-300"
         >
-          ← Ver suscripciones del cliente
+          ← Ver suscripción
         </Link>
+
       </div>
 
       <h2 className="text-2xl font-bold mb-6">Editar Suscripción</h2>
@@ -268,9 +269,7 @@ function SuscripcionPage() {
           <input type="hidden" {...register("cliente_id")} />
 
           {/* usuarioId */}
-          <input type="hidden" value={usuarioId} {...register("usuarioId")}
-          />
-
+          <input type="hidden" value={usuarioId} {...register("usuarioId")} />
         </div>
 
         {/* Botón de enviar */}

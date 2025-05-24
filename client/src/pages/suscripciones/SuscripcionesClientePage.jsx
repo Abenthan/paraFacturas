@@ -77,10 +77,10 @@ function SuscripcionesCliente() {
                     <td className="px-4 py-3">
                       <div className="flex space-x-2">
                         <Link
-                          to={`/suscripcion/${suscripcion.idSuscripcion}`}
+                          to={`/carteraSuscripcion/${suscripcion.idSuscripcion}`}
                           className="text-blue-400 hover:text-blue-300"
                         >
-                          Editar
+                          Ver
                         </Link>
                       </div>
                     </td>

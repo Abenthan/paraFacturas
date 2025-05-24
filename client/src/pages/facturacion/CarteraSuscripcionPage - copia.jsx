@@ -1,28 +1,37 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useFacturacion } from "../../context/FacturacionContext";
 import { useEffect, useState } from "react";
 
 function CarteraSuscripcionPage() {
   const { id: suscripcionId } = useParams();
-  const navigate = useNavigate();
   const { suscripcion, getSuscripcion } = useSuscripciones();
   const { getCarteraSuscripcion } = useFacturacion();
   const [facturas, setFacturas] = useState([]);
-  const [mostrarTramites, setMostrarTramites] = useState(false);
 
   // Cargar datos de la suscripción
   useEffect(() => {
-    async function fetchData() {
+    const fetchSuscripcion = async () => {
       try {
         await getSuscripcion(suscripcionId);
+      } catch (error) {
+        console.error("Error al obtener la suscripción:", error);
+      }
+    };
+    fetchSuscripcion();
+  }, [suscripcionId]);
+
+  // Cargar cartera de la suscripción
+  useEffect(() => {
+    const fetchCartera = async () => {
+      try {
         const cartera = await getCarteraSuscripcion(suscripcionId);
         setFacturas(cartera);
       } catch (error) {
-        console.error("Error cargando datos:", error);
+        console.error("Error al obtener cartera:", error);
       }
-    }
-    fetchData();
+    };
+    fetchCartera();
   }, [suscripcionId]);
 
   if (!suscripcion) {
@@ -32,49 +41,6 @@ function CarteraSuscripcionPage() {
       </div>
     );
   }
-
-  // Validaciones de trámites
-  const puedeSuspender =
-    suscripcion.Estado === "Activo" && facturas.length >= 2;
-
-  const puedeReconectar =
-    suscripcion.Estado === "Suspencion" && facturas.length === 0;
-
-  const puedeRetirar = facturas.length === 0;
-
-  const tramites = [
-    {
-      nombre: "Editar",
-      path: `/suscripcion/${suscripcionId}`,
-      permitido: true,
-    },
-    {
-      nombre: "Suspensión",
-      path: `/suspenderSuscripcion/${suscripcionId}`,
-      permitido: puedeSuspender,
-      mensaje: "Solo se puede suspender si hay 2 o más facturas y la suscripción está activa.",
-    },
-    {
-      nombre: "Reconexion",
-      path: `/reconectarSuscripcion/${suscripcionId}`,
-      permitido: puedeReconectar,
-      mensaje: "Solo se puede reconectar si la suscripción está en suspensión y no hay facturas pendientes.",
-    },
-    {
-      nombre: "Retiro",
-      path: `/retiroSuscripcion/${suscripcionId}`,
-      permitido: puedeRetirar,
-      mensaje: "Solo se puede retirar si no hay facturas pendientes.",
-    },
-  ];
-
-  const handleTramite = (t) => {
-    if (t.permitido) {
-      navigate(t.path);
-    } else {
-      alert(t.mensaje);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 p-6 text-white">
@@ -97,35 +63,6 @@ function CarteraSuscripcionPage() {
           <p className="text-gray-300">Cliente: <span className="text-white font-semibold">{suscripcion.nombreCliente}</span></p>
           <p className="text-gray-300">Producto: <span className="text-white font-semibold">{suscripcion.nombreProducto}</span></p>
           <p className="text-gray-300">Dirección del servicio: <span className="text-white font-semibold">{suscripcion.direccionServicio}</span></p>
-          <p className="text-gray-300">Estado de la suscripción: <span className="text-white font-semibold">{suscripcion.Estado}</span></p>
-        </div>
-
-        {/* Botón Tramites */}
-        <div className="mb-6">
-          <button
-            onClick={() => setMostrarTramites(!mostrarTramites)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
-          >
-            Trámites
-          </button>
-
-          {mostrarTramites && (
-            <div className="mt-4 bg-zinc-700 p-4 rounded-lg space-y-2">
-              {tramites.map((t) => (
-                <button
-                  key={t.nombre}
-                  onClick={() => handleTramite(t)}
-                  className={`block w-full text-left px-4 py-2 rounded-md ${
-                    t.permitido
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : "bg-gray-600 cursor-not-allowed opacity-60"
-                  } text-white`}
-                >
-                  {t.nombre}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Tabla de facturas */}
@@ -156,7 +93,7 @@ function CarteraSuscripcionPage() {
                       ${factura.totalPagado.toLocaleString("es-CO")}
                     </td>
                     <td className="px-4 py-2 text-yellow-300 font-semibold">
-                      ${(saldo).toLocaleString("es-CO")}
+                      ${saldo.toLocaleString("es-CO")}
                     </td>
                     <td className="px-4 py-2">
                       <Link
@@ -169,13 +106,6 @@ function CarteraSuscripcionPage() {
                   </tr>
                 );
               })}
-              {facturas.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4 text-gray-400">
-                    No hay facturas pendientes para esta suscripción.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>

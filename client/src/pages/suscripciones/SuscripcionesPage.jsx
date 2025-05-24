@@ -119,7 +119,7 @@ function SuscripcionesPage() {
                   <td className="px-4 py-2">{s.Estado}</td>
                   <td className="px-4 py-2">
                     <Link
-                      to={`/suscripcion/${s.idSuscripcion}`}
+                      to={`/carteraSuscripcion/${s.idSuscripcion}`}
                       className="text-blue-400 hover:text-blue-300"
                     >
                       Ver
