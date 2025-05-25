@@ -20,7 +20,7 @@ import SuscripcionesPage from "./pages/suscripciones/SuscripcionesPage.jsx";
 import SuscripcionesClientePage from "./pages/suscripciones/SuscripcionesClientePage";
 import SuscripcionPage from "./pages/suscripciones/SuscripcionPage";
 import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
-import TramitesSuscripcion from "./pages/suscripciones/TramitesSuscripcion.jsx";
+import SuspenderSuscripcionPage from "./pages/suscripciones/SuspenderSuscripcionPage.jsx";
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
@@ -68,27 +68,17 @@ function App() {
                       element={<NuevoClientePage />}
                     />
                     <Route path="/register" element={<RegisterPage />} />
-
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
                     <Route path="/productos" element={<ProductosPage />} />
                     <Route path="/crearProducto" element={<CrearProductoPage />} />
                     <Route path="/producto/:id" element={<ProductoPage />} />
                     <Route path="/suscripciones" element={<SuscripcionesPage />} />
+                    <Route path="/suscripciones/:id" element={<SuscripcionesClientePage />} />
+                    <Route path="/crearSuscripcion/:id" element={<CrearSuscripcionPage />} />
+                    <Route path="/suscripcion/:id" element={<SuscripcionPage />} />
+                    <Route path="/suspenderSuscripcion/:idSuscripcion" element={<SuspenderSuscripcionPage />} />
 
-                    <Route
-                      path="/suscripciones/:id"
-                      element={<SuscripcionesClientePage />}
-                    />
-                    <Route
-                      path="/crearSuscripcion/:id"
-                      element={<CrearSuscripcionPage />}
-                    />
-                    <Route
-                      path="/suscripcion/:id"
-                      element={<SuscripcionPage />}
-                    />
-                    <Route path="/tramitesSuscripcion/:id" element={<TramitesSuscripcion />} />
                   </Route>
                 </Routes>
               </BrowserRouter>

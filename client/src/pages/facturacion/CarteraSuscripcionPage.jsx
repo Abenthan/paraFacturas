@@ -38,7 +38,7 @@ function CarteraSuscripcionPage() {
     suscripcion.Estado === "Activo" && facturas.length >= 2;
 
   const puedeReconectar =
-    suscripcion.Estado === "Suspencion" && facturas.length === 0;
+    suscripcion.Estado === "Suspendida" && facturas.length === 0;
 
   const puedeRetirar = facturas.length === 0;
 

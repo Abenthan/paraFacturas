@@ -13,3 +13,6 @@ export const getSuscripcionRequest = (id) =>
 
 export const updateSuscripcionRequest = (id, suscripcion) =>
   axios.put(`/suscripcion/${id}`, suscripcion);
+
+export const suspenderSuscripcionRequest = (id, usuarioId) =>
+  axios.put(`/suspenderSuscripcion/${id}`, { usuarioId });

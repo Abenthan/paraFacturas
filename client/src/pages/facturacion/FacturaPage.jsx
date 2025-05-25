@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFacturacion } from "../../context/FacturacionContext";
+import { Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
 function FacturaPage() {
@@ -67,7 +68,13 @@ function FacturaPage() {
     <div className="container mx-auto p-6 text-white">
       {/* Encabezado con botones */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Factura #{factura.codigoFactura}</h1>
+        {/* enlace para ir estado de cuenta del cliente */}
+        <Link
+          to={`/estadoCuentaCliente/${factura.idCliente}`}
+          className="text-blue-400 hover:text-blue-300 text-sm"         >
+          ← Estado de Cuenta del Cliente
+        </Link>
+
         <div className="flex gap-4">
           {/* Botón para imprimir o guardar PDF */}
           <button
@@ -113,6 +120,7 @@ function FacturaPage() {
           <p>
             <strong>Cliente:</strong> {factura.nombreCliente}
           </p>
+          <p><strong>Suscripcion # </strong> {factura.idSuscripcion}</p>
           <p>
             <strong>Producto:</strong> {factura.nombreProducto}
           </p>

@@ -6,6 +6,7 @@ import {
   getSuscripcionRequest,
   createSuscripcionRequest,
   updateSuscripcionRequest,
+  suspenderSuscripcionRequest,
 } from "../api/suscripcionesApi";
 
 export const SuscripcionesContext = createContext();
@@ -62,6 +63,17 @@ export const SuscripcionesProvider = ({ children }) => {
     }
   };
 
+  const suspenderSuscripcion = async (id, usuarioId) => {
+    try {
+      const response = await suspenderSuscripcionRequest(id, usuarioId);
+      return response;
+    } catch (error) {
+      setErrors(error.response.data);
+      return error.response.data;
+    }
+
+  }
+
   const updateSuscripcion = async (id, suscripcion) => {
     try {
       const response = await updateSuscripcionRequest(id, suscripcion);
@@ -92,6 +104,7 @@ export const SuscripcionesProvider = ({ children }) => {
         getSuscripcion,
         createSuscripcion,
         updateSuscripcion,
+        suspenderSuscripcion,
         errors,
         setErrors,
       }}
