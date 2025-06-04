@@ -244,3 +244,45 @@ export const suspenderSuscripcion = async (req, res) => {
     return res.status(500).json(["Error en el servidor, vuelva a intentarlo"]);
   }
 };
+
+export const reconexionSuscripcion = async (req, res) => {
+  const { idSuscripcion, usuarioId } = req.body;
+  try {
+    // actualizar el estado de la suscripcion a Activo
+    const consultaSuscripcion = `UPDATE suscripciones
+  SET Estado = 'Activo'
+  WHERE idSuscripcion = ?`;
+    const [suscripcion] = await pool.query(consultaSuscripcion, [
+      idSuscripcion,
+    ]);
+
+    if (suscripcion.affectedRows === 0) {
+      return res.status(404).json({ message: "Suscripción no encontrada" });
+    }
+
+    // insertar la novedad de reconexion
+    const consultaNovedad = `INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad,suscripcion_id) VALUES (?, ?, ?, ?)`;
+    const [novedad] = await pool.query(consultaNovedad, [
+      "Reconexión",
+      new Date(),
+      `Se reconectó la suscripción número ${idSuscripcion}`,
+      idSuscripcion,
+    ]);
+
+    // registrar en auditoria
+    const consultaAuditoria = `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion) VALUES (?, ?, ?, ?)`;
+    const [auditoria] = await pool.query(consultaAuditoria, [
+      usuarioId,
+      "Reconectar",
+      "Suscripciones",
+      `Se reconectó la suscripción número ${idSuscripcion}`,
+    ]);
+    res.status(200).json({ message: "Suscripción reconectada" });
+  } catch (error) {
+    console.log("error en reconexionSuscripcion", error);
+    return res.status(500).json({
+      message: "Error en el servidor, vuelva a intentarlo",
+      error: error.message,
+    });
+  }
+};

@@ -91,7 +91,7 @@ function ClientePage() {
 
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <Link
-              to={`/Suscripciones/${params.id}`}
+              to={`/SuscripcionesCliente/${params.id}`}
               className="inline-flex items-center px-3 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 hover:text-purple-200 rounded-lg transition-colors duration-200 border border-purple-600/50"
             >
               <svg

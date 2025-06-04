@@ -13,6 +13,8 @@ function FacturaPage() {
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const idProductoSuscripcion = 1;
+
   // Referencia al bloque que se imprimirá/convertirá en PDF
   const printRef = useRef();
 
@@ -68,12 +70,21 @@ function FacturaPage() {
     <div className="container mx-auto p-6 text-white">
       {/* Encabezado con botones */}
       <div className="flex justify-between items-center mb-6">
-        {/* enlace para ir estado de cuenta del cliente */}
-        <Link
-          to={`/estadoCuentaCliente/${factura.idCliente}`}
-          className="text-blue-400 hover:text-blue-300 text-sm"         >
-          ← Estado de Cuenta del Cliente
-        </Link>
+        <div>
+          <Link
+            to={`/estadoCuentaCliente/${factura.idCliente}`}
+            className="text-blue-400 hover:text-blue-300 text-sm"
+          >
+            Cliente
+          </Link>
+          <span className="mx-2 text-gray-400">|</span>
+          <Link
+            to={`/carteraSuscripcion/${factura.idSuscripcion}`}
+            className="text-green-500 hover:text-green-300 text-sm"
+          >
+            Suscripción
+          </Link>
+        </div>
 
         <div className="flex gap-4">
           {/* Botón para imprimir o guardar PDF */}
@@ -110,9 +121,6 @@ function FacturaPage() {
           <h2 className="text-2xl font-bold mb-1">
             Factura #{factura.codigoFactura}
           </h2>
-          <p>
-            Periodo: {factura.year}/{factura.mes.toString().padStart(2, "0")}
-          </p>
         </div>
 
         {/* Datos principales */}
@@ -120,10 +128,18 @@ function FacturaPage() {
           <p>
             <strong>Cliente:</strong> {factura.nombreCliente}
           </p>
-          <p><strong>Suscripcion # </strong> {factura.idSuscripcion}</p>
+          <p>
+            <strong>Suscripcion # </strong> {factura.idSuscripcion}
+          </p>
           <p>
             <strong>Producto:</strong> {factura.nombreProducto}
           </p>
+          {factura.idProducto === idProductoSuscripcion && (
+            <p>
+              Periodo: {factura.year}/{factura.mes.toString().padStart(2, "0")}
+            </p>
+          )}
+
           <p>
             <strong>Dirección Servicio:</strong> {factura.direccionServicio}
           </p>

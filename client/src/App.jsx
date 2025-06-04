@@ -21,6 +21,7 @@ import SuscripcionesClientePage from "./pages/suscripciones/SuscripcionesCliente
 import SuscripcionPage from "./pages/suscripciones/SuscripcionPage";
 import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
 import SuspenderSuscripcionPage from "./pages/suscripciones/SuspenderSuscripcionPage.jsx";
+import ReconexionPage from "./pages/suscripciones/ReconexionPage.jsx";
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
@@ -44,29 +45,10 @@ function App() {
 
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />
-                  <Route path="/facturacion" element={<FacturacionPage />} />
-                  <Route
-                    path="/prefacturacion"
-                    element={<PrefacturacionPage />}
-                  />
-                  <Route path="/facturas" element={<FacturasPage />} />
-                  <Route path="/factura/:id" element={<FacturaPage />} />
-                  <Route
-                    path="/pagarFactura/:id"
-                    element={<PagarFacturaPage />}
-                  />
-                  <Route path="/pagos" element={<PagosPage />} />
-                  <Route path="/pago/:id" element={<PagoPage />} />
-                  <Route path="/cartera" element={<CarteraPage />} />
-                  <Route path="/estadoCuentaCliente/:id" element={<EstadoCuentaCliente />} />
-                  <Route path="/carteraSuscripcion/:id" element={<CarteraSuscripcionPage />} />
+
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />
-
-                    <Route
-                      path="/nuevoCliente"
-                      element={<NuevoClientePage />}
-                    />
+                    <Route path="/nuevoCliente" element={<NuevoClientePage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
@@ -74,10 +56,22 @@ function App() {
                     <Route path="/crearProducto" element={<CrearProductoPage />} />
                     <Route path="/producto/:id" element={<ProductoPage />} />
                     <Route path="/suscripciones" element={<SuscripcionesPage />} />
-                    <Route path="/suscripciones/:id" element={<SuscripcionesClientePage />} />
+                    <Route path="/suscripcionesCliente/:id" element={<SuscripcionesClientePage />} />
                     <Route path="/crearSuscripcion/:id" element={<CrearSuscripcionPage />} />
                     <Route path="/suscripcion/:id" element={<SuscripcionPage />} />
                     <Route path="/suspenderSuscripcion/:idSuscripcion" element={<SuspenderSuscripcionPage />} />
+                    <Route path="/suscripciones/reconexion" element={<ReconexionPage />} />
+                    <Route path="/facturacion" element={<FacturacionPage />} />
+                    <Route path="/prefacturacion" element={<PrefacturacionPage />} />
+                    <Route path="/facturas" element={<FacturasPage />} />
+                    <Route path="/factura/:id" element={<FacturaPage />} />
+                    <Route path="/pagarFactura/:id" element={<PagarFacturaPage />} />
+                    <Route path="/pagos" element={<PagosPage />} />
+                    <Route path="/pago/:id" element={<PagoPage />} />
+                    <Route path="/cartera" element={<CarteraPage />} />
+                    <Route path="/estadoCuentaCliente/:id" element={<EstadoCuentaCliente />} />
+                    <Route path="/carteraSuscripcion/:id" element={<CarteraSuscripcionPage />} />
+
 
                   </Route>
                 </Routes>

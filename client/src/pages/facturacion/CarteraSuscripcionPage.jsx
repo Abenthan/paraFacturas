@@ -37,8 +37,7 @@ function CarteraSuscripcionPage() {
   const puedeSuspender =
     suscripcion.Estado === "Activo" && facturas.length >= 2;
 
-  const puedeReconectar =
-    suscripcion.Estado === "Suspendida" && facturas.length === 0;
+  const puedeReconectar = suscripcion.Estado === "Suspendida";
 
   const puedeRetirar = facturas.length === 0;
 
@@ -52,13 +51,15 @@ function CarteraSuscripcionPage() {
       nombre: "Suspensión",
       path: `/suspenderSuscripcion/${suscripcionId}`,
       permitido: puedeSuspender,
-      mensaje: "Solo se puede suspender si hay 2 o más facturas y la suscripción está activa.",
+      mensaje:
+        "Solo se puede suspender si hay 2 o más facturas y la suscripción está activa.",
     },
     {
       nombre: "Reconexion",
-      path: `/reconectarSuscripcion/${suscripcionId}`,
+      path: `/suscripciones/reconexion`,
       permitido: puedeReconectar,
-      mensaje: "Solo se puede reconectar si la suscripción está en suspensión y no hay facturas pendientes.",
+      mensaje:
+        "Solo se puede reconectar si la suscripción está en suspensión y no hay facturas pendientes por suscrición.",
     },
     {
       nombre: "Retiro",
@@ -82,7 +83,7 @@ function CarteraSuscripcionPage() {
         {/* Botón de regreso */}
         <div className="mb-4">
           <Link
-            to={`/suscripciones/${suscripcion.cliente_id}`}
+            to={`/suscripcionesCliente/${suscripcion.cliente_id}`}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             ← Ir a las suscripciones de este cliente
@@ -94,10 +95,30 @@ function CarteraSuscripcionPage() {
           <h1 className="text-2xl font-bold mb-1">
             Estado de cuenta de la suscripción #{suscripcionId}
           </h1>
-          <p className="text-gray-300">Cliente: <span className="text-white font-semibold">{suscripcion.nombreCliente}</span></p>
-          <p className="text-gray-300">Producto: <span className="text-white font-semibold">{suscripcion.nombreProducto}</span></p>
-          <p className="text-gray-300">Dirección del servicio: <span className="text-white font-semibold">{suscripcion.direccionServicio}</span></p>
-          <p className="text-gray-300">Estado de la suscripción: <span className="text-white font-semibold">{suscripcion.Estado}</span></p>
+          <p className="text-gray-300">
+            Cliente:{" "}
+            <span className="text-white font-semibold">
+              {suscripcion.nombreCliente}
+            </span>
+          </p>
+          <p className="text-gray-300">
+            Producto:{" "}
+            <span className="text-white font-semibold">
+              {suscripcion.nombreProducto}
+            </span>
+          </p>
+          <p className="text-gray-300">
+            Dirección del servicio:{" "}
+            <span className="text-white font-semibold">
+              {suscripcion.direccionServicio}
+            </span>
+          </p>
+          <p className="text-gray-300">
+            Estado de la suscripción:{" "}
+            <span className="text-white font-semibold">
+              {suscripcion.Estado}
+            </span>
+          </p>
         </div>
 
         {/* Botón Tramites */}
@@ -156,12 +177,12 @@ function CarteraSuscripcionPage() {
                       ${factura.totalPagado.toLocaleString("es-CO")}
                     </td>
                     <td className="px-4 py-2 text-yellow-300 font-semibold">
-                      ${(saldo).toLocaleString("es-CO")}
+                      ${saldo.toLocaleString("es-CO")}
                     </td>
                     <td className="px-4 py-2">
                       <Link
                         to={`/factura/${factura.idFactura}`}
-                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+                        className="text-blue-400 hover:text-blue-300"
                       >
                         Pagar
                       </Link>

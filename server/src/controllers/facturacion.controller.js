@@ -222,7 +222,6 @@ export const getFacturas = async (req, res) => {
 // Obtener factura por ID
 export const getFactura = async (req, res) => {
   const { id } = req.params;
-  console.log("ID de factura:", id);
 
   try {
     // Consultar la factura con cliente, producto y dirección
@@ -549,3 +548,169 @@ export const getCarteraSuscripcion = async (req, res) => {
   }
 };
 
+//obtener factura de reconexión
+export const getFacturaReconexion = async (req, res) => {
+  const { idSuscripcion } = req.params;
+
+  // validar que exista la suscripcion
+  if (!idSuscripcion) {
+    return res
+      .status(400)
+      .json({ message: "No de ha obtenido el numero de suscripcion" });
+  }
+
+  // Busco novedad
+  try {
+    const [resultadoFacturaReconexion] = await pool.query(
+      `
+        SELECT f.codigoFactura, f.fechaFactura, p.nombreProducto, f.valor, f.estado, f.idFactura
+        FROM novedades n
+        JOIN facturasnovedades fn ON fn.novedad_id = n.idNovedad
+        JOIN facturas f ON f.idFactura = fn.factura_id
+        JOIN productos p ON p.idProducto = f.producto_id
+        WHERE n.suscripcion_id = ?
+        AND n.novedad = 'Suspensión'    `,
+      [idSuscripcion]
+    );
+
+    if (resultadoFacturaReconexion.length === 0) {
+      return res.status(404).json({ message: "No hay factura de reconexión." });
+    }
+    const facturaReconexion = resultadoFacturaReconexion[0];
+    res.json(facturaReconexion);
+  } catch (error) {
+    console.error("Error obteniendo factura de reconexión:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// generar factura reconexion
+export const crearFacturaReconexion = async (req, res) => {
+  const { idSuscripcion, usuarioId } = req.body;
+  const ProductoId = 10; // ID del producto de reconexión, debe ser el correcto según tu base de datos
+  console.log("Datos recibidos para crear factura de reconexión:", req.body);
+
+  try {
+    // Verificar si las suscripciones ya tienen factura de reconexión
+    // primero busco la novedad de suspensión
+    const [novedadRows] = await pool.query(
+      `
+      SELECT idNovedad, suscripcion_id
+      FROM novedades
+      WHERE suscripcion_id = ? AND novedad = 'Suspensión'
+      order by fechaNovedad desc
+      limit 1
+      `,
+      [idSuscripcion]
+    );
+
+    if (novedadRows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Novedad de suspensión no encontrada." });
+    }
+
+    // busco idNovedad facturasnovedades
+    const [facturaNovedadesRows] = await pool.query(
+      `
+      SELECT *
+      FROM facturasnovedades
+      WHERE novedad_id = ?
+      `,
+      [novedadRows[0].idNovedad]
+    );
+
+    if (facturaNovedadesRows.length > 0) {
+      return res.status(400).json({
+        message: "Ya existe una factura de reconexión para esta suscripción.",
+      });
+    }
+
+    // Generar el código de la factura
+
+    // Obtener el último consecutivo de facturas de reconexión
+    const [resultadoConsecutivo] = await pool.query(
+      `
+      SELECT codigoFactura 
+      FROM facturas
+      WHERE producto_id = ?
+      ORDER BY idFactura DESC
+      LIMIT 1
+      `,
+      [ProductoId]
+    );
+
+    let nuevoCodigoFactura;
+
+    // genero el nuevo código de factura
+    if (resultadoConsecutivo.length > 0) {
+      const ultimoCodigo = resultadoConsecutivo[0].codigoFactura;
+      const partes = ultimoCodigo.split("-");
+      const ultimoConsecutivo = parseInt(partes[1]);
+      const nuevoConsecutivo = ultimoConsecutivo + 1;
+      nuevoCodigoFactura = `R-${nuevoConsecutivo}`;
+    } else {
+      nuevoCodigoFactura = "R-1";
+    }
+
+    // Obtener el producto de reconexión
+    const [productoReconexion] = await pool.query(
+      `
+      SELECT idProducto, nombreProducto, precioProducto
+      FROM productos
+      WHERE idProducto = ?
+      `,
+      [ProductoId]
+    );
+
+    // insertar la factura de reconexión
+    const [insertResult] = await pool.query(
+      `
+      INSERT INTO facturas (producto_id, suscripcion_id, valor, estado, codigoFactura)
+      VALUES (?, ?, ?, 'Pendiente por pagar', ?)
+      `,
+      [
+        ProductoId,
+        idSuscripcion,
+        productoReconexion[0].precioProducto,
+        nuevoCodigoFactura,
+      ]
+    );
+
+    // insertar registro en facturasnovedades
+    await pool.query(
+      `
+            INSERT INTO facturasnovedades (factura_id, novedad_id)
+            VALUES (?, ?)
+            `,
+      [insertResult.insertId, novedadRows[0].idNovedad]
+    );
+
+    // insterto registro en auditoria
+    await pool.query(
+      `
+            INSERT INTO auditoria (usuario_id, accion, modulo, descripcion)
+            VALUES (?, ?, ?, ?)
+            `,
+      [
+        usuarioId,
+        "Crear",
+        "Facturación",
+        `Factura de reconexión #${insertResult.insertId}`,
+      ]
+    );
+    // Responder con éxito
+    res.json({
+      message: "Factura de reconexión creada con éxito.",
+      idFactura: insertResult.insertId,
+      codigoFactura: nuevoCodigoFactura,
+      valor: productoReconexion[0].precioProducto,
+      producto: productoReconexion[0].nombreProducto,
+      estado: "Pendiente por pagar",
+      fechaFactura: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
+    });
+  } catch (error) {
+    console.error("Error creando factura de reconexión:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};

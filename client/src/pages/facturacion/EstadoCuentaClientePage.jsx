@@ -15,7 +15,7 @@ function EstadoCuentaClientePage() {
     async function cargarDatos() {
       try {
         const clienteData = cliente;
-        console.log(id);
+        console.log("Cliente cargado:", clienteData);
         if (clienteData && id) {
           const facturasData = await getEstadoCuentaCliente(id);
           setFacturas(facturasData);
@@ -51,7 +51,7 @@ function EstadoCuentaClientePage() {
       <div className="max-w-6xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
         <div className="mb-6">
           <Link
-            to={`/cliente/${cliente?.idCliente}`}
+            to={`/cliente/${id}`}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             ← Ver Cliente

@@ -36,7 +36,7 @@ function ClientesPage() {
 
   const handleSuscripciones = (clienteDatos) => {
     setCliente(clienteDatos);
-    navigate(`/suscripciones/${clienteDatos.idCliente}`);
+    navigate(`/suscripcionesCliente/${clienteDatos.idCliente}`);
   };
   const handleCuenta = (clienteDatos) => {
     setCliente(clienteDatos);

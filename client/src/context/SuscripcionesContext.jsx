@@ -7,6 +7,9 @@ import {
   createSuscripcionRequest,
   updateSuscripcionRequest,
   suspenderSuscripcionRequest,
+  obtenerFacturaReconexionRequest,
+  insertarFacturaReconexionRequest,
+  reconexionSuscripcionRequest,
 } from "../api/suscripcionesApi";
 
 export const SuscripcionesContext = createContext();
@@ -85,6 +88,36 @@ export const SuscripcionesProvider = ({ children }) => {
     }
   };
 
+  const obtenerFacturaReconexion = async (idSuscripcion) => {
+    try {
+      const response = await obtenerFacturaReconexionRequest(idSuscripcion);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factura de reconexion:", error);
+      return null;
+    }
+  }
+
+  const insertarFacturaReconexion = async (data) => {
+    try {
+      const respuestaFacturaReconexion = await insertarFacturaReconexionRequest(data);
+      return respuestaFacturaReconexion.data;
+    } catch (error) {
+      console.error("Error inserting factura de reconexion:", error);
+      return null;
+    }
+  }
+
+  const reconexionSuscripcion = async (data) => {
+    try {
+      const respuestaReconexion = await reconexionSuscripcionRequest(data);
+      return respuestaReconexion.data;
+    } catch (error) {
+      console.error("Error reconectando suscripcion:", error);
+      return null;
+    }
+  }
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -105,6 +138,9 @@ export const SuscripcionesProvider = ({ children }) => {
         createSuscripcion,
         updateSuscripcion,
         suspenderSuscripcion,
+        obtenerFacturaReconexion,
+        insertarFacturaReconexion,
+        reconexionSuscripcion,
         errors,
         setErrors,
       }}
