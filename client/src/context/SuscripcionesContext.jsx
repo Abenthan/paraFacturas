@@ -10,6 +10,7 @@ import {
   obtenerFacturaReconexionRequest,
   insertarFacturaReconexionRequest,
   reconexionSuscripcionRequest,
+  getNovedadesSuscripcionRequest,
 } from "../api/suscripcionesApi";
 
 export const SuscripcionesContext = createContext();
@@ -118,6 +119,16 @@ export const SuscripcionesProvider = ({ children }) => {
     }
   }
 
+  const getNovedadesSuscripcion = async (idSuscripcion) => {
+    try {
+      const response = await getNovedadesSuscripcionRequest(idSuscripcion);
+      return response;
+    } catch (error) {
+      console.error("Error fetching novedades de la suscripción:", error);
+      return null;
+    }
+  }
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -141,6 +152,7 @@ export const SuscripcionesProvider = ({ children }) => {
         obtenerFacturaReconexion,
         insertarFacturaReconexion,
         reconexionSuscripcion,
+        getNovedadesSuscripcion,
         errors,
         setErrors,
       }}

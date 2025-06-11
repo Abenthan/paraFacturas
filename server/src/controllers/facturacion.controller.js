@@ -1,7 +1,6 @@
 import { pool } from "../db.js";
 
 // Obtener registros pendientes por facturar
-
 export const getFacturasPendientes = async (req, res) => {
   const { year, mes } = req.query;
 
@@ -11,23 +10,54 @@ export const getFacturasPendientes = async (req, res) => {
 
   try {
     const consulta = `
-    SELECT 
-      s.idSuscripcion,
-      c.nombreCliente,
-      p.nombreProducto,
-      s.direccionServicio,
-      p.precioProducto AS valor,
-      s.Estado
-    FROM suscripciones s
-    INNER JOIN clientes c ON s.cliente_id = c.idCliente
-    INNER JOIN productos p ON s.producto_id = p.idProducto
-    WHERE s.Estado = 'Activo'
-      AND NOT EXISTS (
-        SELECT 1 FROM facturas f
-        WHERE f.suscripcion_id = s.idSuscripcion
-          AND f.year = ?
-          AND f.mes = ?
-      )
+      SELECT 
+          s.idSuscripcion,
+          c.nombreCliente,
+          p.nombreProducto,
+          s.direccionServicio,
+          p.precioProducto AS valor,
+          s.Estado,
+          n.novedad,
+          n.fechaNovedad AS fecha_novedad,
+          COALESCE(saldos.saldoPendiente, 0) AS saldoPendiente
+      FROM suscripciones s
+      INNER JOIN clientes c ON s.cliente_id = c.idCliente
+      INNER JOIN productos p ON s.producto_id = p.idProducto
+      LEFT JOIN (
+          SELECT 
+              suscripcion_id, 
+              novedad,
+              fechaNovedad
+          FROM novedades 
+          WHERE idNovedad IN (
+              SELECT MAX(idNovedad) 
+              FROM novedades 
+              GROUP BY suscripcion_id
+          )
+      ) n ON s.idSuscripcion = n.suscripcion_id
+      LEFT JOIN (
+          SELECT 
+              f.suscripcion_id,
+              SUM(f.valor - IFNULL(p.totalPagado, 0)) AS saldoPendiente
+          FROM facturas f
+          LEFT JOIN (
+              SELECT 
+                  factura_id,
+                  SUM(valorPago) AS totalPagado
+              FROM pagos
+              GROUP BY factura_id
+          ) p ON f.idFactura = p.factura_id
+          WHERE f.estado IN ('Pendiente por pagar', 'Pago Parcial')
+          GROUP BY f.suscripcion_id
+      ) saldos ON s.idSuscripcion = saldos.suscripcion_id
+      WHERE s.Estado = 'Activo'
+        AND NOT EXISTS (
+          SELECT 1 
+          FROM facturas f
+          WHERE f.suscripcion_id = s.idSuscripcion
+            AND f.year = 2025
+            AND f.mes = 6
+        );
     `;
     const [rows] = await pool.query(consulta, [year, mes]);
 

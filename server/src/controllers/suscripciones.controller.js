@@ -286,3 +286,28 @@ export const reconexionSuscripcion = async (req, res) => {
     });
   }
 };
+
+// novedades de una suscripción
+export const getNovedadesSuscripcion = async (req, res) => {
+  try {
+    const { idSuscripcion } = req.params;
+    const consulta = `SELECT *
+    FROM novedades
+    WHERE suscripcion_id = ?
+    ORDER BY fechaNovedad DESC`;
+    const [rows] = await pool.query(consulta, [idSuscripcion]);
+
+    if (rows.length === 0) {
+      return res.status(204).json({
+        message: "No hay novedades para esta suscripción",
+      });
+    }
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.log("error en getNovedadesSuscripcion", error);
+    return res.status(500).json({
+      message: "Error al obtener las novedades de la suscripción",
+      error: error.message,
+    });
+  }
+};

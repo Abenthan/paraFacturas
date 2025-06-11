@@ -25,3 +25,6 @@ export const insertarFacturaReconexionRequest = (data) =>
 
 export const reconexionSuscripcionRequest = (data) =>
   axios.post(`/reconexionSuscripcion`, data);
+
+export const getNovedadesSuscripcionRequest = (idSuscripcion) =>
+  axios.get(`/suscripciones/novedades/${idSuscripcion}`);

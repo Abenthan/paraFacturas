@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 function PrefacturacionPage() {
   const navigate = useNavigate();
-
   const { obtenerRegistrosPrefacturacion, generarFacturas } = useFacturacion();
 
   const [year, setYear] = useState("");
@@ -12,7 +11,7 @@ function PrefacturacionPage() {
   const [buscarCliente, setBuscarCliente] = useState("");
   const [registros, setRegistros] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
+  const [orden, setOrden] = useState({ campo: "nombreCliente", asc: true });
   const [loading, setLoading] = useState(false);
 
   const handleBuscar = async () => {
@@ -67,9 +66,29 @@ function PrefacturacionPage() {
     }
   };
 
+  const cambiarOrden = (campo) => {
+    setOrden((prev) => ({
+      campo,
+      asc: prev.campo === campo ? !prev.asc : true,
+    }));
+  };
+
+  const registrosFiltrados = registros
+    .filter((r) =>
+      r.nombreCliente.toLowerCase().includes(buscarCliente.toLowerCase()) ||
+      r.idSuscripcion.toString().includes(buscarCliente)
+    )
+    .sort((a, b) => {
+      const aVal = a[orden.campo]?.toString().toLowerCase() ?? "";
+      const bVal = b[orden.campo]?.toString().toLowerCase() ?? "";
+      if (aVal < bVal) return orden.asc ? -1 : 1;
+      if (aVal > bVal) return orden.asc ? 1 : -1;
+      return 0;
+    });
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center text-white">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center">
         Generar Facturación del Mes
       </h1>
 
@@ -91,26 +110,19 @@ function PrefacturacionPage() {
           className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
         >
           <option value="">Seleccione Mes</option>
-          <option value="01">Enero</option>
-          <option value="02">Febrero</option>
-          <option value="03">Marzo</option>
-          <option value="04">Abril</option>
-          <option value="05">Mayo</option>
-          <option value="06">Junio</option>
-          <option value="07">Julio</option>
-          <option value="08">Agosto</option>
-          <option value="09">Septiembre</option>
-          <option value="10">Octubre</option>
-          <option value="11">Noviembre</option>
-          <option value="12">Diciembre</option>
+          {[...Array(12)].map((_, i) => (
+            <option key={i} value={String(i + 1).padStart(2, "0")}>
+              {new Date(0, i).toLocaleString("es-CO", { month: "long" })}
+            </option>
+          ))}
         </select>
 
         <input
           type="text"
-          placeholder="Buscar cliente..."
+          placeholder="Buscar por cliente o suscripción..."
           value={buscarCliente}
           onChange={(e) => setBuscarCliente(e.target.value)}
-          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 w-64"
         />
 
         <button
@@ -125,73 +137,88 @@ function PrefacturacionPage() {
       {loading ? (
         <div className="text-center text-xl text-white">Cargando...</div>
       ) : (
-        registros.length > 0 && (
+        registrosFiltrados.length > 0 && (
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-900 border border-gray-700 rounded-lg shadow text-white">
-              <thead className="bg-gray-800">
+            <table className="min-w-full bg-gray-900 border border-gray-700 rounded-lg shadow text-white text-sm">
+              <thead className="bg-gray-800 text-gray-300 uppercase text-xs">
                 <tr>
                   <th className="p-3">
                     <input
                       type="checkbox"
-                      checked={seleccionados.length === registros.length}
+                      checked={seleccionados.length === registrosFiltrados.length}
                       onChange={handleSeleccionarTodos}
                       className="w-4 h-4"
                     />
                   </th>
+                  <th className="p-3">ID</th>
                   <th
-                    className="p-3 text-left cursor-pointer hover:underline"
-                    onClick={() => setOrdenAscendente(!ordenAscendente)}
+                    className="p-3 cursor-pointer hover:underline"
+                    onClick={() => cambiarOrden("nombreCliente")}
                   >
-                    Cliente
+                    Cliente {orden.campo === "nombreCliente" && (orden.asc ? "▲" : "▼")}
                   </th>
-                  <th className="p-3 text-left">Producto</th>
-                  <th className="p-3 text-left">Dirección</th>
-                  <th className="p-3 text-left">Valor</th>
+                  <th className="p-3">Producto</th>
+                  <th className="p-3">Dirección</th>
+                  <th className="p-3">Valor</th>
+                  <th
+                    className="p-3 cursor-pointer hover:underline"
+                    onClick={() => cambiarOrden("Estado")}
+                  >
+                    Estado {orden.campo === "Estado" && (orden.asc ? "▲" : "▼")}
+                  </th>
+                  <th
+                    className="p-3 cursor-pointer hover:underline"
+                    onClick={() => cambiarOrden("novedad")}
+                  >
+                    Novedad {orden.campo === "novedad" && (orden.asc ? "▲" : "▼")}
+                  </th>
+                  <th className="p-3">Fecha Novedad</th>
+                  <th className="p-3">Saldo Pendiente</th>
                 </tr>
               </thead>
               <tbody>
-                {registros
-                  .filter((r) =>
-                    r.nombreCliente
-                      .toLowerCase()
-                      .includes(buscarCliente.toLowerCase())
-                  )
-                  .sort((a, b) => {
-                    if (ordenAscendente) {
-                      return a.nombreCliente.localeCompare(b.nombreCliente);
-                    } else {
-                      return b.nombreCliente.localeCompare(a.nombreCliente);
-                    }
-                  })
-                  .map((registro) => (
-                    <tr
-                      key={registro.idSuscripcion}
-                      className="border-t border-gray-700 hover:bg-gray-800"
-                    >
-                      <td className="p-3">
-                        <input
-                          type="checkbox"
-                          checked={seleccionados.includes(
-                            registro.idSuscripcion
-                          )}
-                          onChange={() =>
-                            handleSeleccionar(registro.idSuscripcion)
-                          }
-                          className="w-4 h-4"
-                        />
-                      </td>
-                      <td className="p-3">{registro.nombreCliente}</td>
-                      <td className="p-3">{registro.nombreProducto}</td>
-                      <td className="p-3">{registro.direccionServicio}</td>
-                      <td className="p-3">
-                        ${registro.valor.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                {registrosFiltrados.map((registro) => (
+                  <tr
+                    key={registro.idSuscripcion}
+                    className="border-t border-gray-700 hover:bg-gray-800"
+                  >
+                    <td className="p-3">
+                      <input
+                        type="checkbox"
+                        checked={seleccionados.includes(registro.idSuscripcion)}
+                        onChange={() => handleSeleccionar(registro.idSuscripcion)}
+                        className="w-4 h-4"
+                      />
+                    </td>
+                    <td className="p-3">{registro.idSuscripcion}</td>
+                    <td className="p-3">{registro.nombreCliente}</td>
+                    <td className="p-3">{registro.nombreProducto}</td>
+                    <td className="p-3">{registro.direccionServicio}</td>
+                    <td className="p-3">${registro.valor.toLocaleString("es-CO")}</td>
+                    <td className="p-3">{registro.Estado}</td>
+                    <td className="p-3">
+                      {registro.novedad ? (
+                        <a
+                          href={`/suscripciones/novedades/${registro.idSuscripcion}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:underline"
+                        >
+                          {registro.novedad}
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="p-3">{registro.fecha_novedad || "-"}</td>
+                    <td className="p-3 text-yellow-300 font-semibold">
+                      ${registro.saldoPendiente?.toLocaleString("es-CO") || "0"}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
 
-            {/* Resumen y botón */}
             <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
               <p className="text-lg font-semibold text-white">
                 Registros seleccionados: {seleccionados.length}
