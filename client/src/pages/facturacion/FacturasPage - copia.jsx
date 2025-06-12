@@ -1,25 +1,31 @@
 import { useState } from "react";
-import { useFacturacion } from "../../context/FacturacionContext";
+import { useFacturacion } from "../../context/FacturacionContext"; 
 import { useNavigate } from "react-router-dom";
 
 function FacturasPage() {
   const navigate = useNavigate();
   const { obtenerFacturas } = useFacturacion();
 
+  // Filtros
   const [year, setYear] = useState("");
   const [mes, setMes] = useState("");
-  const [estadoFiltro, setEstadoFiltro] = useState("");
-  const [buscar, setBuscar] = useState(""); // Campo de búsqueda unificado
+  const [estado, setEstado] = useState("");
+  const [buscarCliente, setBuscarCliente] = useState("");
+  const [codigoFactura, setCodigoFactura] = useState("");
+
+  // Resultados
   const [facturas, setFacturas] = useState([]);
-  const [orden, setOrden] = useState({ campo: "nombreCliente", asc: true });
   const [loading, setLoading] = useState(false);
 
   const handleBuscar = async () => {
     setLoading(true);
     try {
-      const data = await obtenerFacturas({
+      const data = await obtenerFacturas({ 
         year: Number(year),
         mes: Number(mes),
+        estado,
+        cliente: buscarCliente,
+        codigoFactura
       });
       setFacturas(data);
     } catch (error) {
@@ -33,37 +39,9 @@ function FacturasPage() {
     navigate(`/factura/${idFactura}`);
   };
 
-  const cambiarOrden = (campo) => {
-    setOrden((prev) => ({
-      campo,
-      asc: prev.campo === campo ? !prev.asc : true,
-    }));
-  };
-
-  const facturasFiltradas = facturas
-    .filter((f) => {
-      const busqueda = buscar.toLowerCase();
-      return (
-        f.nombreCliente.toLowerCase().includes(busqueda) ||
-        f.codigoFactura.toLowerCase().includes(busqueda) ||
-        f.suscripcion_id.toString().includes(busqueda)
-      );
-    })
-    .filter((f) => {
-      if (!estadoFiltro) return true;
-      return f.estado === estadoFiltro;
-    })
-    .sort((a, b) => {
-      const aVal = a[orden.campo]?.toString().toLowerCase() ?? "";
-      const bVal = b[orden.campo]?.toString().toLowerCase() ?? "";
-      if (aVal < bVal) return orden.asc ? -1 : 1;
-      if (aVal > bVal) return orden.asc ? 1 : -1;
-      return 0;
-    });
-
   return (
-    <div className="container mx-auto p-6 text-white">
-      <h1 className="text-3xl font-bold mb-6 text-center">Facturas</h1>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center text-white">Facturas</h1>
 
       {/* Filtros */}
       <div className="flex flex-col md:flex-row flex-wrap gap-4 justify-center items-center mb-8">
@@ -92,8 +70,8 @@ function FacturasPage() {
         </select>
 
         <select
-          value={estadoFiltro}
-          onChange={(e) => setEstadoFiltro(e.target.value)}
+          value={estado}
+          onChange={(e) => setEstado(e.target.value)}
           className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
         >
           <option value="">Todos los estados</option>
@@ -105,10 +83,18 @@ function FacturasPage() {
 
         <input
           type="text"
-          placeholder="Buscar cliente, código o suscripción..."
-          value={buscar}
-          onChange={(e) => setBuscar(e.target.value)}
-          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 w-72"
+          placeholder="Buscar cliente..."
+          value={buscarCliente}
+          onChange={(e) => setBuscarCliente(e.target.value)}
+          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
+        />
+
+        <input
+          type="text"
+          placeholder="Código de factura..."
+          value={codigoFactura}
+          onChange={(e) => setCodigoFactura(e.target.value)}
+          className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
         />
 
         <button
@@ -122,45 +108,30 @@ function FacturasPage() {
       {/* Resultados */}
       {loading ? (
         <div className="text-center text-xl text-white">Cargando...</div>
-      ) : facturasFiltradas.length > 0 ? (
+      ) : facturas.length > 0 ? (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-900 border border-gray-700 rounded-lg shadow text-white text-sm">
-            <thead className="bg-gray-800 text-gray-300 uppercase text-xs">
+          <table className="min-w-full bg-gray-900 border border-gray-700 rounded-lg shadow text-white">
+            <thead className="bg-gray-800">
               <tr>
                 <th className="p-3 text-left">Código</th>
-                <th
-                  className="p-3 text-left cursor-pointer hover:underline"
-                  onClick={() => cambiarOrden("suscripcion_id")}
-                >
-                  Suscripción {orden.campo === "suscripcion_id" && (orden.asc ? "▲" : "▼")}
-                </th>
-                <th
-                  className="p-3 text-left cursor-pointer hover:underline"
-                  onClick={() => cambiarOrden("nombreCliente")}
-                >
-                  Cliente {orden.campo === "nombreCliente" && (orden.asc ? "▲" : "▼")}
-                </th>
+                <th className="p-3 text-left">Suscripcion</th>
+                <th className="p-3 text-left">Cliente</th>
                 <th className="p-3 text-left">Producto</th>
                 <th className="p-3 text-left">Dirección</th>
                 <th className="p-3 text-left">Valor</th>
-                <th
-                  className="p-3 text-left cursor-pointer hover:underline"
-                  onClick={() => cambiarOrden("estado")}
-                >
-                  Estado {orden.campo === "estado" && (orden.asc ? "▲" : "▼")}
-                </th>
+                <th className="p-3 text-left">Estado</th>
                 <th className="p-3 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {facturasFiltradas.map((factura) => (
+              {facturas.map((factura) => (
                 <tr key={factura.idFactura} className="border-t border-gray-700 hover:bg-gray-800">
                   <td className="p-3">{factura.codigoFactura}</td>
                   <td className="p-3">{factura.suscripcion_id}</td>
                   <td className="p-3">{factura.nombreCliente}</td>
                   <td className="p-3">{factura.nombreProducto}</td>
                   <td className="p-3">{factura.direccionServicio}</td>
-                  <td className="p-3">${factura.valor.toLocaleString("es-CO")}</td>
+                  <td className="p-3">${factura.valor.toLocaleString()}</td>
                   <td className="p-3">{factura.estado}</td>
                   <td className="p-3 text-center">
                     <button

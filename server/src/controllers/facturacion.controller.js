@@ -250,6 +250,7 @@ export const getFacturas = async (req, res) => {
           f.estado,
           f.year,
           f.mes,
+          f.suscripcion_id,
           c.nombreCliente,
           s.direccionServicio,
           p.nombreProducto
