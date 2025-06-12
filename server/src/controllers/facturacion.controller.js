@@ -184,7 +184,7 @@ export const crearFacturas = async (req, res) => {
       usuarioId,
       "Crear",
       "Facturación",
-      `Factura #${insertResult.insertId + index} para suscripción ${factura[1]}`,
+      `Factura #${insertResult.insertId + index} con el codigo #${factura[6]} para suscripción ${factura[1]}`,
     ]);
     
     // 8. Insertar auditorías
