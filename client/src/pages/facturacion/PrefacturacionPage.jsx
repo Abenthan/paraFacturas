@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { useFacturacion } from "../../context/FacturacionContext";
 import { useNavigate } from "react-router-dom";
 
 function PrefacturacionPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { obtenerRegistrosPrefacturacion, generarFacturas } = useFacturacion();
 
   const [year, setYear] = useState("");
@@ -56,7 +58,7 @@ function PrefacturacionPage() {
 
     setLoading(true);
     try {
-      await generarFacturas(seleccionados, year, mes);
+      await generarFacturas(seleccionados, year, mes, user.id);
       alert("Facturación generada exitosamente.");
       navigate("/facturacion");
     } catch (error) {

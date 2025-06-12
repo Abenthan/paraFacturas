@@ -46,9 +46,9 @@ export const FacturacionProvider = ({ children }) => {
     }
   };
 
-  const generarFacturas = async (suscripciones, year, mes) => {
+  const generarFacturas = async (suscripciones, year, mes, usuarioId) => {
     try {
-      const res = await crearFacturasRequest(suscripciones, year, mes);
+      const res = await crearFacturasRequest(suscripciones, year, mes, usuarioId);
       return res.data;
     } catch (error) {
       console.error("Error al generar las facturas:", error);

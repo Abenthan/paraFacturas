@@ -11,11 +11,12 @@ export const getPrefacturacionRequest = async (year, mes) =>
     },
   });
 
-export const crearFacturasRequest = async (suscripciones, year, mes) =>
+export const crearFacturasRequest = async (suscripciones, year, mes, usuarioId) =>
   await axios.post("/facturas", {
     suscripciones,
     year,
     mes,
+    usuarioId,
   });
 
 export const getFacturaRequest = async (idFactura) =>
@@ -23,7 +24,6 @@ export const getFacturaRequest = async (idFactura) =>
 
 export const registrarPagoRequest = async (idFactura, valorPago) =>
   await axios.post(`/pagarFactura`, { idFactura, valorPago });
-
 
 export const obtenerPagosRequest = async (filtros) =>
   await axios.get("/pagos", { params: filtros });
@@ -39,4 +39,3 @@ export const getEstadoCuentaClienteRequest = async (idCliente) =>
 
 export const getCarteraSuscripcionRequest = async (idSuscripcion) =>
   await axios.get(`/carteraSuscripcion/${idSuscripcion}`);
-

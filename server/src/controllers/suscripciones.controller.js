@@ -294,7 +294,7 @@ export const getNovedadesSuscripcion = async (req, res) => {
     const consulta = `SELECT *
     FROM novedades
     WHERE suscripcion_id = ?
-    ORDER BY fechaNovedad DESC`;
+    ORDER BY idNovedad DESC`;
     const [rows] = await pool.query(consulta, [idSuscripcion]);
 
     if (rows.length === 0) {

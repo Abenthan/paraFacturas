@@ -44,7 +44,7 @@ function NovedadesSuscripcionPage() {
         {/* Encabezado */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">
-            Estado de cuenta de la suscripción #{idSuscripcion}
+            Novedades de la suscripción #{idSuscripcion}
           </h1>
           <p className="text-gray-300">
             Cliente:{" "}

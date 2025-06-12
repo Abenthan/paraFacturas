@@ -70,7 +70,7 @@ export const getFacturasPendientes = async (req, res) => {
 
 // Crear facturas
 export const crearFacturas = async (req, res) => {
-  const { suscripciones, year, mes } = req.body;
+  const { suscripciones, year, mes, usuarioId } = req.body;
 
   if (
     !suscripciones ||
@@ -138,6 +138,7 @@ export const crearFacturas = async (req, res) => {
       `
       SELECT 
         s.idSuscripcion,
+        p.idProducto AS producto_id,
         p.precioProducto
       FROM suscripciones s
       INNER JOIN productos p ON s.producto_id = p.idProducto
@@ -159,6 +160,7 @@ export const crearFacturas = async (req, res) => {
         .toString()
         .padStart(2, "0")}-${consecutivo}`;
       return [
+        suscripcion.producto_id,
         suscripcion.idSuscripcion,
         year,
         mes,
@@ -171,11 +173,30 @@ export const crearFacturas = async (req, res) => {
     // 6. Insertar facturas
     const [insertResult] = await pool.query(
       `
-      INSERT INTO facturas (suscripcion_id, year, mes, valor, estado, codigoFactura)
+      INSERT INTO facturas (producto_id, suscripcion_id, year, mes, valor, estado, codigoFactura)
       VALUES ?
       `,
       [facturasAInsertar]
     );
+
+    // 7. preparar auditorías
+    const auditorias = facturasAInsertar.map((factura, index) => [
+      usuarioId,
+      "Crear",
+      "Facturación",
+      `Factura #${insertResult.insertId + index} para suscripción ${factura[1]}`,
+    ]);
+    
+    // 8. Insertar auditorías
+    if (auditorias.length > 0) {
+      await pool.query(
+        `
+        INSERT INTO auditoria (usuario_id, accion, modulo, descripcion)
+        VALUES ?
+        `,
+        [auditorias]
+      );
+    }
 
     res.json({
       message: "Facturación completada.",
