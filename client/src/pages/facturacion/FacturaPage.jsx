@@ -12,6 +12,7 @@ function FacturaPage() {
   const [factura, setFactura] = useState(null);
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saldoPendiente, setSaldoPendiente] = useState(0);
 
   const idProductoSuscripcion = 1;
 
@@ -25,6 +26,7 @@ function FacturaPage() {
         const data = await obtenerFactura(id);
         setFactura(data.factura);
         setPagos(data.pagos || []);
+        setSaldoPendiente(data.saldoPendienteAnterior || 0);
       } catch (error) {
         console.error("Error cargando factura:", error);
       } finally {
@@ -36,7 +38,9 @@ function FacturaPage() {
 
   // Cálculos de totales
   const totalPagado = pagos.reduce((sum, p) => sum + p.valorPago, 0);
-  const saldoPendiente = factura ? factura.valor - totalPagado : 0;
+  const saldoTotal = factura
+    ? factura.valor - totalPagado + Number(saldoPendiente)
+    : 0;
 
   // Determinar si el botón "Pagar" está habilitado
   const puedePagar =
@@ -114,64 +118,86 @@ function FacturaPage() {
       {/* Zona imprimible */}
       <div
         ref={printRef}
-        className="bg-white text-black p-6 rounded-lg shadow-md max-w-2xl mx-auto"
+        className="bg-white text-black p-8 rounded-lg shadow-md max-w-2xl mx-auto border border-gray-300"
       >
-        {/* Cabecera de la factura */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold mb-1">
-            Factura #{factura.codigoFactura}
+        {/* Encabezado */}
+        <div className="text-center mb-6 border-b pb-4">
+          <h2 className="text-3xl font-bold tracking-wide mb-1 text-gray-800">
+            FACTURA
           </h2>
+          <p className="text-sm text-gray-600">
+            <strong>Código:</strong> {factura.codigoFactura}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Fecha de facturación:</strong>{" "}
+            {new Date(factura.fechaFactura).toLocaleDateString("es-CO", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
         </div>
 
-        {/* Datos principales */}
-        <div className="mb-4">
+        {/* Información del cliente */}
+        <div className="mb-6 space-y-1 text-sm text-gray-700">
           <p>
             <strong>Cliente:</strong> {factura.nombreCliente}
           </p>
           <p>
-            <strong>Suscripcion # </strong> {factura.idSuscripcion}
+            <strong>Suscripción:</strong> #{factura.idSuscripcion}
           </p>
           <p>
             <strong>Producto:</strong> {factura.nombreProducto}
           </p>
           {factura.idProducto === idProductoSuscripcion && (
             <p>
-              Periodo: {factura.year}/{factura.mes.toString().padStart(2, "0")}
+              <strong>Periodo:</strong> {factura.year}/
+              {factura.mes.toString().padStart(2, "0")}
             </p>
           )}
-
           <p>
-            <strong>Dirección Servicio:</strong> {factura.direccionServicio}
+            <strong>Dirección del servicio:</strong> {factura.direccionServicio}
           </p>
           <p>
-            <strong>Estado:</strong> {factura.estado}
-          </p>
-        </div>
-
-        {/* Totales y saldos */}
-        <div className="mb-4">
-          <p>
-            <strong>Valor Total:</strong> ${factura.valor.toLocaleString()}
-          </p>
-          <p>
-            <strong>Total Pagado:</strong> ${totalPagado.toLocaleString()}
-          </p>
-          <p>
-            <strong>Saldo Pendiente:</strong> ${saldoPendiente.toLocaleString()}
+            <strong>Estado de la factura:</strong> {factura.estado}
           </p>
         </div>
 
-        {/* Tabla de pagos */}
+        {/* Totales */}
+        <div className="mb-6 text-sm text-gray-800">
+          <p>
+            <strong>Valor de la factura:</strong> $
+            {factura.valor.toLocaleString("es-CO")}
+          </p>
+          <p>
+            <strong>Total pagado:</strong> $
+            {totalPagado.toLocaleString("es-CO")}
+          </p>
+          <p>
+            <strong>Saldo pendiente anterior:</strong> $
+            {Number(saldoPendiente).toLocaleString("es-CO")}
+          </p>
+          <p className="text-lg font-semibold mt-2">
+            <strong>Total a pagar:</strong>{" "}
+            <span className="text-red-600">
+              ${saldoTotal.toLocaleString("es-CO")}
+            </span>
+          </p>
+        </div>
+
+        {/* Pagos realizados */}
         {pagos.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-2">Pagos realizados</h3>
-            <table className="min-w-full border border-gray-400">
-              <thead className="bg-gray-200">
+            <h3 className="text-base font-semibold text-gray-800 mb-2">
+              Pagos realizados
+            </h3>
+            <table className="w-full border border-gray-300 text-sm">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="text-left p-2 border border-gray-400">
+                  <th className="p-2 border border-gray-300 text-left">
                     Fecha
                   </th>
-                  <th className="text-left p-2 border border-gray-400">
+                  <th className="p-2 border border-gray-300 text-left">
                     Valor
                   </th>
                 </tr>
@@ -179,11 +205,11 @@ function FacturaPage() {
               <tbody>
                 {pagos.map((pago) => (
                   <tr key={pago.idPagos}>
-                    <td className="p-2 border border-gray-400">
-                      {new Date(pago.fechaPago).toLocaleDateString()}
+                    <td className="p-2 border border-gray-200">
+                      {new Date(pago.fechaPago).toLocaleDateString("es-CO")}
                     </td>
-                    <td className="p-2 border border-gray-400">
-                      ${pago.valorPago.toLocaleString()}
+                    <td className="p-2 border border-gray-200">
+                      ${pago.valorPago.toLocaleString("es-CO")}
                     </td>
                   </tr>
                 ))}

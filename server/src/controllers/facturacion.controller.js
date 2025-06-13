@@ -184,9 +184,11 @@ export const crearFacturas = async (req, res) => {
       usuarioId,
       "Crear",
       "Facturación",
-      `Factura #${insertResult.insertId + index} con el codigo #${factura[6]} para suscripción ${factura[1]}`,
+      `Factura #${insertResult.insertId + index} con el codigo #${
+        factura[6]
+      } para suscripción ${factura[1]}`,
     ]);
-    
+
     // 8. Insertar auditorías
     if (auditorias.length > 0) {
       await pool.query(
@@ -286,6 +288,7 @@ export const getFactura = async (req, res) => {
         f.estado,
         f.year,
         f.mes,
+        f.fechaFactura,
         c.idCliente,
         c.nombreCliente,
         p.nombreProducto,
@@ -306,7 +309,7 @@ export const getFactura = async (req, res) => {
 
     const factura = facturaRows[0];
 
-    // Consultar los pagos asociados
+    // Consultar los pagos asociados a la factura
     const [pagos] = await pool.query(
       `
       SELECT idPagos, fechaPago, valorPago
@@ -317,9 +320,34 @@ export const getFactura = async (req, res) => {
       [id]
     );
 
+    // Calcular total pagado anterior
+    const [saldoRows] = await pool.query(
+      `
+      SELECT 
+        SUM(f.valor - IFNULL(p.totalPagado, 0)) AS saldoPendienteAnterior
+      FROM facturas f
+      LEFT JOIN (
+        SELECT 
+          factura_id, 
+          SUM(valorPago) AS totalPagado
+        FROM pagos
+        GROUP BY factura_id
+      ) p ON f.idFactura = p.factura_id
+      WHERE 
+        f.suscripcion_id = ? 
+        AND f.idFactura < ?
+        AND f.estado IN ('Pendiente por pagar', 'Pago Parcial')
+      `,
+      [factura.idSuscripcion, id]
+    );
+
+    const saldoPendienteAnterior = saldoRows[0]?.saldoPendienteAnterior || 0;
+
+    // respuesta
     res.json({
       factura,
       pagos,
+      saldoPendienteAnterior,
     });
   } catch (error) {
     console.error("Error al obtener detalle de factura:", error);
