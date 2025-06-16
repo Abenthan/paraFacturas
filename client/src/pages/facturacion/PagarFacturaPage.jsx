@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { useFacturacion } from "../../context/FacturacionContext";
 
 function PagarFacturaPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { obtenerFactura, registrarPago } = useFacturacion();
 
   const [factura, setFactura] = useState(null);
   const [pagos, setPagos] = useState([]);
+  const [abonos, setAbonos] = useState([]);
+  const [saldoPendiente, setSaldoPendiente] = useState(0);
+  const [valorPagar, setValorPagar] = useState(0);
   const [valorPago, setValorPago] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -18,9 +23,13 @@ function PagarFacturaPage() {
         const data = await obtenerFactura(id);
         setFactura(data.factura);
         setPagos(data.pagos || []);
-        const totalPagado = data.pagos?.reduce((sum, p) => sum + p.valorPago, 0) || 0;
-        const saldo = data.factura.valor - totalPagado;
-        setValorPago(saldo);
+        setSaldoPendiente(data.saldoPendienteAnterior || 0);
+        const abonosFactura =
+          data.pagos?.reduce((sum, p) => sum + p.valorPago, 0) || 0;
+        setAbonos(abonosFactura);
+        const totalPagar = data.factura.valor - abonosFactura + Number(data.saldoPendienteAnterior);
+        setValorPagar(totalPagar);
+        setValorPago(totalPagar); 
       } catch (error) {
         console.error("Error cargando factura:", error);
       } finally {
@@ -29,24 +38,26 @@ function PagarFacturaPage() {
     };
 
     cargarDatos();
-  }, [id, obtenerFactura]);
+  }, []);
 
   const handlePagar = async () => {
-    const totalPagado = pagos.reduce((sum, p) => sum + p.valorPago, 0);
-    const saldo = factura.valor - totalPagado;
+    console.log("valorPago: ", valorPago);
+    console.log("idFactura: ", id);
+    console.log("idSuscripcion: ", factura.idSuscripcion);
+    console.log("usuarioId: ", user.id);
 
     if (valorPago <= 0) {
-      alert("Debe ingresar un valor mayor a cero.");
-      return;
+       alert("Debe ingresar un valor mayor a cero.");
+       return;
     }
 
-    if (valorPago > saldo) {
-      alert("El valor a pagar no puede ser mayor al saldo pendiente.");
-      return;
-    }
+     if (valorPago > valorPagar) {
+       alert("El valor a pagar no puede ser mayor al saldo pendiente.");
+       return;
+     }
 
     try {
-      await registrarPago(factura.idFactura, valorPago);
+      await registrarPago(id, valorPago, factura.idSuscripcion, user.id);
       alert("Pago registrado con éxito.");
       navigate(`/factura/${factura.idFactura}`);
     } catch (error) {
@@ -56,26 +67,58 @@ function PagarFacturaPage() {
   };
 
   if (loading) {
-    return <div className="text-white text-center mt-8 text-xl">Cargando datos...</div>;
+    return (
+      <div className="text-white text-center mt-8 text-xl">
+        Cargando datos...
+      </div>
+    );
   }
 
   if (!factura) {
-    return <div className="text-red-500 text-center mt-8 text-xl">Factura no encontrada</div>;
+    return (
+      <div className="text-red-500 text-center mt-8 text-xl">
+        Factura no encontrada
+      </div>
+    );
   }
 
-  const totalPagado = pagos.reduce((sum, p) => sum + p.valorPago, 0);
-  const saldo = factura.valor - totalPagado;
 
   return (
     <div className="container mx-auto p-6 text-white">
+      {/* Enlace a regresar a la factura */}
+      <Link
+        to={`/factura/${factura.idFactura}`}
+        className="text-blue-400 hover:underline mb-4 inline-block"
+      >
+        &larr; Volver a la factura
+      </Link>
+
       <h1 className="text-2xl font-bold mb-6 text-center">Registrar Pago</h1>
 
       <div className="bg-gray-900 p-6 rounded-lg shadow-md space-y-4 max-w-xl mx-auto">
-        <p><strong>Código de Factura:</strong> {factura.codigoFactura}</p>
-        <p><strong>Cliente:</strong> {factura.nombreCliente}</p>
-        <p><strong>Valor Total:</strong> ${factura.valor.toLocaleString()}</p>
-        <p><strong>Total Pagado:</strong> ${totalPagado.toLocaleString()}</p>
-        <p><strong>Saldo Pendiente:</strong> ${saldo.toLocaleString()}</p>
+        <p>
+          <strong>Código de Factura:</strong> {factura.codigoFactura}
+        </p>
+        <p>
+          <strong>Cliente:</strong> {factura.nombreCliente}
+        </p>
+        <p>
+          <strong>Valor Factura:</strong> ${factura.valor.toLocaleString()}
+        </p>
+        {abonos > 0 && (
+          <p>
+            <strong>Abonos:</strong> ${abonos.toLocaleString()}
+          </p>
+        )}
+        {saldoPendiente > 0 && (
+          <p>
+            <strong>Saldo Pendiente:</strong> $
+            {Number(saldoPendiente).toLocaleString()}
+          </p>
+        )}
+        <p>
+          <strong>Saldo total a pagar:</strong> ${valorPagar.toLocaleString()}
+        </p>
 
         <div>
           <label className="block mb-2 font-semibold">Valor a pagar:</label>
@@ -84,7 +127,7 @@ function PagarFacturaPage() {
             value={valorPago}
             onChange={(e) => setValorPago(Number(e.target.value))}
             min="0"
-            max={saldo}
+            max={valorPagar}
             className="bg-gray-800 text-white border border-gray-600 rounded-lg px-4 py-2 w-full"
           />
         </div>
@@ -101,4 +144,3 @@ function PagarFacturaPage() {
 }
 
 export default PagarFacturaPage;
-

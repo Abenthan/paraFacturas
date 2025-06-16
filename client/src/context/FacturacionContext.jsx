@@ -65,10 +65,9 @@ export const FacturacionProvider = ({ children }) => {
       throw error; // Propagar el error para manejarlo en el componente
     }
   };
-
-  const registrarPago = async (idFactura, valorPago) => {
+  const registrarPago = async (idFactura, valorPago, idSuscripcion, usuarioId) => {
     try {
-      const res = await registrarPagoRequest(idFactura, valorPago);
+      const res = await registrarPagoRequest(idFactura, valorPago, idSuscripcion, usuarioId);
       return res.data;
     } catch (error) {
       console.error("Error al registrar el pago:", error);
@@ -88,7 +87,6 @@ export const FacturacionProvider = ({ children }) => {
 
   const obtenerPago = async (idPago) => {
     try {
-      console.log("estamos ene el contexto obtenerPago", idPago);
       const res = await obtenerPagoRequest(idPago);
       return res.data;
     } catch (error) {

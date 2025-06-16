@@ -357,7 +357,7 @@ export const getFactura = async (req, res) => {
 
 // Registrar pago
 export const registrarPago = async (req, res) => {
-  const { idFactura, valorPago } = req.body;
+  const { idFactura, valorPago, idSuscripcion, usuarioId } = req.body;
 
   if (!idFactura || !valorPago || valorPago <= 0) {
     return res
@@ -366,58 +366,105 @@ export const registrarPago = async (req, res) => {
   }
 
   try {
-    // Verificar si la factura existe
-    const [facturaRows] = await pool.query(
-      "SELECT valor FROM facturas WHERE idFactura = ?",
-      [idFactura]
+    // Obtener todas las facturas pendientes anteriores o igual a la actual
+    const [facturasPendientes] = await pool.query(
+      `SELECT 
+        f.idFactura,
+        f.codigoFactura,
+        f.fechaFactura,
+        f.valor AS valorFactura,
+        COALESCE(SUM(p.valorPago), 0) AS pagosRealizados,
+        (f.valor - COALESCE(SUM(p.valorPago), 0)) AS saldoFactura
+      FROM 
+        facturas f
+        LEFT JOIN pagos p ON f.idFactura = p.factura_id
+      WHERE 
+        f.suscripcion_id = ? AND
+        (f.estado = "Pendiente por pagar" OR f.estado = "Pago Parcial") AND
+        f.idFactura <= ?
+      GROUP BY 
+        f.idFactura
+      ORDER BY 
+        f.fechaFactura ASC
+      `,
+      [idSuscripcion, idFactura]
     );
 
-    if (facturaRows.length === 0) {
-      return res.status(404).json({ message: "Factura no encontrada." });
-    }
-
-    const valorFactura = Number(facturaRows[0].valor);
-
-    // Calcular total pagado hasta ahora
-    const [pagosRows] = await pool.query(
-      "SELECT SUM(valorPago) AS totalPagado FROM pagos WHERE factura_id = ?",
-      [idFactura]
-    );
-
-    const totalPagado = Number(pagosRows[0].totalPagado) || 0;
-    const saldoPendiente = valorFactura - totalPagado;
-
-    if (valorPago > saldoPendiente) {
+    if (facturasPendientes.length === 0) {
       return res
-        .status(400)
-        .json({ message: "El valor a pagar excede el saldo pendiente." });
+        .status(404)
+        .json({ message: "No hay facturas pendientes para aplicar el pago." });
     }
 
-    // Registrar el nuevo pago
-    await pool.query(
-      "INSERT INTO pagos (factura_id, valorPago) VALUES (?, ?)",
-      [idFactura, valorPago]
-    );
+    const pagosRealizados = [];
 
-    // Actualizar el estado de la factura si es necesario
-    const nuevoTotalPagado = totalPagado + Number(valorPago);
-    let nuevoEstado = "Pendiente por pagar";
+    async function registrarUnPago(idFactura, valor, nuevoEstado) {
+      const [pago] = await pool.query(
+        "INSERT INTO pagos (factura_id, valorPago) VALUES (?, ?)",
+        [idFactura, valor]
+      );
 
-    console.log("Nuevo total pagado:", nuevoTotalPagado);
-    console.log("Valor de la factura:", valorFactura);
+      // Actualizar estado de la factura
+      await pool.query("UPDATE facturas SET estado = ? WHERE idFactura = ?", [
+        nuevoEstado,
+        idFactura,
+      ]);
 
-    if (nuevoTotalPagado >= valorFactura) {
-      nuevoEstado = "Cancelada";
-    } else if (nuevoTotalPagado > 0 && nuevoTotalPagado < valorFactura) {
-      nuevoEstado = "Pago Parcial";
+      // Registrar auditoría
+      await pool.query(
+        `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion)
+         VALUES (?, ?, ?, ?)`,
+        [
+          usuarioId,
+          "Insertar",
+          "Pagos",
+          `Pago de $${valor} aplicado a factura ${idFactura} (ID Pago: ${pago.insertId})`,
+        ]
+      );
+
+      // Retornar para la respuesta
+      pagosRealizados.push({
+        idFactura,
+        valorPagado: valor,
+        estado: nuevoEstado,
+        idPago: pago.insertId,
+      });
     }
 
-    await pool.query("UPDATE facturas SET estado = ? WHERE idFactura = ?", [
-      nuevoEstado,
-      idFactura,
-    ]);
+    let saldoPago = Number(valorPago);
 
-    res.json({ message: "Pago registrado con éxito.", nuevoEstado });
+    for (const factura of facturasPendientes) {
+      const { idFactura, saldoFactura } = factura;
+
+      if (saldoPago <= 0) break;
+
+      if (saldoPago > Number(saldoFactura)) {
+        console.log(
+          `idFactura: ${idFactura}, saldoPago $${saldoPago}, saldoFactura : $${saldoFactura}, 1`
+        );
+        await registrarUnPago(idFactura, saldoFactura, "Cancelada");
+        saldoPago -= saldoFactura;
+      } else if (saldoPago === Number(saldoFactura)) {
+        console.log(
+          `idFactura: ${idFactura}, saldoPago $${saldoPago}, saldoFactura : $${saldoFactura}, 2`
+        );
+        await registrarUnPago(idFactura, saldoPago, "Cancelada");
+        saldoPago = 0;
+        break;
+      } else {
+        console.log(
+          `idFactura: ${idFactura}, saldoPago $${saldoPago}, saldoFactura : $${saldoFactura}, 3`
+        );
+        await registrarUnPago(idFactura, saldoPago, "Pago Parcial");
+        saldoPago = 0;
+        break;
+      }
+    }
+
+    res.status(200).json({
+      message: "Pago registrado exitosamente.",
+      pagos: pagosRealizados,
+    });
   } catch (error) {
     console.error("Error al registrar el pago:", error);
     res.status(500).json({ message: "Error interno del servidor." });
@@ -605,6 +652,7 @@ export const getCarteraSuscripcion = async (req, res) => {
       SELECT  
         f.idFactura,
         f.codigoFactura,
+        f.fechaFactura,
         f.valor AS valorFactura, 
         COALESCE(SUM(p.valorPago), 0) AS totalPagado
       FROM facturas f

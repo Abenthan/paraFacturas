@@ -173,10 +173,12 @@ function FacturaPage() {
             <strong>Total pagado:</strong> $
             {totalPagado.toLocaleString("es-CO")}
           </p>
+          { saldoPendiente > 0 && (
           <p>
             <strong>Saldo pendiente anterior:</strong> $
             {Number(saldoPendiente).toLocaleString("es-CO")}
           </p>
+          )}
           <p className="text-lg font-semibold mt-2">
             <strong>Total a pagar:</strong>{" "}
             <span className="text-red-600">

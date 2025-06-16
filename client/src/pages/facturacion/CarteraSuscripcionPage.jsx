@@ -155,6 +155,7 @@ function CarteraSuscripcionPage() {
             <thead className="text-xs uppercase bg-zinc-700 text-gray-400">
               <tr>
                 <th className="px-4 py-3">Código Factura</th>
+                <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3">Valor Factura</th>
                 <th className="px-4 py-3">Total Pagado</th>
                 <th className="px-4 py-3">Saldo Pendiente</th>
@@ -170,6 +171,12 @@ function CarteraSuscripcionPage() {
                     className="border-b border-zinc-700 hover:bg-zinc-700"
                   >
                     <td className="px-4 py-2">{factura.codigoFactura}</td>
+                    <td className="px-4 py-2">
+                      {factura.fechaFactura &&
+                        new Date(factura.fechaFactura).toLocaleDateString(
+                          "es-CO"
+                        )}
+                    </td>
                     <td className="px-4 py-2">
                       ${factura.valorFactura.toLocaleString("es-CO")}
                     </td>
