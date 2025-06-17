@@ -1,24 +1,37 @@
-import express from 'express';
-import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import express from "express";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
-import authRoutes from './routes/auth.routes.js';
-import clientesRoutes from './routes/clientes.routes.js';
-import productosRoutes from './routes/productos.routes.js';
-import suscripcionesRoutes from './routes/suscripciones.routes.js';
-import facturacionRoutes from './routes/facturacion.routes.js';
-
+import authRoutes from "./routes/auth.routes.js";
+import clientesRoutes from "./routes/clientes.routes.js";
+import productosRoutes from "./routes/productos.routes.js";
+import suscripcionesRoutes from "./routes/suscripciones.routes.js";
+import facturacionRoutes from "./routes/facturacion.routes.js";
 
 const app = express();
 
-app.use(cors(
-    {
-        origin: 'http://localhost:5173',
-        credentials: true
-    }
-)); 
-app.use(morgan('dev'));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://parafacturasclient.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permite peticiones sin origin (como Postman o curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("No permitido por CORS: " + origin));
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 

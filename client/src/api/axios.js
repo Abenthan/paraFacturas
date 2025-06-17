@@ -1,7 +1,7 @@
 import axios from 'axios'; 
 
 const instance = axios.create({
-    baseURL: 'https://parafacturas-production.up.railway.app/api' || 'http://localhost:5173/api',
+    baseURL: 'https://parafacturas-production.up.railway.app/api',
     withCredentials: true,
 });
 
