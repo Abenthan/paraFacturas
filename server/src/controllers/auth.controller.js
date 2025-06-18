@@ -1,13 +1,16 @@
 import { pool } from "../db.js";
 import bcript from "bcryptjs";
 import { createAccessToken } from "../libs/jwt.js";
-import jwt from 'jsonwebtoken';
-import { TOKEN_SECRET } from '../config.js';
+import jwt from "jsonwebtoken";
+import { TOKEN_SECRET } from "../config.js";
 
 export const home = async (req, res) => {
   const { id } = req.user;
   try {
-    const [rows] = await pool.query("SELECT * FROM usuarios WHERE idUsuario = ?", [id]);
+    const [rows] = await pool.query(
+      "SELECT * FROM usuarios WHERE idUsuario = ?",
+      [id]
+    );
     if (rows.length === 0) {
       return res.status(400).json({ message: "Usuario no encontrado" });
     } else {
@@ -53,7 +56,7 @@ export const register = async (req, res) => {
           id: result.insertId,
           username,
           fullname,
-          email
+          email,
         });
       }
     }
@@ -81,7 +84,14 @@ export const login = async (req, res) => {
         // Crear el token
         const token = await createAccessToken({ id: user.idUsuario });
         // responder al frontend
-        res.cookie("token", token);
+        const isProduction = process.env.NODE_ENV === "production";
+
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "Lax",
+        });
+
         res.json({
           message: "Usuario logueado.",
           id: user.idUsuario,
@@ -111,32 +121,35 @@ export const verifyToken = async (req, res) => {
   if (!token) {
     return res.status(401).json({ message: "¡Desautorizado!, No hay token " });
   }
-  
-  jwt.verify(token, TOKEN_SECRET, async(err, user) => {
+
+  jwt.verify(token, TOKEN_SECRET, async (err, user) => {
     if (err) {
-      return res.status(401).json({ message: "¡Desautorizado!, Token inválido" });
+      return res
+        .status(401)
+        .json({ message: "¡Desautorizado!, Token inválido" });
     }
 
     try {
-      const [rows] = await pool.query("SELECT * FROM usuarios WHERE idUsuario = ?", [user.id]);
+      const [rows] = await pool.query(
+        "SELECT * FROM usuarios WHERE idUsuario = ?",
+        [user.id]
+      );
       if (rows.length === 0) {
-        return res.status(401).json({ message: "¡Desautorizado!, Usuario no encontrado" });
+        return res
+          .status(401)
+          .json({ message: "¡Desautorizado!, Usuario no encontrado" });
       } else {
-        console.log({message: "usuario autoriazado!"});
+        console.log({ message: "usuario autoriazado!" });
         return res.json({
           id: rows[0].idUsuario,
           username: rows[0].username,
           fullname: rows[0].fullname,
-          email: rows[0].email
+          email: rows[0].email,
         });
       }
-      
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
-      
     }
   });
- };
-
-   
+};
