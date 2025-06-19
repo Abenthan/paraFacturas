@@ -8,6 +8,7 @@ function ClientePage() {
   const { user } = useAuth();
   const {
     cliente,
+    getCliente,
     setCliente,
     updateCliente,
     errors: updateClienteError,
@@ -20,18 +21,23 @@ function ClientePage() {
     formState: { errors },
   } = useForm();
   const params = useParams();
+  const clienteId = params.id;
   const usuarioId = user.id;
   const [successMessage, setSuccessMessage] = useState("");
 
   // Llenar formulario con datos del cliente
   useEffect(() => {
-    if (cliente) {
-      Object.entries(cliente).forEach(([key, value]) => {
-        setValue(key, value);
-      });
-    }
-  }, [cliente, setValue]);
-
+    const fetchCliente = async () => {
+      const respuestaCliente = await getCliente(clienteId);
+      if (respuestaCliente) {
+        Object.entries(respuestaCliente).forEach(([key, value]) => {
+          setValue(key, value);
+        });
+      }
+    };
+    fetchCliente();
+  }, [clienteId]);
+  
   // Scroll to top en mensaje de error o éxito
   useEffect(() => {
     if (updateClienteError.length > 0 || successMessage) {

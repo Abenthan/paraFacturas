@@ -25,6 +25,16 @@ function Navbar() {
                 Clientes
               </Link>
             </li>
+
+            {/* Link a suscripciones */}
+            <li>
+              <Link
+                to="/suscripciones"
+                className="text-white hover:text-blue-500 transition duration-300"
+              >
+                Suscripciones
+              </Link>
+            </li>
             {/* Link a Facturacion */}
             <li>
               <Link
