@@ -287,6 +287,49 @@ export const reconexionSuscripcion = async (req, res) => {
   }
 };
 
+export const retirarSuscripcion = async (req, res) => {
+  const { idSuscripcion, usuarioId } = req.body;
+  try {
+    // actualizar el estado de la suscripcion a Retirada
+    const consultaSuscripcion = `UPDATE suscripciones
+    SET Estado = 'Retirada'
+    WHERE idSuscripcion = ?`;
+    const [suscripcion] = await pool.query(consultaSuscripcion, [
+      idSuscripcion,
+    ]);
+
+    if (suscripcion.affectedRows === 0) {
+      return res.status(404).json({ message: "Suscripción no encontrada" });
+    }
+
+    // insertar la novedad de retiro
+    const consultaNovedad = `INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad,suscripcion_id) VALUES (?, ?, ?, ?)`;
+    const [novedad] = await pool.query(consultaNovedad, [
+      "Retiro",
+      new Date(),
+      `Se retiró la suscripción número ${idSuscripcion}`,
+      idSuscripcion,
+    ]);
+
+    // registrar en auditoria
+    const consultaAuditoria = `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion) VALUES (?, ?, ?, ?)`;
+    const [auditoria] = await pool.query(consultaAuditoria, [
+      usuarioId,
+      "Retirar",
+      "Suscripciones",
+      `Se retiró la suscripción número ${idSuscripcion}`,
+    ]);
+    
+    res.status(200).json({ message: "Suscripción retirada" });
+  } catch (error) {
+    console.log("error en retirarSuscripcion", error);
+    return res.status(500).json({
+      message: "Error en el servidor, vuelva a intentarlo",
+      error: error.message,
+    });
+  }
+}
+
 // novedades de una suscripción
 export const getNovedadesSuscripcion = async (req, res) => {
   try {

@@ -10,6 +10,7 @@ import {
   obtenerFacturaReconexionRequest,
   insertarFacturaReconexionRequest,
   reconexionSuscripcionRequest,
+  retirarSuscripcionRequest,
   getNovedadesSuscripcionRequest,
 } from "../api/suscripcionesApi";
 
@@ -118,6 +119,15 @@ export const SuscripcionesProvider = ({ children }) => {
       return null;
     }
   }
+  const retirarSuscripcion = async (data) => {
+    try {
+      const respuestaRetirar = await retirarSuscripcionRequest(data);
+      return respuestaRetirar;
+    } catch (error) {
+      console.error("Error retirando suscripcion:", error);
+      return null;
+    }
+  }
 
   const getNovedadesSuscripcion = async (idSuscripcion) => {
     try {
@@ -152,6 +162,7 @@ export const SuscripcionesProvider = ({ children }) => {
         obtenerFacturaReconexion,
         insertarFacturaReconexion,
         reconexionSuscripcion,
+        retirarSuscripcion,
         getNovedadesSuscripcion,
         errors,
         setErrors,

@@ -63,7 +63,7 @@ function CarteraSuscripcionPage() {
     },
     {
       nombre: "Retiro",
-      path: `/retiroSuscripcion/${suscripcionId}`,
+      path: `/suscripciones/retiro`,
       permitido: puedeRetirar,
       mensaje: "Solo se puede retirar si no hay facturas pendientes.",
     },

@@ -23,6 +23,7 @@ import NovedadesSuscripcionPage from "./pages/suscripciones/NovedadesSuscripcion
 import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
 import SuspenderSuscripcionPage from "./pages/suscripciones/SuspenderSuscripcionPage.jsx";
 import ReconexionPage from "./pages/suscripciones/ReconexionPage.jsx";
+import RetiroSuscripcionPage from "./pages/suscripciones/RetiroSuscripcionPage.jsx";
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
@@ -63,6 +64,7 @@ function App() {
                     <Route path="/suspenderSuscripcion/:idSuscripcion" element={<SuspenderSuscripcionPage />} />
                     <Route path="/suscripciones/reconexion" element={<ReconexionPage />} />
                     <Route path="/suscripciones/novedades/:idSuscripcion" element={<NovedadesSuscripcionPage />} />
+                    <Route path="/suscripciones/retiro" element={<RetiroSuscripcionPage />} />
                     <Route path="/facturacion" element={<FacturacionPage />} />
                     <Route path="/prefacturacion" element={<PrefacturacionPage />} />
                     <Route path="/facturas" element={<FacturasPage />} />
