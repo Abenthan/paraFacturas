@@ -76,7 +76,7 @@ function FacturaPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <Link
-            to={`/estadoCuentaCliente/${factura.idCliente}`}
+            to={`/Cliente/${factura.idCliente}`}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             Cliente

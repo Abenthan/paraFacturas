@@ -29,8 +29,8 @@ function ClientePage() {
   useEffect(() => {
     const fetchCliente = async () => {
       const respuestaCliente = await getCliente(clienteId);
-      if (respuestaCliente) {
-        Object.entries(respuestaCliente).forEach(([key, value]) => {
+      if (respuestaCliente.data) {
+        Object.entries(respuestaCliente.data).forEach(([key, value]) => {
           setValue(key, value);
         });
       }

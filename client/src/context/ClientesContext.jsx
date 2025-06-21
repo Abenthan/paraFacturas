@@ -35,6 +35,7 @@ export const ClientesProvider = ({ children }) => {
     try {
       const res = await getClienteRequest(id);
       setCliente(res.data);
+      return res;
     } catch (error) {
       console.error("Error Catch en getCliente: ", error);
     }

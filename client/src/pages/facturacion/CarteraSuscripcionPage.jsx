@@ -83,10 +83,10 @@ function CarteraSuscripcionPage() {
         {/* Botón de regreso */}
         <div className="mb-4">
           <Link
-            to={`/suscripcionesCliente/${suscripcion.cliente_id}`}
+            to={`/cliente/${suscripcion.cliente_id}`}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
-            ← Ir a las suscripciones de este cliente
+            ← ver cliente
           </Link>
         </div>
 
