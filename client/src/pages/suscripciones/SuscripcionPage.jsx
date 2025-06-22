@@ -281,7 +281,7 @@ function SuscripcionPage() {
         </button>
         {/* Botón de cancelar, Link to `/suscripciones/data.cliente_id` */}
         <Link
-          to={`/suscripciones/${suscripcion.cliente_id}`}
+          to={`/carteraSuscripcion/${suscripcion.idSuscripcion}`}
           className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-white ml-2"
         >
           Cancelar

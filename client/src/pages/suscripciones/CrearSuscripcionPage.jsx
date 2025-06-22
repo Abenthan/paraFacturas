@@ -30,10 +30,7 @@ function CrearSuscripcionPage() {
     async function loadCliente() {
       if (params.id) {
         try {
-          const clienteData = await getCliente(params.id);
-          if (clienteData) {
-            setCliente(clienteData);
-          }
+          await getCliente(params.id);
         } catch (error) {
           console.error("Error al cargar el cliente:", error);
         } finally {
@@ -74,7 +71,7 @@ function CrearSuscripcionPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     const confirmacion = window.confirm(
-      `¿Está seguro que desea crear la suscripción para ${cliente.nombreCliente}?`
+      `Está a punto de generar una factura de suscripción.\n¿Desea continuar para ${cliente.nombreCliente}?`
     );
     if (!confirmacion) {
       return;
@@ -85,7 +82,7 @@ function CrearSuscripcionPage() {
       setSuccessMessage("Suscripción creada con éxito.");
       setTimeout(() => {
         setSuccessMessage("");
-        navigate(`/suscripciones/${params.id}`);
+        navigate(`/suscripcionesCliente/${params.id}`);
       }, 2000); // Redirigir después de 2 segundos
     } catch (error) {
       console.error("Error al crear la suscripción:", error);
@@ -97,7 +94,7 @@ function CrearSuscripcionPage() {
       <div className="max-w-2xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <Link
-            to={`/suscripciones/${params.id}`}
+            to={`/suscripcionesCliente/${params.id}`}
             className="text-blue-400 hover:text-blue-300"
           >
             ← Volver
@@ -231,13 +228,19 @@ function CrearSuscripcionPage() {
           <input type="hidden" value={usuarioId} {...register("usuarioId")} />
 
           {/* Botón */}
-          <div className="flex justify-end">
+          <div className="flex justify-center mt-6">
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
             >
               Crear Suscripción
             </button>
+            <Link
+              to={`/suscripcionesCliente/${params.id}`}
+              className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg text-white ml-2"
+            >
+              Cancelar
+            </Link>
           </div>
         </form>
       </div>

@@ -47,6 +47,7 @@ export const getSuscripciones = async (req, res) => {
 };
 
 export const createSuscripcion = async (req, res) => {
+  const productoId = 11; // ID del producto de internet
   try {
     const {
       cliente_id,
@@ -97,13 +98,66 @@ export const createSuscripcion = async (req, res) => {
       observaciones,
     ]);
 
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "Error al crear la suscripción" });
+    }
+    // CREAR FACTURA DE SUSCRIPCION
+    //1. obtener el ultimo consecutivo de la factura 
+    const [resultadoConsecutivo] = await pool.query(
+      `
+      SELECT codigoFactura 
+      FROM facturas
+      WHERE producto_id = ?
+      ORDER BY idFactura DESC
+      LIMIT 1
+      `,
+      [productoId]
+    );
+
+    let nuevoCodigoFactura;
+
+    //2. genero el nuevo código de factura
+    if (resultadoConsecutivo.length > 0) {
+      const ultimoCodigo = resultadoConsecutivo[0].codigoFactura;
+      const partes = ultimoCodigo.split("-");
+      const ultimoConsecutivo = parseInt(partes[1]);
+      const nuevoConsecutivo = ultimoConsecutivo + 1;
+      nuevoCodigoFactura = `NS-${nuevoConsecutivo}`;
+    } else {
+      nuevoCodigoFactura = "NS-1";
+    }
+
+    // Obtener el producto de reconexión
+    const [productoReconexion] = await pool.query(
+      `
+      SELECT idProducto, nombreProducto, precioProducto
+      FROM productos
+      WHERE idProducto = ?
+      `,
+      [productoId]
+    );
+
+    // insertar la factura de reconexión
+    const [insertResult] = await pool.query(
+      `
+      INSERT INTO facturas (producto_id, suscripcion_id, valor, estado, codigoFactura)
+      VALUES (?, ?, ?, 'Pendiente por pagar', ?)
+      `,
+      [
+        productoId,
+        result.insertId, // id de la suscripción recién creada
+        productoReconexion[0].precioProducto,
+        nuevoCodigoFactura,
+      ]
+    );    
+
     // registrar en auditoria
     const consultaAuditoria = `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion) VALUES (?, ?, ?, ?)`;
     const [auditoria] = await pool.query(consultaAuditoria, [
       usuarioId,
       "Crear",
       "Suscripciones",
-      `Se creó la suscripción número ${result.insertId}`,
+      `Se creó la suscripción número ${result.insertId} y la factura número ${insertResult.insertId}`,
     ]);
 
     return res
