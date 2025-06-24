@@ -29,5 +29,8 @@ export const reconexionSuscripcionRequest = (data) =>
 export const retirarSuscripcionRequest = (data) =>
   axios.post(`/retirarSuscripcion`, data);
 
+export const reactivarSuscripcionRequest = (data) =>
+  axios.post(`/reactivarSuscripcion`, data);
+
 export const getNovedadesSuscripcionRequest = (idSuscripcion) =>
   axios.get(`/suscripciones/novedades/${idSuscripcion}`);

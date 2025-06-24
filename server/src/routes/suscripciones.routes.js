@@ -9,6 +9,7 @@ import {
   suspenderSuscripcion,
   reconexionSuscripcion,
   retirarSuscripcion,
+  reactivarSuscripcion,
   getNovedadesSuscripcion,
 } from "../controllers/suscripciones.controller.js";
 
@@ -22,6 +23,7 @@ router.put("/suscripcion/:id", authRequired, updateSuscripcion);
 router.put("/suspenderSuscripcion/:id", authRequired, suspenderSuscripcion);
 router.post("/reconexionSuscripcion", authRequired, reconexionSuscripcion);
 router.post("/retirarSuscripcion", authRequired, retirarSuscripcion);
+router.post("/reactivarSuscripcion", authRequired, reactivarSuscripcion);
 router.get("/suscripciones/novedades/:idSuscripcion", authRequired, getNovedadesSuscripcion);
 
 export default router;

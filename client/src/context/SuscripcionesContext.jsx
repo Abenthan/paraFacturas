@@ -11,6 +11,7 @@ import {
   insertarFacturaReconexionRequest,
   reconexionSuscripcionRequest,
   retirarSuscripcionRequest,
+  reactivarSuscripcionRequest,
   getNovedadesSuscripcionRequest,
 } from "../api/suscripcionesApi";
 
@@ -76,8 +77,7 @@ export const SuscripcionesProvider = ({ children }) => {
       setErrors(error.response.data);
       return error.response.data;
     }
-
-  }
+  };
 
   const updateSuscripcion = async (id, suscripcion) => {
     try {
@@ -98,17 +98,19 @@ export const SuscripcionesProvider = ({ children }) => {
       console.error("Error fetching factura de reconexion:", error);
       return null;
     }
-  }
+  };
 
   const insertarFacturaReconexion = async (data) => {
     try {
-      const respuestaFacturaReconexion = await insertarFacturaReconexionRequest(data);
+      const respuestaFacturaReconexion = await insertarFacturaReconexionRequest(
+        data
+      );
       return respuestaFacturaReconexion.data;
     } catch (error) {
       console.error("Error inserting factura de reconexion:", error);
       return null;
     }
-  }
+  };
 
   const reconexionSuscripcion = async (data) => {
     try {
@@ -118,7 +120,8 @@ export const SuscripcionesProvider = ({ children }) => {
       console.error("Error reconectando suscripcion:", error);
       return null;
     }
-  }
+  };
+
   const retirarSuscripcion = async (data) => {
     try {
       const respuestaRetirar = await retirarSuscripcionRequest(data);
@@ -127,8 +130,19 @@ export const SuscripcionesProvider = ({ children }) => {
       console.error("Error retirando suscripcion:", error);
       return null;
     }
-  }
+  };
 
+  const reactivarSuscripcion = async (data) => {
+    try {
+      console.log("Reactivando suscripcion con data:", data);
+      const respuestaReactivar = await reactivarSuscripcionRequest(data);
+      return respuestaReactivar;
+    } catch (error) {
+      console.error("Error reactivando suscripcion:", error);
+      return null;
+    }
+  };
+  
   const getNovedadesSuscripcion = async (idSuscripcion) => {
     try {
       const response = await getNovedadesSuscripcionRequest(idSuscripcion);
@@ -137,7 +151,7 @@ export const SuscripcionesProvider = ({ children }) => {
       console.error("Error fetching novedades de la suscripción:", error);
       return null;
     }
-  }
+  };
 
   useEffect(() => {
     if (errors.length > 0) {
@@ -163,6 +177,7 @@ export const SuscripcionesProvider = ({ children }) => {
         insertarFacturaReconexion,
         reconexionSuscripcion,
         retirarSuscripcion,
+        reactivarSuscripcion,
         getNovedadesSuscripcion,
         errors,
         setErrors,

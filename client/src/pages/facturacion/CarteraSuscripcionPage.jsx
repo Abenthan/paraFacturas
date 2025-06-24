@@ -39,7 +39,12 @@ function CarteraSuscripcionPage() {
 
   const puedeReconectar = suscripcion.Estado === "Suspendida";
 
-  const puedeRetirar = facturas.length === 0;
+  // puedeRetirar = true menos cuando la suscripcion.Estado = "Retirada"
+  
+  var puedeRetirar = true;
+  if (suscripcion.Estado === "Retirada") puedeRetirar = false;
+
+  const puedeReactivar = suscripcion.Estado === "Retirada";
 
   const tramites = [
     {
@@ -65,7 +70,13 @@ function CarteraSuscripcionPage() {
       nombre: "Retiro",
       path: `/suscripciones/retiro`,
       permitido: puedeRetirar,
-      mensaje: "Solo se puede retirar si no hay facturas pendientes.",
+      mensaje: "La suscripcion ya está retirada.",
+    },
+    {
+      nombre: "Reactivación",
+      path: `/suscripciones/reactivar`,
+      permitido: puedeReactivar,
+      mensaje: "Solo se puede reactivar si la suscripción está retirada.",
     },
   ];
 

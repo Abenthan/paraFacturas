@@ -384,6 +384,99 @@ export const retirarSuscripcion = async (req, res) => {
   }
 }
 
+// Reactivacion de una suscripción
+export const reactivarSuscripcion = async (req, res) => {
+  const { idSuscripcion, usuarioId } = req.body;
+  const productoId = 12; // ID del producto de internet
+  try {
+    // actualizar el estado de la suscripcion a Activo
+    const consultaSuscripcion = `UPDATE suscripciones
+    SET Estado = 'Activo'
+    WHERE idSuscripcion = ?`;
+    const [suscripcion] = await pool.query(consultaSuscripcion, [
+      idSuscripcion,
+    ]);
+
+    if (suscripcion.affectedRows === 0) {
+      return res.status(404).json({ message: "Suscripción no encontrada" });
+    }
+
+    // crear Factura de reactivación
+    // 1. obtener el ultimo consecutivo de la factura
+    const [resultadoConsecutivo] = await pool.query(
+      `
+      SELECT codigoFactura
+      FROM facturas
+      WHERE producto_id = ?
+      ORDER BY idFactura DESC
+      LIMIT 1
+      `,
+      [productoId]
+    );
+    let nuevoCodigoFactura;
+    // 2. genero el nuevo código de factura
+    if (resultadoConsecutivo.length > 0) {
+      const ultimoCodigo = resultadoConsecutivo[0].codigoFactura;
+      const partes = ultimoCodigo.split("-");
+      const ultimoConsecutivo = parseInt(partes[1]);
+      const nuevoConsecutivo = ultimoConsecutivo + 1;
+      nuevoCodigoFactura = `RA-${nuevoConsecutivo}`;
+    }
+    else {
+      nuevoCodigoFactura = "RA-1";
+    }
+    //3. Obtener el producto de reactivación
+    const [productoReactivacion] = await pool.query(
+      `
+      SELECT idProducto, nombreProducto, precioProducto
+      FROM productos
+      WHERE idProducto = ?
+      `,
+      [productoId]
+    );
+
+    //4. insertar la factura de reactivación
+    const [insertResult] = await pool.query(
+      `
+      INSERT INTO facturas (producto_id, suscripcion_id, valor, estado, codigoFactura)
+      VALUES (?, ?, ?, 'Pendiente por pagar', ?)
+      `,
+      [
+        productoId,
+        idSuscripcion, // id de la suscripción recién reactivada
+        productoReactivacion[0].precioProducto,
+        nuevoCodigoFactura,
+      ]
+    );
+
+    // insertar la novedad de reactivación
+    const consultaNovedad = `INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad,suscripcion_id) VALUES (?, ?, ?, ?)`;
+    const [novedad] = await pool.query(consultaNovedad, [
+      "Reactivación",
+      new Date(),
+      `Se reactivó la suscripción número ${idSuscripcion} con la factura número ${insertResult.insertId}`,
+      idSuscripcion,
+    ]);
+
+    // registrar en auditoria
+    const consultaAuditoria = `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion) VALUES (?, ?, ?, ?)`;
+    const [auditoria] = await pool.query(consultaAuditoria, [
+      usuarioId,
+      "Reactivar",
+      "Suscripciones",
+      `Se reactivó la suscripción número ${idSuscripcion}`,
+    ]);
+
+    res.status(200).json({ message: "Suscripción reactivada" });
+  } catch (error) {
+    console.log("error en reactivarSuscripcion", error);
+    return res.status(500).json({
+      message: "Error en el servidor, vuelva a intentarlo",
+      error: error.message,
+    });
+  }
+}
+
 // novedades de una suscripción
 export const getNovedadesSuscripcion = async (req, res) => {
   try {
