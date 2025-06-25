@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function ReactivacionPage() {
   const { user } = useAuth();

@@ -10,7 +10,7 @@ export const getFacturasPendientes = async (req, res) => {
 
   try {
     const consulta = `
-      SELECT 
+SELECT 
           s.idSuscripcion,
           c.nombreCliente,
           p.nombreProducto,
@@ -24,16 +24,18 @@ export const getFacturasPendientes = async (req, res) => {
       INNER JOIN clientes c ON s.cliente_id = c.idCliente
       INNER JOIN productos p ON s.producto_id = p.idProducto
       LEFT JOIN (
-          SELECT 
-              suscripcion_id, 
-              novedad,
-              fechaNovedad
-          FROM novedades 
-          WHERE idNovedad IN (
-              SELECT MAX(idNovedad) 
-              FROM novedades 
-              GROUP BY suscripcion_id
-          )
+		SELECT 
+			suscripcion_id, novedad, fechaNovedad
+		FROM novedades 
+		WHERE idNovedad IN (
+			SELECT MAX(idNovedad) 
+			FROM novedades 
+			WHERE YEAR(fechaNovedad) = ? 
+				AND MONTH(fechaNovedad) = ?
+			GROUP BY suscripcion_id
+		)
+		AND YEAR(fechaNovedad) = ?
+		AND MONTH(fechaNovedad) = ?
       ) n ON s.idSuscripcion = n.suscripcion_id
       LEFT JOIN (
           SELECT 
@@ -55,11 +57,10 @@ export const getFacturasPendientes = async (req, res) => {
           SELECT 1 
           FROM facturas f
           WHERE f.suscripcion_id = s.idSuscripcion
-            AND f.year = 2025
-            AND f.mes = 6
-        );
+            AND f.year = ?
+            AND f.mes = ?)
     `;
-    const [rows] = await pool.query(consulta, [year, mes]);
+    const [rows] = await pool.query(consulta, [year, mes, year, mes, year, mes]);
 
     res.json(rows);
   } catch (error) {
