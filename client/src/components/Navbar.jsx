@@ -76,6 +76,16 @@ function Navbar() {
                     Suscripciones
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    to="/novedades"
+                    className="text-white hover:text-blue-500 transition duration-300"
+                  >
+                    Novedades
+                  </Link>
+                </li>
+
                 <li>
                   <Link
                     to="/register"

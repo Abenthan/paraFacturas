@@ -132,8 +132,9 @@ function CarteraSuscripcionPage() {
           </p>
         </div>
 
-        {/* Botón Tramites */}
+        {/* Botónes */}
         <div className="mb-6">
+          {/* Boton tramites */}
           <button
             onClick={() => setMostrarTramites(!mostrarTramites)}
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
@@ -141,6 +142,14 @@ function CarteraSuscripcionPage() {
             Trámites
           </button>
 
+          {/* Enlace para novedades suscripciones/novedades/idSuscripcion */}
+          <Link
+            to={`/suscripciones/novedades/${suscripcionId}`}
+            className="ml-4 px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg"
+          >
+            Novedades
+          </Link>
+          
           {mostrarTramites && (
             <div className="mt-4 bg-zinc-700 p-4 rounded-lg space-y-2">
               {tramites.map((t) => (

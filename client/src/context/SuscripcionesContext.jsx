@@ -11,9 +11,10 @@ import {
   insertarFacturaReconexionRequest,
   reconexionSuscripcionRequest,
   retirarSuscripcionRequest,
-  reactivarSuscripcionRequest,
-  getNovedadesSuscripcionRequest,
+  reactivarSuscripcionRequest  
 } from "../api/suscripcionesApi";
+
+import { getNovedadesSuscripcionRequest } from "../api/novedadesApi";
 
 export const SuscripcionesContext = createContext();
 

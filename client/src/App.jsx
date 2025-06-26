@@ -19,12 +19,13 @@ import ProductoPage from "./pages/productos/ProductoPage.jsx";
 import SuscripcionesPage from "./pages/suscripciones/SuscripcionesPage.jsx";
 import SuscripcionesClientePage from "./pages/suscripciones/SuscripcionesClientePage";
 import SuscripcionPage from "./pages/suscripciones/SuscripcionPage";
-import NovedadesSuscripcionPage from "./pages/suscripciones/NovedadesSuscripcionPage.jsx";
 import CrearSuscripcionPage from "./pages/suscripciones/CrearSuscripcionPage";
 import SuspenderSuscripcionPage from "./pages/suscripciones/SuspenderSuscripcionPage.jsx";
 import ReconexionPage from "./pages/suscripciones/ReconexionPage.jsx";
 import RetiroSuscripcionPage from "./pages/suscripciones/RetiroSuscripcionPage.jsx";
 import ReactivacionPage from "./pages/suscripciones/ReactivacionPage.jsx";
+import NovedadesPage from "./pages/novedades/NovedadesPage.jsx";
+import NovedadesSuscripcionPage from "./pages/novedades/NovedadesSuscripcionPage.jsx";
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
@@ -64,9 +65,10 @@ function App() {
                     <Route path="/suscripcion/:id" element={<SuscripcionPage />} />
                     <Route path="/suspenderSuscripcion/:idSuscripcion" element={<SuspenderSuscripcionPage />} />
                     <Route path="/suscripciones/reconexion" element={<ReconexionPage />} />
-                    <Route path="/suscripciones/novedades/:idSuscripcion" element={<NovedadesSuscripcionPage />} />
                     <Route path="/suscripciones/retiro" element={<RetiroSuscripcionPage />} />
                     <Route path="/suscripciones/reactivar" element={<ReactivacionPage />} />
+                    <Route path="/suscripciones/novedades/:idSuscripcion" element={<NovedadesSuscripcionPage />} />
+                    <Route path="/novedades" element={<NovedadesPage />} />
                     <Route path="/facturacion" element={<FacturacionPage />} />
                     <Route path="/prefacturacion" element={<PrefacturacionPage />} />
                     <Route path="/facturas" element={<FacturasPage />} />
