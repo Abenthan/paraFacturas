@@ -35,21 +35,6 @@ const PagoPage = () => {
     },
   });
 
-  const handleDownloadPDF = () => {
-    if (!contentRef.current) {
-      console.error("No se encontró el elemento para generar PDF.");
-      return;
-    }
-    const opt = {
-      margin: 0.5,
-      filename: `Pago_${pago?.codigoFactura || "sin_codigo"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-    html2pdf().set(opt).from(contentRef.current).save();
-  };
-
   if (!pago) return <div className="p-4 text-center">Cargando pago...</div>;
 
   return (

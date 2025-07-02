@@ -285,6 +285,7 @@ export const getFactura = async (req, res) => {
       SELECT 
         f.idFactura,
         f.codigoFactura,
+        f.producto_id,
         f.valor,
         f.estado,
         f.year,
