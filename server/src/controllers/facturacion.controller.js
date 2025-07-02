@@ -299,7 +299,7 @@ export const getFactura = async (req, res) => {
       FROM facturas f
       INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
       INNER JOIN clientes c ON s.cliente_id = c.idCliente
-      INNER JOIN productos p ON s.producto_id = p.idProducto
+      INNER JOIN productos p ON f.producto_id = p.idProducto
       WHERE f.idFactura = ?
       `,
       [id]
