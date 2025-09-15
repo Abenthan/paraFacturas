@@ -11,6 +11,11 @@ function FacturasPage() {
   const [estadoFiltro, setEstadoFiltro] = useState("");
   const [buscar, setBuscar] = useState(""); // Campo de búsqueda unificado
   const [facturas, setFacturas] = useState([]);
+  const [totales, setTotales] = useState({
+    totalFacturasMes: 0,
+    totalPendiente: 0,
+    totalFacturacion: 0,
+  });
   const [orden, setOrden] = useState({ campo: "nombreCliente", asc: true });
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +26,9 @@ function FacturasPage() {
         year: Number(year),
         mes: Number(mes),
       });
-      setFacturas(data);
+      setFacturas(data.facturas);
+      setTotales(data.totales);
+      console.log("Facturas obtenidas:", data.facturas);
     } catch (error) {
       console.error("Error buscando facturas:", error);
     } finally {
@@ -84,10 +91,22 @@ function FacturasPage() {
         >
           <option value="">Mes</option>
           {[
-            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre",
           ].map((m, i) => (
-            <option key={i} value={(i + 1).toString().padStart(2, "0")}>{m}</option>
+            <option key={i} value={(i + 1).toString().padStart(2, "0")}>
+              {m}
+            </option>
           ))}
         </select>
 
@@ -111,12 +130,23 @@ function FacturasPage() {
           className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2 w-72"
         />
 
-        <button
-          onClick={handleBuscar}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-        >
-          Buscar Facturas
-        </button>
+        {/* Botones de acción */}
+        <div className="flex gap-4">
+          <button
+            onClick={handleBuscar}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Buscar Facturas
+          </button>
+
+          {/* Botón imprimir */}
+          <button
+            onClick={() => navigate("/facturas/imprimir")}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Imprimir
+          </button>
+        </div>
       </div>
 
       {/* Resultados */}
@@ -127,22 +157,26 @@ function FacturasPage() {
           <table className="min-w-full bg-gray-900 border border-gray-700 rounded-lg shadow text-white text-sm">
             <thead className="bg-gray-800 text-gray-300 uppercase text-xs">
               <tr>
-                <th className="p-3 text-left">Código</th>
+                <th className="p-3 text-left">Factura</th>
                 <th
                   className="p-3 text-left cursor-pointer hover:underline"
                   onClick={() => cambiarOrden("suscripcion_id")}
                 >
-                  Suscripción {orden.campo === "suscripcion_id" && (orden.asc ? "▲" : "▼")}
+                  Suscripción{" "}
+                  {orden.campo === "suscripcion_id" && (orden.asc ? "▲" : "▼")}
                 </th>
                 <th
                   className="p-3 text-left cursor-pointer hover:underline"
                   onClick={() => cambiarOrden("nombreCliente")}
                 >
-                  Cliente {orden.campo === "nombreCliente" && (orden.asc ? "▲" : "▼")}
+                  Cliente{" "}
+                  {orden.campo === "nombreCliente" && (orden.asc ? "▲" : "▼")}
                 </th>
                 <th className="p-3 text-left">Producto</th>
                 <th className="p-3 text-left">Dirección</th>
                 <th className="p-3 text-left">Valor</th>
+                <th className="p-3">Pendiente</th>
+                <th className="p-3">Total a Pagar</th>
                 <th
                   className="p-3 text-left cursor-pointer hover:underline"
                   onClick={() => cambiarOrden("estado")}
@@ -154,13 +188,24 @@ function FacturasPage() {
             </thead>
             <tbody>
               {facturasFiltradas.map((factura) => (
-                <tr key={factura.idFactura} className="border-t border-gray-700 hover:bg-gray-800">
+                <tr
+                  key={factura.idFactura}
+                  className="border-t border-gray-700 hover:bg-gray-800"
+                >
                   <td className="p-3">{factura.codigoFactura}</td>
                   <td className="p-3">{factura.suscripcion_id}</td>
                   <td className="p-3">{factura.nombreCliente}</td>
                   <td className="p-3">{factura.nombreProducto}</td>
                   <td className="p-3">{factura.direccionServicio}</td>
-                  <td className="p-3">${factura.valor.toLocaleString("es-CO")}</td>
+                  <td className="p-3">
+                    ${factura.valor.toLocaleString("es-CO")}
+                  </td>
+                  <td className="p-3 text-center">
+                    ${Number(factura.valor_pendiente)?.toLocaleString("es-CO")}
+                  </td>
+                  <td className="p-3 text-center">
+                    ${Number(factura.totalPagar)?.toLocaleString("es-CO")}
+                  </td>
                   <td className="p-3">{factura.estado}</td>
                   <td className="p-3 text-center">
                     <button
@@ -173,10 +218,39 @@ function FacturasPage() {
                 </tr>
               ))}
             </tbody>
+            {/* Totales calculados en frontend */}
+            <tfoot className="bg-gray-800 font-bold">
+              <tr>
+                <td colSpan="5" className="p-3 text-right">
+                  Totales (vista filtrada):
+                </td>
+                <td className="p-3">
+                  $
+                  {facturasFiltradas
+                    .reduce((acc, f) => acc + f.valor, 0)
+                    .toLocaleString("es-CO")}
+                </td>
+                <td className="p-3">
+                  $
+                  {facturasFiltradas
+                    .reduce((acc, f) => acc + (Number(f.valor_pendiente) || 0), 0)
+                    .toLocaleString("es-CO")}
+                </td>
+                <td className="p-3">
+                  $
+                  {facturasFiltradas
+                    .reduce((acc, f) => acc + (Number(f.totalPagar) || 0), 0)
+                    .toLocaleString("es-CO")}
+                </td>
+                <td colSpan="2"></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       ) : (
-        <div className="text-center text-xl text-white">No se encontraron facturas.</div>
+        <div className="text-center text-xl text-white">
+          No se encontraron facturas.
+        </div>
       )}
     </div>
   );

@@ -60,7 +60,14 @@ SELECT
             AND f.year = ?
             AND f.mes = ?)
     `;
-    const [rows] = await pool.query(consulta, [year, mes, year, mes, year, mes]);
+    const [rows] = await pool.query(consulta, [
+      year,
+      mes,
+      year,
+      mes,
+      year,
+      mes,
+    ]);
 
     res.json(rows);
   } catch (error) {
@@ -245,7 +252,8 @@ export const getFacturas = async (req, res) => {
       valores.push(`%${codigoFactura}%`);
     }
 
-    const sql = `
+    // Consulta para obtener las facturas
+    const facturasSql = `
         SELECT 
           f.idFactura,
           f.codigoFactura,
@@ -256,18 +264,65 @@ export const getFacturas = async (req, res) => {
           f.suscripcion_id,
           c.nombreCliente,
           s.direccionServicio,
-          p.nombreProducto
+          p.nombreProducto,
+          COALESCE(v.valor_pendiente, 0) AS valor_pendiente,
+          COALESCE(v.facturas_vencidas, 0) AS facturas_vencidas,
+          (f.valor + COALESCE(v.valor_pendiente, 0)) AS totalPagar
         FROM facturas f
         INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
         INNER JOIN clientes c ON s.cliente_id = c.idCliente
         INNER JOIN productos p ON s.producto_id = p.idProducto
+        left join (
+	        SELECT 
+		        suscripcion_id AS 'suscripcionId',
+		        SUM(valor) AS 'valor_pendiente',
+		        count(*) as 'Facturas_vencidas'
+	        FROM facturas
+	        where not (year = ? and mes = ?)
+		        or year is null
+		        or mes is null
+	        GROUP BY suscripcion_id
+        ) v on f.suscripcion_id = v.suscripcionId
         ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
         ORDER BY f.idFactura DESC
       `;
+    const valoresConsulta = [year, mes, ...valores];
 
-    const [rows] = await pool.query(sql, valores);
+    // Consulta para obtener los totales
+    const totalesSql = `
+        SELECT 
+	        sum(f.valor) as totalFacturasMes,
+          sum(coalesce(p.valor_pendiente, 0)) as totalPendiente,
+          sum(f.valor + coalesce(p.valor_pendiente, 0)) as totalFacturacion
+        FROM facturas f
+          left join(
+	          select
+		          suscripcion_id,
+		          sum(valor) as valor_pendiente
+	          from facturas
+            where not (year = ? AND mes = ?)
+		          or year is null
+              or mes is null
+	          group by suscripcion_id    
+          ) p on f.suscripcion_id = p.suscripcion_id
+        ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
+        `;
+    const [rows, totales] = await Promise.all([
+      pool.query(facturasSql, valoresConsulta),
+      pool.query(totalesSql, valoresConsulta),
+    ]);
 
-    res.json(rows);
+    // Arreglo con facturas y totales
+    const facturas = {
+      facturas: rows[0],
+      totales: totales[0] || {
+        totalFacturasMes: 0,
+        totalPendiente: 0,
+        totalFacturacion: 0,
+      },
+    };
+
+    res.json(facturas);
   } catch (error) {
     console.error("Error obteniendo facturas:", error);
     res.status(500).json({ message: "Error al obtener facturas" });
