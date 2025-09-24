@@ -29,7 +29,7 @@ import NovedadesSuscripcionPage from "./pages/novedades/NovedadesSuscripcionPage
 import FacturacionPage from "./pages/facturacion/FacturacionPage.jsx";
 import PrefacturacionPage from "./pages/facturacion/PrefacturacionPage.jsx";
 import FacturasPage from "./pages/facturacion/FacturasPage.jsx";
-import ImprimirFacturacion from "./pages/facturacion/ImprimirFacturacion.jsx";
+import ImprimirFacturacionPage from "./pages/facturacion/ImprimirFacturacionPage.jsx";
 import FacturaPage from "./pages/facturacion/FacturaPage.jsx";
 import PagarFacturaPage from "./pages/facturacion/PagarFacturaPage.jsx";
 import PagosPage from "./pages/facturacion/PagosPage.jsx";
@@ -73,7 +73,7 @@ function App() {
                     <Route path="/facturacion" element={<FacturacionPage />} />
                     <Route path="/prefacturacion" element={<PrefacturacionPage />} />
                     <Route path="/facturas" element={<FacturasPage />} />
-                    <Route path="/facturas/imprimir" element={<ImprimirFacturacion />} />
+                    <Route path="/facturas/imprimir" element={<ImprimirFacturacionPage />} />
                     <Route path="/factura/:id" element={<FacturaPage />} />
                     <Route path="/pagarFactura/:id" element={<PagarFacturaPage />} />
                     <Route path="/pagos" element={<PagosPage />} />

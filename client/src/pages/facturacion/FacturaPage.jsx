@@ -113,6 +113,7 @@ function FacturaPage() {
             </svg>
             Imprimir
           </button>
+
           {/* Botón Pagar, condicionado por estado */}
           <button
             onClick={() =>
@@ -212,10 +213,7 @@ function FacturaPage() {
                     Saldo pendiente anterior
                   </td>
                   <td className="border px-4 py-2 text-right">
-                    $
-                    {(saldoPendiente).toLocaleString(
-                      "es-CO"
-                    )}
+                    ${saldoPendiente.toLocaleString("es-CO")}
                   </td>
                 </tr>
               )}

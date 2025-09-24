@@ -28,7 +28,6 @@ function FacturasPage() {
       });
       setFacturas(data.facturas);
       setTotales(data.totales);
-      console.log("Facturas obtenidas:", data.facturas);
     } catch (error) {
       console.error("Error buscando facturas:", error);
     } finally {
@@ -141,7 +140,18 @@ function FacturasPage() {
 
           {/* Botón imprimir */}
           <button
-            onClick={() => navigate("/facturas/imprimir")}
+            onClick={() => {
+              localStorage.setItem(
+                "filtrosFacturas",
+                JSON.stringify({
+                  year,
+                  mes,
+                  estadoFiltro,
+                  buscar,
+                })
+              );
+              navigate("/facturas/imprimir");
+            }}
             className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
           >
             Imprimir
@@ -233,7 +243,10 @@ function FacturasPage() {
                 <td className="p-3">
                   $
                   {facturasFiltradas
-                    .reduce((acc, f) => acc + (Number(f.valor_pendiente) || 0), 0)
+                    .reduce(
+                      (acc, f) => acc + (Number(f.valor_pendiente) || 0),
+                      0
+                    )
                     .toLocaleString("es-CO")}
                 </td>
                 <td className="p-3">

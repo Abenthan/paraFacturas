@@ -369,8 +369,8 @@ export const getFactura = async (req, res) => {
     // Consultar los pagos asociados a la factura
     const [pagos] = await pool.query(
       `
-      SELECT idPagos, fechaPago, valorPago
-      FROM pagos
+      SELECT idPagoFactura, fechaPago, valorPago
+      FROM pagoFactura
       WHERE factura_id = ?
       ORDER BY fechaPago ASC
       `,
@@ -387,7 +387,7 @@ export const getFactura = async (req, res) => {
         SELECT 
           factura_id, 
           SUM(valorPago) AS totalPagado
-        FROM pagos
+        FROM pagoFactura
         GROUP BY factura_id
       ) p ON f.idFactura = p.factura_id
       WHERE 
@@ -713,7 +713,7 @@ export const getCarteraSuscripcion = async (req, res) => {
         f.valor AS valorFactura, 
         COALESCE(SUM(p.valorPago), 0) AS totalPagado
       FROM facturas f
-      LEFT JOIN pagos p ON f.idFactura = p.factura_id
+      LEFT JOIN pagoFactura p ON f.idFactura = p.factura_id
       WHERE f.suscripcion_id = ?
       AND (f.estado = 'Pendiente por pagar' OR f.estado = 'Pago Parcial')
       GROUP BY f.idFactura
