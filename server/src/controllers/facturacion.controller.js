@@ -639,7 +639,7 @@ export const getCartera = async (req, res) => {
       JOIN facturas f ON f.suscripcion_id = s.idSuscripcion
       LEFT JOIN (
         SELECT factura_id, SUM(valorPago) AS totalPagado
-        FROM pagos
+        FROM pagoFactura
         GROUP BY factura_id
       ) p ON p.factura_id = f.idFactura
       WHERE f.estado IN ('Pendiente por pagar', 'Pago Parcial')
