@@ -39,7 +39,7 @@ function PagosPage() {
       filtros.fechaDesde.trim() === "" &&
       filtros.fechaHasta.trim() === "" &&
       filtros.cliente.trim() === "" &&
-      filtros.codigoFactura.trim() === ""
+      filtros.suscripcion.trim() === ""
     ) {
       alert("Debe diligenciar al menos un campo en el filtro de busqueda.");
       return;
@@ -95,8 +95,8 @@ function PagosPage() {
     if (filtros.cliente) {
       partes.push(`Cliente: ${filtros.cliente}`);
     }
-    if (filtros.codigoFactura) {
-      partes.push(`Factura: ${filtros.codigoFactura}`);
+    if (filtros.suscripcion) {
+      partes.push(`Suscripcion: ${filtros.suscripcion}`);
     }
     return partes.length > 0 ? partes.join(" | ") : "Todos los pagos";
   };
@@ -147,13 +147,13 @@ function PagosPage() {
         </div>
 
         <div>
-          <label className="block mb-1 text-sm">Código Factura:</label>
+          <label className="block mb-1 text-sm">Suscripción:</label>
           <input
             type="text"
-            placeholder="Código Factura"
-            value={filtros.codigoFactura}
+            placeholder="Suscripción"
+            value={filtros.suscripcion}
             onChange={(e) =>
-              setFiltros({ ...filtros, codigoFactura: e.target.value })
+              setFiltros({ ...filtros, suscripcion: e.target.value })
             }
             className="bg-gray-800 text-white border border-gray-600 px-3 py-2 rounded"
           />
@@ -193,10 +193,10 @@ function PagosPage() {
                   />
                 </th>
                 <th className="p-3 text-left">Cliente</th>
-                <th className="p-3 text-left">Código Factura</th>
+                <th className="p-3 text-left">Suscripción</th>
                 <th className="p-3 text-left">Fecha</th>
                 <th className="p-3 text-left">Valor</th>
-                <th className="p-3 text-center print:hidden">Acciones</th>
+                <th className="p-3 text-center print:hidden">Ver</th>
               </tr>
             </thead>
             <tbody>
@@ -215,7 +215,7 @@ function PagosPage() {
                     />
                   </td>
                   <td className="p-3">{pago.nombreCliente}</td>
-                  <td className="p-3">{pago.codigoFactura}</td>
+                  <td className="p-3">{pago.suscripcion_id}</td>
                   <td className="p-3">
                     {new Date(pago.fechaPago).toLocaleDateString()}
                   </td>

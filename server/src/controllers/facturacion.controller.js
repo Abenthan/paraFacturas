@@ -434,7 +434,7 @@ export const registrarPago = async (req, res) => {
         (f.valor - COALESCE(SUM(p.valorPago), 0)) AS saldoFactura
       FROM 
         facturas f
-        LEFT JOIN pagos p ON f.idFactura = p.factura_id
+        LEFT JOIN pagoFactura p ON f.idFactura = p.factura_id
       WHERE 
         f.suscripcion_id = ? AND
         (f.estado = "Pendiente por pagar" OR f.estado = "Pago Parcial") AND
@@ -453,12 +453,18 @@ export const registrarPago = async (req, res) => {
         .json({ message: "No hay facturas pendientes para aplicar el pago." });
     }
 
+    // registrar en pagos
+    const [pagoRegistro] = await pool.query(
+      "INSERT INTO pagos (suscripcion_id, valorPago) VALUES (?, ?)",
+      [idSuscripcion, valorPago]
+    );
+
     const pagosRealizados = [];
 
     async function registrarUnPago(idFactura, valor, nuevoEstado) {
       const [pago] = await pool.query(
-        "INSERT INTO pagos (factura_id, valorPago) VALUES (?, ?)",
-        [idFactura, valor]
+        "INSERT INTO pagoFactura (idPago, factura_id, valorPago) VALUES (?, ?, ?)",
+        [pagoRegistro.insertId, idFactura, valor]        
       );
 
       // Actualizar estado de la factura
@@ -531,7 +537,7 @@ export const registrarPago = async (req, res) => {
 // obtener pagos
 export const getPagos = async (req, res) => {
   try {
-    const { fechaDesde, fechaHasta, cliente, codigoFactura } = req.query;
+    const { fechaDesde, fechaHasta, cliente, suscripcion } = req.query;
 
     const condiciones = [];
     const valores = [];
@@ -551,21 +557,20 @@ export const getPagos = async (req, res) => {
       valores.push(`%${cliente.toLowerCase()}%`);
     }
 
-    if (codigoFactura) {
-      condiciones.push("f.codigoFactura LIKE ?");
-      valores.push(`%${codigoFactura}%`);
+    if (suscripcion) {
+      condiciones.push("p.suscripcion_id = ?");
+      valores.push(suscripcion);
     }
-
+    
     const sql = `
       SELECT 
         p.idPagos,
+        p.suscripcion_id,
         p.fechaPago,
         p.valorPago,
-        f.codigoFactura,
         c.nombreCliente
       FROM pagos p
-      INNER JOIN facturas f ON p.factura_id = f.idFactura
-      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
+      INNER JOIN suscripciones s ON p.suscripcion_id = s.idSuscripcion
       INNER JOIN clientes c ON s.cliente_id = c.idCliente
       ${condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : ""}
       ORDER BY p.fechaPago DESC
