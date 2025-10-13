@@ -576,9 +576,6 @@ export const getPagos = async (req, res) => {
       ORDER BY p.fechaPago DESC
     `;
 
-    console.log("Consulta SQL:", sql);
-    console.log("Valores:", valores);
-
     const [rows] = await pool.query(sql, valores);
     res.json(rows);
   } catch (error) {
@@ -591,22 +588,26 @@ export const getPagos = async (req, res) => {
 export const getPago = async (req, res) => {
   const { id } = req.params;
 
-  console.log("estamos en backend con el idPago :) ", id);
-
   try {
     const [pagoRows] = await pool.query(
       `
-      SELECT 
-        p.idPagos,
-        p.fechaPago,
-        p.valorPago,
-        f.codigoFactura,
-        c.nombreCliente
-      FROM pagos p
-      INNER JOIN facturas f ON p.factura_id = f.idFactura
-      INNER JOIN suscripciones s ON f.suscripcion_id = s.idSuscripcion
-      INNER JOIN clientes c ON s.cliente_id = c.idCliente
-      WHERE p.idPagos = ?
+        SELECT 
+          p.idPagos,
+            c.nombreCliente,
+            p.suscripcion_id,
+            p.fechaPago,
+            p.valorPago,
+            pf.idPagoFactura,
+            pf.factura_id,
+            pf.valorPago as pagoFactura,
+            f.codigoFactura,
+            f.estado
+        FROM pagofactura pf
+        inner join pagos p on  pf.idPago = p.idPagos
+        inner join facturas f on pf.factura_id = f.idFactura
+        inner join suscripciones s on p.suscripcion_id = s.idSuscripcion
+        inner join clientes c on s.cliente_id = c.idCliente
+        where pf.idPago = ?
     `,
       [id]
     );
@@ -615,7 +616,7 @@ export const getPago = async (req, res) => {
       return res.status(404).json({ message: "Pago no encontrado" });
     }
 
-    res.json(pagoRows[0]);
+    res.json(pagoRows);
   } catch (error) {
     console.error("Error al obtener pago:", error);
     res.status(500).json({ message: "Error interno del servidor" });

@@ -16,6 +16,7 @@ const PagoPage = () => {
         const respuesta = await obtenerPago(id);
         if (respuesta) {
           setPago(respuesta);
+          console.log("Pago obtenido:", respuesta);
         } else {
           console.error("No se encontró el pago con ID:", id);
         }
@@ -71,17 +72,19 @@ const PagoPage = () => {
           className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:p-0 print:shadow-none print:border-0"
         >
           <div className="mb-8">
+            {/* Encabezado del Recibo */}
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                  Recibo de Pago #{pago.idPagos}
+                  Recibo de Pago #{pago[0].idPagos}
                 </h2>
                 <p className="text-sm text-gray-500">
                   Fecha de emisión: {new Date().toLocaleDateString()}
                 </p>
               </div>
             </div>
-
+            
+            {/* Información del Cliente y Detalles del Pago */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-700">
@@ -90,11 +93,11 @@ const PagoPage = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-gray-800">
                     <span className="font-medium">Nombre:</span>{" "}
-                    {pago.nombreCliente}
+                    {pago[0].nombreCliente}
                   </p>
                   <p className="text-gray-800">
-                    <span className="font-medium">Factura:</span>{" "}
-                    {pago.codigoFactura}
+                    <span className="font-medium">Suscripcion:</span>{" "}
+                    {pago[0].suscripcion_id}
                   </p>
                 </div>
               </div>
@@ -106,16 +109,17 @@ const PagoPage = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-gray-800">
                     <span className="font-medium">Fecha de Pago:</span>{" "}
-                    {new Date(pago.fechaPago).toLocaleDateString()}
+                    {new Date(pago[0].fechaPago).toLocaleDateString()}
                   </p>
                   <p className="text-gray-800">
                     <span className="font-medium">Valor Pagado:</span> $
-                    {Number(pago.valorPago).toLocaleString("es-CO")}
+                    {Number(pago[0].valorPago).toLocaleString("es-CO")}
                   </p>
                 </div>
               </div>
             </div>
-
+            
+            {/* Resumen del Pago */}
             <div className="border-t border-gray-200 pt-6">
               <h3 className="font-semibold text-gray-700 mb-3">Resumen</h3>
               <div className="overflow-x-auto">
@@ -131,27 +135,28 @@ const PagoPage = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
+                    {pago.map((pagoAFactura) => (
+                      <tr key={pagoAFactura.idPagoFactura}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        Pago de factura
+                        Pago a la factura # {pagoAFactura.codigoFactura}, {pagoAFactura.estado}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        ${Number(pago.valorPago).toLocaleString("es-CO")}
+                        ${Number(pagoAFactura.pagoFactura).toLocaleString("es-CO")}
                       </td>
                     </tr>
+                    ))}
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                         Total
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                        ${Number(pago.valorPago).toLocaleString("es-CO")}
+                        ${Number(pago[0].valorPago).toLocaleString("es-CO")}
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
-
             <div className="mt-12 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-500">
                 Gracias por su pago. Este documento es válido como comprobante.
