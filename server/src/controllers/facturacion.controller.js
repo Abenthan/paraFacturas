@@ -46,7 +46,7 @@ SELECT
               SELECT 
                   factura_id,
                   SUM(valorPago) AS totalPagado
-              FROM pagos
+              FROM pagofactura
               GROUP BY factura_id
           ) p ON f.idFactura = p.factura_id
           WHERE f.estado IN ('Pendiente por pagar', 'Pago Parcial')
