@@ -21,11 +21,11 @@ function ReconexionPage() {
   const idSuscripcion = suscripcion.idSuscripcion;
 
   useEffect(() => {
-    if (suscripcion.Estado !== "Suspendida") {
-      setError("La suscripción no está suspendida. No se puede reconectar.");
-      setLoading(false);
-      return;
-    }
+    //if (suscripcion.Estado !== "Suspendida" ) {
+    //  setError("La suscripción no está suspendida. No se puede reconectar.");
+    //  setLoading(false);
+    //  return;
+    //}
 
     const cargarDatos = async () => {
       try {

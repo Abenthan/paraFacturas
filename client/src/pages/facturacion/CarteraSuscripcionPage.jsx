@@ -35,16 +35,17 @@ function CarteraSuscripcionPage() {
 
   // Validaciones de trámites
   const puedeSuspender =
-    suscripcion.Estado === "Activo" && facturas.length >= 2;
+    suscripcion.Estado === "Activo";
 
-  const puedeReconectar = suscripcion.Estado === "Suspendida";
+  // puedeReconectar = true solo cuando la suscripcion.Estado = "Suspendida" o "Desconectado"
+    const puedeReconectar = suscripcion.Estado === "Suspendida" || suscripcion.Estado === "Desconectado"
 
   // puedeRetirar = true menos cuando la suscripcion.Estado = "Retirada"
   
   var puedeRetirar = true;
   if (suscripcion.Estado === "Retirada") puedeRetirar = false;
 
-  const puedeReactivar = suscripcion.Estado === "Retirada";
+  const puedeReactivar = suscripcion.Estado === "Retirada"
 
   const tramites = [
     {
@@ -52,6 +53,7 @@ function CarteraSuscripcionPage() {
       path: `/suscripcion/${suscripcionId}`,
       permitido: true,
     },
+    
     {
       nombre: "Suspensión",
       path: `/suspenderSuscripcion/${suscripcionId}`,
