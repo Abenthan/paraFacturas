@@ -719,7 +719,7 @@ export const getCarteraSuscripcion = async (req, res) => {
         f.valor AS valorFactura, 
         COALESCE(SUM(p.valorPago), 0) AS totalPagado
       FROM facturas f
-      LEFT JOIN pagoFactura p ON f.idFactura = p.factura_id
+      LEFT JOIN pagofactura p ON f.idFactura = p.factura_id
       WHERE f.suscripcion_id = ?
       AND (f.estado = 'Pendiente por pagar' OR f.estado = 'Pago Parcial')
       GROUP BY f.idFactura
