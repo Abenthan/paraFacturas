@@ -11,7 +11,8 @@ import {
   insertarFacturaReconexionRequest,
   reconexionSuscripcionRequest,
   retirarSuscripcionRequest,
-  reactivarSuscripcionRequest  
+  reactivarSuscripcionRequest,  
+  crearFacturaTrasladoRequest
 } from "../api/suscripcionesApi";
 
 import { getNovedadesSuscripcionRequest } from "../api/novedadesApi";
@@ -143,7 +144,18 @@ export const SuscripcionesProvider = ({ children }) => {
       return null;
     }
   };
-  
+
+  const insertarFacturaTraslado = async (data) => {
+    try {
+      const respuestaFacturaTraslado = await crearFacturaTrasladoRequest(data);
+      return respuestaFacturaTraslado.data;
+    }
+    catch (error) {
+      console.error("Error inserting factura de traslado:", error);
+      return null;
+    }
+  };
+    
   const getNovedadesSuscripcion = async (idSuscripcion) => {
     try {
       const response = await getNovedadesSuscripcionRequest(idSuscripcion);
@@ -179,6 +191,7 @@ export const SuscripcionesProvider = ({ children }) => {
         reconexionSuscripcion,
         retirarSuscripcion,
         reactivarSuscripcion,
+        insertarFacturaTraslado,
         getNovedadesSuscripcion,
         errors,
         setErrors,

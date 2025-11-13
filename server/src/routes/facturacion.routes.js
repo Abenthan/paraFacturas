@@ -12,6 +12,7 @@ import {
   getCarteraSuscripcion,
   getFacturaReconexion,
   crearFacturaReconexion,
+  crearFacturaTraslado,
 } from "../controllers/facturacion.controller.js";
 
 const router = Router();
@@ -39,5 +40,7 @@ router.get("/carteraSuscripcion/:idSuscripcion", getCarteraSuscripcion);
 router.get("/facturaReconexion/:idSuscripcion", getFacturaReconexion);
 
 router.post("/facturaReconexion", crearFacturaReconexion);
+
+router.post("/facturaTraslado", crearFacturaTraslado);
 
 export default router;

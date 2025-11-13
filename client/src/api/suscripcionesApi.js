@@ -32,3 +32,6 @@ export const retirarSuscripcionRequest = (data) =>
 export const reactivarSuscripcionRequest = (data) =>
   axios.post(`/reactivarSuscripcion`, data);
 
+export const crearFacturaTrasladoRequest = (data) =>
+  axios.post(`/facturaTraslado`, data);
+

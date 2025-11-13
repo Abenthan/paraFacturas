@@ -80,6 +80,12 @@ function CarteraSuscripcionPage() {
       permitido: puedeReactivar,
       mensaje: "Solo se puede reactivar si la suscripción está retirada.",
     },
+    {
+      nombre: "Traslado",
+      path: `/suscripciones/traslado`,
+      permitido: true,
+      mensaje: "",
+    }
   ];
 
   const handleTramite = (t) => {

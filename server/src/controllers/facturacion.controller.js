@@ -464,7 +464,7 @@ export const registrarPago = async (req, res) => {
     async function registrarUnPago(idFactura, valor, nuevoEstado) {
       const [pago] = await pool.query(
         "INSERT INTO pagoFactura (idPago, factura_id, valorPago) VALUES (?, ?, ?)",
-        [pagoRegistro.insertId, idFactura, valor]        
+        [pagoRegistro.insertId, idFactura, valor]
       );
 
       // Actualizar estado de la factura
@@ -561,7 +561,7 @@ export const getPagos = async (req, res) => {
       condiciones.push("p.suscripcion_id = ?");
       valores.push(suscripcion);
     }
-    
+
     const sql = `
       SELECT 
         p.idPagos,
@@ -904,4 +904,124 @@ export const crearFacturaReconexion = async (req, res) => {
     console.error("Error creando factura de reconexión:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
+};
+
+// crear factura de traslado
+export const crearFacturaTraslado = async (req, res) => {
+  const { idSuscripcion, usuarioId, nuevaDireccion } = req.body;
+  const ProductoId = 13;
+
+  try {
+    // GENERAR EL CÓDIGO DE LA FACTURA
+
+    // Obtener el último consecutivo de facturas de reconexión
+    const [resultadoConsecutivo] = await pool.query(
+      `
+      SELECT codigoFactura 
+      FROM facturas
+      WHERE producto_id = ?
+      ORDER BY idFactura DESC
+      LIMIT 1
+      `,
+      [ProductoId]
+    );
+
+    let nuevoCodigoFactura;
+
+    // genero el nuevo código de factura
+    if (resultadoConsecutivo.length > 0) {
+      const ultimoCodigo = resultadoConsecutivo[0].codigoFactura;
+      const partes = ultimoCodigo.split("-");
+      const ultimoConsecutivo = parseInt(partes[1]);
+      const nuevoConsecutivo = ultimoConsecutivo + 1;
+      nuevoCodigoFactura = `T-${nuevoConsecutivo}`;
+    } else {
+      nuevoCodigoFactura = "T-1";
+    }
+
+    // Obtener el producto de reconexión
+    const [productoReconexion] = await pool.query(
+      `
+      SELECT idProducto, nombreProducto, precioProducto
+      FROM productos
+      WHERE idProducto = ?
+      `,
+      [ProductoId]
+    );
+
+    // insertar la factura de reconexión
+    const [insertResult] = await pool.query(
+      `
+      INSERT INTO facturas (producto_id, suscripcion_id, valor, estado, codigoFactura)
+      VALUES (?, ?, ?, 'Pendiente por pagar', ?)
+      `,
+      [
+        ProductoId,
+        idSuscripcion,
+        productoReconexion[0].precioProducto,
+        nuevoCodigoFactura,
+      ]
+    );
+
+    // Obtener observaciones de la suscripción
+    const consultaSuscripcion = 'SELECT direccionServicio FROM parafacturas.suscripciones where idSuscripcion = ?';
+    const [suscripcionRows] = await pool.query(consultaSuscripcion, [idSuscripcion]);
+    const observaciones = ` Direccion Antes del traslado: ${suscripcionRows[0].direccionServicio}`;
+
+    // Actualizar direccion en suscripciones
+    const consultaActualizarSuscripcion = `
+      UPDATE suscripciones 
+      SET direccionServicio = ?, Observaciones = ? 
+      WHERE idSuscripcion = ?
+    `;
+    await pool.query(consultaActualizarSuscripcion, [nuevaDireccion, observaciones, idSuscripcion]);
+
+    // insertar registro en novedades
+    const [novedadInsertResult] = await pool.query(
+      `
+      INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad, suscripcion_id)
+      VALUES ('Traslado', NOW(), ?, ?)
+      `,
+      [`Traslado de servicio a la nueva dirección: ${nuevaDireccion}`, idSuscripcion]
+    );
+
+    // insertar registro en facturasnovedades
+    await pool.query(
+      `
+            INSERT INTO facturasnovedades (factura_id, novedad_id)
+            VALUES (?, ?)
+            `,
+      [insertResult.insertId, novedadInsertResult.insertId]
+    );
+    
+    // insterto registro en auditoria
+    await pool.query(
+      `
+            INSERT INTO auditoria (usuario_id, accion, modulo, descripcion)
+            VALUES (?, ?, ?, ?)
+            `,
+      [
+        usuarioId,
+        "Crear",
+        "Facturación",
+        `Factura de traslado #${insertResult.insertId}`,
+      ]
+    );
+
+    // Responder con éxito
+    res.json({
+      message: "Direccion actualizada, novedad creada y factura generada con éxito.",
+      idFactura: insertResult.insertId,
+      codigoFactura: nuevoCodigoFactura,
+      valor: productoReconexion[0].precioProducto,
+      producto: productoReconexion[0].nombreProducto,     
+      estado: "Pendiente por pagar",
+      fechaFactura: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
+      idNovedad: novedadInsertResult.insertId,
+    });
+  } catch (error) {
+    console.error("Error creando factura de traslado:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+  
 };
