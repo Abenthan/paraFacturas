@@ -38,6 +38,7 @@ function SuscripcionPage() {
         setValue("nombreProducto", data.nombreProducto);
         setValue("direccionServicio", data.direccionServicio);
         setValue("Estado", data.Estado);
+        console.log("Estado: ", data.Estado);
         setValue("fechaInicio", data.fechaInicio.split("T")[0]);
         // Solo establecer fechaFin si tiene valor
         if (data.fechaFin) {
@@ -210,14 +211,17 @@ function SuscripcionPage() {
           )}
         </div>
 
-        {/* Estado: Activo o Inactivo */}
+        {/* Estado: */}
         <div>
           <label className="block text-sm font-medium">Estado</label>
           <select
+            id="Estado"
             {...register("Estado", { required: true })}
             className="w-full bg-gray-800 p-2 rounded mt-1"
           >
             <option value="Activo">Activo</option>
+            <option value="Suspencion">Suspencion</option>
+            <option value="Retiro">Retiro</option>
             <option value="Inactivo">Inactivo</option>
           </select>
         </div>

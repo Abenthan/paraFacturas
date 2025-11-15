@@ -146,14 +146,8 @@ export const SuscripcionesProvider = ({ children }) => {
   };
 
   const insertarFacturaTraslado = async (data) => {
-    try {
       const respuestaFacturaTraslado = await crearFacturaTrasladoRequest(data);
-      return respuestaFacturaTraslado.data;
-    }
-    catch (error) {
-      console.error("Error inserting factura de traslado:", error);
-      return null;
-    }
+      return respuestaFacturaTraslado;
   };
     
   const getNovedadesSuscripcion = async (idSuscripcion) => {
