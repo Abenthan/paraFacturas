@@ -344,9 +344,9 @@ export const reconexionSuscripcion = async (req, res) => {
 export const retirarSuscripcion = async (req, res) => {
   const { idSuscripcion, usuarioId } = req.body;
   try {
-    // actualizar el estado de la suscripcion a Retirada
+    // actualizar el estado de la suscripcion a Retiro
     const consultaSuscripcion = `UPDATE suscripciones
-    SET Estado = 'Retirada'
+    SET Estado = 'Retiro'
     WHERE idSuscripcion = ?`;
     const [suscripcion] = await pool.query(consultaSuscripcion, [
       idSuscripcion,
@@ -369,7 +369,7 @@ export const retirarSuscripcion = async (req, res) => {
     const consultaAuditoria = `INSERT INTO auditoria (usuario_id, accion, modulo, descripcion) VALUES (?, ?, ?, ?)`;
     const [auditoria] = await pool.query(consultaAuditoria, [
       usuarioId,
-      "Retirar",
+      "Retiro",
       "Suscripciones",
       `Se retiró la suscripción número ${idSuscripcion}`,
     ]);
@@ -467,7 +467,7 @@ export const reactivarSuscripcion = async (req, res) => {
       `Se reactivó la suscripción número ${idSuscripcion}`,
     ]);
 
-    res.status(200).json({ message: "Suscripción reactivada" });
+    res.status(200).json({ message: "Suscripción reactivada y factura generada" });
   } catch (error) {
     console.log("error en reactivarSuscripcion", error);
     return res.status(500).json({

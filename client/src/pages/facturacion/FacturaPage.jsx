@@ -27,7 +27,6 @@ function FacturaPage() {
         setFactura(data.factura);
         setPagos(data.pagos || []);
         setSaldoPendiente(data.saldoPendienteAnterior || 0);
-        console.log("Factura", data.factura);
       } catch (error) {
         console.error("Error cargando factura:", error);
       } finally {

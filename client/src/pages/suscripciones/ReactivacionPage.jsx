@@ -23,7 +23,7 @@ function ReactivacionPage() {
       try {
         const respuestaReactivacion = await reactivarSuscripcion(data);
         if (respuestaReactivacion.status === 200) {
-          setMensaje(respuestaReactivacion.message);
+          setMensaje(respuestaReactivacion.data.message);
           setError("");
           // Redirigir a la página de carteraSuscripcion después de 2 segundos
           setTimeout(() => {

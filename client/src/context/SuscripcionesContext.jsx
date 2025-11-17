@@ -136,7 +136,6 @@ export const SuscripcionesProvider = ({ children }) => {
 
   const reactivarSuscripcion = async (data) => {
     try {
-      console.log("Reactivando suscripcion con data:", data);
       const respuestaReactivar = await reactivarSuscripcionRequest(data);
       return respuestaReactivar;
     } catch (error) {

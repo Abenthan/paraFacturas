@@ -39,12 +39,12 @@ function CarteraSuscripcionPage() {
   // puedeReconectar = true solo cuando la suscripcion.Estado = "Suspendida" o "Desconectado"
   const puedeReconectar = suscripcion.Estado === "Suspencion";
 
-  // puedeRetirar = true menos cuando la suscripcion.Estado = "Retirada"
+  // puedeRetirar = true menos cuando la suscripcion.Estado = "Retiro"
 
   var puedeRetirar = true;
-  if (suscripcion.Estado === "Retirada") puedeRetirar = false;
+  if (suscripcion.Estado === "Retiro") puedeRetirar = false;
 
-  const puedeReactivar = suscripcion.Estado === "Retirada";
+  const puedeReactivar = suscripcion.Estado === "Retiro";
 
   const tramites = [
     {
