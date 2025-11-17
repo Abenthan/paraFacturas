@@ -266,7 +266,7 @@ export const suspenderSuscripcion = async (req, res) => {
     const { usuarioId } = req.body;
     // suspender la suscripcion
     const consulta = `UPDATE suscripciones 
-    SET estado = 'Suspendida'
+    SET estado = 'Suspencion'
     WHERE idSuscripcion = ?`;
     const [result] = await pool.query(consulta, [id]);
 

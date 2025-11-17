@@ -41,10 +41,6 @@ function PagarFacturaPage() {
   }, []);
 
   const handlePagar = async () => {
-    console.log("valorPago: ", valorPago);
-    console.log("idFactura: ", id);
-    console.log("idSuscripcion: ", factura.idSuscripcion);
-    console.log("usuarioId: ", user.id);
 
     if (valorPago <= 0) {
        alert("Debe ingresar un valor mayor a cero.");
@@ -57,9 +53,9 @@ function PagarFacturaPage() {
      }
 
     try {
-      await registrarPago(id, valorPago, factura.idSuscripcion, user.id);
+      const respuestaPago = await registrarPago(id, valorPago, factura.idSuscripcion, user.id);
       alert("Pago registrado con éxito.");
-      navigate(`/factura/${factura.idFactura}`);
+      navigate(`/pago/${respuestaPago.data.idPago}`);
     } catch (error) {
       console.error("Error registrando el pago:", error);
       alert("Ocurrió un error al registrar el pago.");

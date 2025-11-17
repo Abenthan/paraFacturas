@@ -71,7 +71,7 @@ function ReconexionPage() {
 
   const handlePagar = () => {
     if (factura) {
-      navigate(`/pagarFactura/${factura.idFactura}`);
+      navigate(`/factura/${factura.idFactura}`);
     }
   };
 
@@ -152,7 +152,7 @@ function ReconexionPage() {
             </span>{" "}
             {suscripcion.direccionServicio}
           </p>
-          {suscripcion.Estado === "Suspendida" ? (
+          {suscripcion.Estado === "Suspencion" ? (
             <p className="text-yellow-400">
               <span className="text-white font-semibold">
                 Estado de la suscripción:

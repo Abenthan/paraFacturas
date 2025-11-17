@@ -72,18 +72,19 @@ function PagosPage() {
     if (todasSeleccionadas) {
       setSeleccionados([]);
     } else {
-      setSeleccionados(pagos.map((p) => p.idPagos));
+      setSeleccionados(pagos.map((p) => p.idPago));
     }
   };
 
   // Navegar a la vista detallada del pago
   const handleVerPago = (idPago) => {
+    console.log("Navegando al pago:", idPago);
     navigate(`/pago/${idPago}`);
   };
 
   // Total acumulado de los seleccionados
   const totalSeleccionado = pagos
-    .filter((p) => seleccionados.includes(p.idPagos))
+    .filter((p) => seleccionados.includes(p.idPago))
     .reduce((sum, p) => sum + p.valorPago, 0);
 
   // Generar título de filtro para impresión
@@ -202,16 +203,16 @@ function PagosPage() {
             <tbody>
               {pagos.map((pago) => (
                 <tr
-                  key={pago.idPagos}
+                  key={pago.idPago}
                   className={`border-t border-gray-700 print:border-black ${
-                    seleccionados.includes(pago.idPagos) ? "bg-gray-800" : ""
+                    seleccionados.includes(pago.idPago) ? "bg-gray-800" : ""
                   }`}
                 >
                   <td className="p-3">
                     <input
                       type="checkbox"
-                      checked={seleccionados.includes(pago.idPagos)}
-                      onChange={() => toggleSeleccion(pago.idPagos)}
+                      checked={seleccionados.includes(pago.idPago)}
+                      onChange={() => toggleSeleccion(pago.idPago)}
                     />
                   </td>
                   <td className="p-3">{pago.nombreCliente}</td>
@@ -222,7 +223,7 @@ function PagosPage() {
                   <td className="p-3">${pago.valorPago.toLocaleString()}</td>
                   <td className="p-3 text-center print:hidden">
                     <button
-                      onClick={() => handleVerPago(pago.idPagos)}
+                      onClick={() => handleVerPago(pago.idPago)}
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
                     >
                       Ver

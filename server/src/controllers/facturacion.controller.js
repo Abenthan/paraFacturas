@@ -481,7 +481,7 @@ export const registrarPago = async (req, res) => {
           usuarioId,
           "Insertar",
           "Pagos",
-          `Pago de $${valor} aplicado a factura ${idFactura} (ID Pago: ${pago.insertId})`,
+          `Pago de $${valor} aplicado a factura ${idFactura} (ID Pago: ${pagoRegistro.insertId})`,
         ]
       );
 
@@ -527,6 +527,7 @@ export const registrarPago = async (req, res) => {
     res.status(200).json({
       message: "Pago registrado exitosamente.",
       pagos: pagosRealizados,
+      idPago: pagoRegistro.insertId,
     });
   } catch (error) {
     console.error("Error al registrar el pago:", error);
@@ -564,7 +565,7 @@ export const getPagos = async (req, res) => {
 
     const sql = `
       SELECT 
-        p.idPagos,
+        p.idPago,
         p.suscripcion_id,
         p.fechaPago,
         p.valorPago,
@@ -592,8 +593,9 @@ export const getPago = async (req, res) => {
     const [pagoRows] = await pool.query(
       `
         SELECT 
-          p.idPagos,
-            c.nombreCliente,
+          p.idPago,
+          c.idCliente,  
+          c.nombreCliente,
             p.suscripcion_id,
             p.fechaPago,
             p.valorPago,
@@ -603,7 +605,7 @@ export const getPago = async (req, res) => {
             f.codigoFactura,
             f.estado
         FROM pagofactura pf
-        inner join pagos p on  pf.idPago = p.idPagos
+        inner join pagos p on  pf.idPago = p.idPago
         inner join facturas f on pf.factura_id = f.idFactura
         inner join suscripciones s on p.suscripcion_id = s.idSuscripcion
         inner join clientes c on s.cliente_id = c.idCliente
@@ -964,8 +966,11 @@ export const crearFacturaTraslado = async (req, res) => {
     );
 
     // Obtener observaciones de la suscripción
-    const consultaSuscripcion = 'SELECT direccionServicio FROM parafacturas.suscripciones where idSuscripcion = ?';
-    const [suscripcionRows] = await pool.query(consultaSuscripcion, [idSuscripcion]);
+    const consultaSuscripcion =
+      "SELECT direccionServicio FROM parafacturas.suscripciones where idSuscripcion = ?";
+    const [suscripcionRows] = await pool.query(consultaSuscripcion, [
+      idSuscripcion,
+    ]);
     const observaciones = ` Direccion Antes del traslado: ${suscripcionRows[0].direccionServicio}`;
 
     // Actualizar direccion en suscripciones
@@ -974,7 +979,11 @@ export const crearFacturaTraslado = async (req, res) => {
       SET direccionServicio = ?, Observaciones = ? 
       WHERE idSuscripcion = ?
     `;
-    await pool.query(consultaActualizarSuscripcion, [nuevaDireccion, observaciones, idSuscripcion]);
+    await pool.query(consultaActualizarSuscripcion, [
+      nuevaDireccion,
+      observaciones,
+      idSuscripcion,
+    ]);
 
     // insertar registro en novedades
     const [novedadInsertResult] = await pool.query(
@@ -982,7 +991,10 @@ export const crearFacturaTraslado = async (req, res) => {
       INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad, suscripcion_id)
       VALUES ('Traslado', NOW(), ?, ?)
       `,
-      [`Traslado de servicio a la nueva dirección: ${nuevaDireccion}`, idSuscripcion]
+      [
+        `Traslado de servicio a la nueva dirección: ${nuevaDireccion}`,
+        idSuscripcion,
+      ]
     );
 
     // insertar registro en facturasnovedades
@@ -993,7 +1005,7 @@ export const crearFacturaTraslado = async (req, res) => {
             `,
       [insertResult.insertId, novedadInsertResult.insertId]
     );
-    
+
     // insterto registro en auditoria
     await pool.query(
       `
@@ -1010,11 +1022,12 @@ export const crearFacturaTraslado = async (req, res) => {
 
     // Responder con éxito
     res.json({
-      message: "Direccion actualizada, novedad creada y factura generada con éxito.",
+      message:
+        "Direccion actualizada, novedad creada y factura generada con éxito.",
       idFactura: insertResult.insertId,
       codigoFactura: nuevoCodigoFactura,
       valor: productoReconexion[0].precioProducto,
-      producto: productoReconexion[0].nombreProducto,     
+      producto: productoReconexion[0].nombreProducto,
       estado: "Pendiente por pagar",
       fechaFactura: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
       idNovedad: novedadInsertResult.insertId,
@@ -1023,5 +1036,4 @@ export const crearFacturaTraslado = async (req, res) => {
     console.error("Error creando factura de traslado:", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
-  
 };

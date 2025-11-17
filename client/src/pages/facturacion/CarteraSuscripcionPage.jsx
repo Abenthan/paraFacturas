@@ -34,18 +34,17 @@ function CarteraSuscripcionPage() {
   }
 
   // Validaciones de trámites
-  const puedeSuspender =
-    suscripcion.Estado === "Activo";
+  const puedeSuspender = suscripcion.Estado === "Activo";
 
   // puedeReconectar = true solo cuando la suscripcion.Estado = "Suspendida" o "Desconectado"
-    const puedeReconectar = suscripcion.Estado === "Suspendida" || suscripcion.Estado === "Desconectado"
+  const puedeReconectar = suscripcion.Estado === "Suspencion";
 
   // puedeRetirar = true menos cuando la suscripcion.Estado = "Retirada"
-  
+
   var puedeRetirar = true;
   if (suscripcion.Estado === "Retirada") puedeRetirar = false;
 
-  const puedeReactivar = suscripcion.Estado === "Retirada"
+  const puedeReactivar = suscripcion.Estado === "Retirada";
 
   const tramites = [
     {
@@ -53,7 +52,7 @@ function CarteraSuscripcionPage() {
       path: `/suscripcion/${suscripcionId}`,
       permitido: true,
     },
-    
+
     {
       nombre: "Suspensión",
       path: `/suspenderSuscripcion/${suscripcionId}`,
@@ -65,8 +64,7 @@ function CarteraSuscripcionPage() {
       nombre: "Reconexion",
       path: `/suscripciones/reconexion`,
       permitido: puedeReconectar,
-      mensaje:
-        "Solo se puede reconectar si la suscripción está en suspensión y no hay facturas pendientes por suscrición.",
+      mensaje: "Solo se puede reconectar si la suscripción está en suspensión.",
     },
     {
       nombre: "Retiro",
@@ -85,7 +83,7 @@ function CarteraSuscripcionPage() {
       path: `/suscripciones/traslado`,
       permitido: true,
       mensaje: "",
-    }
+    },
   ];
 
   const handleTramite = (t) => {
@@ -157,7 +155,7 @@ function CarteraSuscripcionPage() {
           >
             Novedades
           </Link>
-          
+
           {mostrarTramites && (
             <div className="mt-4 bg-zinc-700 p-4 rounded-lg space-y-2">
               {tramites.map((t) => (

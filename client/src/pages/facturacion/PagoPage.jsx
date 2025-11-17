@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import html2pdf from "html2pdf.js";
 import { useFacturacion } from "../../context/FacturacionContext.jsx";
 
 const PagoPage = () => {
@@ -16,7 +15,6 @@ const PagoPage = () => {
         const respuesta = await obtenerPago(id);
         if (respuesta) {
           setPago(respuesta);
-          console.log("Pago obtenido:", respuesta);
         } else {
           console.error("No se encontró el pago con ID:", id);
         }
@@ -42,9 +40,21 @@ const PagoPage = () => {
     <div className="min-h-screen bg-gray-800 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-100">
-            Detalle del Pago
-          </h1>
+          <div>
+            <Link
+              to={`/Cliente/${pago[0].idCliente}`}
+              className="text-blue-400 hover:text-blue-300 text-sm"
+            >
+              Cliente
+            </Link>
+            <span className="mx-2 text-gray-400">|</span>
+            <Link
+              to={`/carteraSuscripcion/${pago[0].suscripcion_id}`}
+              className="text-green-500 hover:text-green-300 text-sm"
+            >
+              Suscripción
+            </Link>
+          </div>
           <div className="flex gap-2 w-full md:w-auto">
             <button
               onClick={handlePrint}
@@ -76,14 +86,14 @@ const PagoPage = () => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                  Recibo de Pago #{pago[0].idPagos}
+                  Recibo de Pago #{pago[0].idPago}
                 </h2>
                 <p className="text-sm text-gray-500">
                   Fecha de emisión: {new Date().toLocaleDateString()}
                 </p>
               </div>
             </div>
-            
+
             {/* Información del Cliente y Detalles del Pago */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-2">
@@ -118,7 +128,7 @@ const PagoPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Resumen del Pago */}
             <div className="border-t border-gray-200 pt-6">
               <h3 className="font-semibold text-gray-700 mb-3">Resumen</h3>
@@ -137,13 +147,17 @@ const PagoPage = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {pago.map((pagoAFactura) => (
                       <tr key={pagoAFactura.idPagoFactura}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        Pago a la factura # {pagoAFactura.codigoFactura}, {pagoAFactura.estado}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        ${Number(pagoAFactura.pagoFactura).toLocaleString("es-CO")}
-                      </td>
-                    </tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          Pago a la factura # {pagoAFactura.codigoFactura},{" "}
+                          {pagoAFactura.estado}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          $
+                          {Number(pagoAFactura.pagoFactura).toLocaleString(
+                            "es-CO"
+                          )}
+                        </td>
+                      </tr>
                     ))}
                     <tr className="bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
