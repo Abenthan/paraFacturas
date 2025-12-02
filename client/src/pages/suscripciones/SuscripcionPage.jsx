@@ -220,7 +220,7 @@ function SuscripcionPage() {
             className="w-full bg-gray-800 p-2 rounded mt-1"
           >
             <option value="Activo">Activo</option>
-            <option value="Suspencion">Suspencion</option>
+            <option value="Suspendido">Suspendido</option>
             <option value="Retiro">Retiro</option>
             <option value="Inactivo">Inactivo</option>
           </select>

@@ -37,7 +37,7 @@ function CarteraSuscripcionPage() {
   const puedeSuspender = suscripcion.Estado === "Activo";
 
   // puedeReconectar = true solo cuando la suscripcion.Estado = "Suspendida" o "Desconectado"
-  const puedeReconectar = suscripcion.Estado === "Suspencion";
+  const puedeReconectar = suscripcion.Estado === "Suspendido";
 
   // puedeRetirar = true menos cuando la suscripcion.Estado = "Retiro"
 
@@ -64,7 +64,7 @@ function CarteraSuscripcionPage() {
       nombre: "Reconexion",
       path: `/suscripciones/reconexion`,
       permitido: puedeReconectar,
-      mensaje: "Solo se puede reconectar si la suscripción está en suspensión.",
+      mensaje: "Solo se puede reconectar si la suscripción está en suspendida.",
     },
     {
       nombre: "Retiro",
