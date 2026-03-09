@@ -370,7 +370,7 @@ export const getFactura = async (req, res) => {
     const [pagos] = await pool.query(
       `
       SELECT idPagoFactura, fechaPago, valorPago
-      FROM pagoFactura
+      FROM pagofactura
       WHERE factura_id = ?
       ORDER BY fechaPago ASC
       `,
@@ -387,7 +387,7 @@ export const getFactura = async (req, res) => {
         SELECT 
           factura_id, 
           SUM(valorPago) AS totalPagado
-        FROM pagoFactura
+        FROM pagofactura
         GROUP BY factura_id
       ) p ON f.idFactura = p.factura_id
       WHERE 
@@ -434,8 +434,8 @@ export const registrarPago = async (req, res) => {
         (f.valor - COALESCE(SUM(p.valorPago), 0)) AS saldoFactura
       FROM 
         facturas f
-        LEFT JOIN pagoFactura p ON f.idFactura = p.factura_id
-      WHERE 
+        LEFT JOIN pagofactura p ON f.idFactura = p.factura_id
+      WHERE
         f.suscripcion_id = ? AND
         (f.estado = "Pendiente por pagar" OR f.estado = "Pago Parcial") AND
         f.idFactura <= ?
@@ -465,7 +465,7 @@ export const registrarPago = async (req, res) => {
       
       // Registrar pago en pagoFactura
       const [pago] = await pool.query(
-        "INSERT INTO pagoFactura (idPago, factura_id, valorPago) VALUES (?, ?, ?)",
+        "INSERT INTO pagofactura (idPago, factura_id, valorPago) VALUES (?, ?, ?)",
         [pagoRegistro.insertId, idFactura, valor]
       );
 
