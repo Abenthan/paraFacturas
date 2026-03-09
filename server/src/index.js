@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import app from './app.js';
 import {PORT} from './config.js';
 import indexRoutes from './routes/index.routes.js';

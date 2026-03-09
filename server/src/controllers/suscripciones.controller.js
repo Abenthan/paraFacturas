@@ -262,7 +262,6 @@ export const updateSuscripcion = async (req, res) => {
 export const suspenderSuscripcion = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(req.body);
     const { usuarioId } = req.body;
     // suspender la suscripcion
     const consulta = `UPDATE suscripciones 
@@ -277,7 +276,7 @@ export const suspenderSuscripcion = async (req, res) => {
     // registrar en novedad
     const consultaNovedad = `INSERT INTO novedades (novedad, fechaNovedad, descripcionNovedad,suscripcion_id) VALUES (?, ?, ?, ?)`;
     const [novedad] = await pool.query(consultaNovedad, [
-      "Suspensión",
+      "Suspension",
       new Date(),
       `Se suspendió la suscripción número ${id}`,
       id,

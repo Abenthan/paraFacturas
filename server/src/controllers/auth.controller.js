@@ -50,7 +50,12 @@ export const register = async (req, res) => {
         // Crear el token
         const token = await createAccessToken({ id: result.insertId });
         // responder al frontend
-        res.cookie("token", token);
+        const isProduction = process.env.NODE_ENV === "production";
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "Lax",
+        });
         res.json({
           message: "Usuario creado",
           id: result.insertId,

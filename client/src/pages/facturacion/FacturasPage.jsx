@@ -79,8 +79,7 @@ function FacturasPage() {
           className="bg-gray-800 text-white border border-gray-600 rounded-lg px-3 py-2"
         >
           <option value="">Año</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
+          <option value="2026">2026</option>
         </select>
 
         <select

@@ -462,6 +462,8 @@ export const registrarPago = async (req, res) => {
     const pagosRealizados = [];
 
     async function registrarUnPago(idFactura, valor, nuevoEstado) {
+      
+      // Registrar pago en pagoFactura
       const [pago] = await pool.query(
         "INSERT INTO pagoFactura (idPago, factura_id, valorPago) VALUES (?, ?, ?)",
         [pagoRegistro.insertId, idFactura, valor]
@@ -790,7 +792,7 @@ export const crearFacturaReconexion = async (req, res) => {
       `
       SELECT idNovedad, suscripcion_id
       FROM novedades
-      WHERE suscripcion_id = ? AND novedad = 'Suspensión'
+      WHERE suscripcion_id = ? AND novedad = 'Suspension'
       order by fechaNovedad desc
       limit 1
       `,

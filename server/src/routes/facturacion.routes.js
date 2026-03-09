@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authRequired } from "../middlewares/validateToken.js";
 import {
   getFacturasPendientes,
   crearFacturas,
@@ -17,30 +18,30 @@ import {
 
 const router = Router();
 
-router.get("/prefacturacion", getFacturasPendientes);
+router.get("/prefacturacion", authRequired, getFacturasPendientes);
 
-router.post("/facturas", crearFacturas);
+router.post("/facturas", authRequired, crearFacturas);
 
-router.get("/facturas", getFacturas);
+router.get("/facturas", authRequired, getFacturas);
 
-router.get("/factura/:id", getFactura);
+router.get("/factura/:id", authRequired, getFactura);
 
-router.post("/pagarFactura", registrarPago);
+router.post("/pagarFactura", authRequired, registrarPago);
 
-router.get("/pagos", getPagos);
+router.get("/pagos", authRequired, getPagos);
 
-router.get("/pago/:id", getPago);
+router.get("/pago/:id", authRequired, getPago);
 
-router.get("/cartera", getCartera);
+router.get("/cartera", authRequired, getCartera);
 
-router.get("/estadoCuentaCliente/:idCliente", getEstadoCuentaCliente);
+router.get("/estadoCuentaCliente/:idCliente", authRequired, getEstadoCuentaCliente);
 
-router.get("/carteraSuscripcion/:idSuscripcion", getCarteraSuscripcion);
+router.get("/carteraSuscripcion/:idSuscripcion", authRequired, getCarteraSuscripcion);
 
-router.get("/facturaReconexion/:idSuscripcion", getFacturaReconexion);
+router.get("/facturaReconexion/:idSuscripcion", authRequired, getFacturaReconexion);
 
-router.post("/facturaReconexion", crearFacturaReconexion);
+router.post("/facturaReconexion", authRequired, crearFacturaReconexion);
 
-router.post("/facturaTraslado", crearFacturaTraslado);
+router.post("/facturaTraslado", authRequired, crearFacturaTraslado);
 
 export default router;
