@@ -77,25 +77,23 @@ const PagoPage = () => {
           </div>
         </div>
 
+          {/* Zona de impresión */}
         <div
           ref={contentRef}
-          className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:p-0 print:shadow-none print:border-0"
+          className="bg-white p-8 rounded-lg shadow-md border border-gray-300"
         >
           <div className="mb-8">
             {/* Encabezado del Recibo */}
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="font-bold text-black">
                   Recibo de Pago #{pago[0].idPago}
                 </h2>
-                <p className="text-sm text-gray-500">
-                  Fecha de emisión: {new Date().toLocaleDateString()}
-                </p>
               </div>
             </div>
 
             {/* Información del Cliente y Detalles del Pago */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-700">
                   Información del Cliente
@@ -131,7 +129,6 @@ const PagoPage = () => {
 
             {/* Resumen del Pago */}
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="font-semibold text-gray-700 mb-3">Resumen</h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -160,25 +157,16 @@ const PagoPage = () => {
                       </tr>
                     ))}
                     <tr className="bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                        Total
+                      <td className="px-6 py-4 font-bold text-gray-900">
+                        Total Pagado
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                      <td className="px-6 py-4 font-bold text-gray-900">
                         ${Number(pago[0].valorPago).toLocaleString("es-CO")}
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-            </div>
-            <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-              <p className="text-sm text-gray-500">
-                Gracias por su pago. Este documento es válido como comprobante.
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Generado automáticamente por el sistema el{" "}
-                {new Date().toLocaleDateString()}
-              </p>
             </div>
           </div>
         </div>
