@@ -1,15 +1,13 @@
 import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SuscripcionesPage() {
   const { getSuscripciones, suscripciones } = useSuscripciones();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [orden, setOrden] = useState({ campo: "idSuscripcion", direccion: "asc" });
-  const [filtros, setFiltros] = useState({
-    idSuscripcion: "",
-    nombreCliente: "",
-  });
+  const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -33,9 +31,9 @@ function SuscripcionesPage() {
   const filtrarSuscripciones = () => {
     return suscripciones
       .filter((s) =>
-        (!filtros.idSuscripcion || s.idSuscripcion.toString().includes(filtros.idSuscripcion)) &&
-        (!filtros.nombreCliente ||
-          s.nombreCliente.toLowerCase().includes(filtros.nombreCliente.toLowerCase()))
+        !filtro ||
+        s.idSuscripcion.toString().includes(filtro) ||
+        s.nombreCliente.toLowerCase().includes(filtro.toLowerCase())
       )
       .sort((a, b) => {
         let valorA = a[orden.campo];
@@ -61,24 +59,21 @@ function SuscripcionesPage() {
   return (
     <div className="min-h-screen bg-gray-900 p-6 text-white">
       <div className="max-w-6xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-6">Suscripciones</h1>
-
-        {/* Filtros */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <h1 className="text-2xl font-bold shrink-0">Suscripciones</h1>
           <input
             type="text"
-            placeholder="Buscar por ID suscripción"
-            value={filtros.idSuscripcion}
-            onChange={(e) => setFiltros({ ...filtros, idSuscripcion: e.target.value })}
-            className="px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+            placeholder="Buscar por ID o nombre de cliente"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+            className="flex-1 px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            type="text"
-            placeholder="Buscar por nombre de cliente"
-            value={filtros.nombreCliente}
-            onChange={(e) => setFiltros({ ...filtros, nombreCliente: e.target.value })}
-            className="px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
-          />
+          <button
+            onClick={() => navigate("/suscripciones/imprimir")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm shrink-0"
+          >
+            Imprimir
+          </button>
         </div>
 
         {/* Tabla */}
