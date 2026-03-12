@@ -15,6 +15,8 @@ function PagarFacturaPage() {
   const [saldoPendiente, setSaldoPendiente] = useState(0);
   const [valorPagar, setValorPagar] = useState(0);
   const [valorPago, setValorPago] = useState(0);
+  const [metodoPago, setMetodoPago] = useState("Efectivo");
+  const [fechaPago, setFechaPago] = useState(new Date().toISOString().split("T")[0]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ function PagarFacturaPage() {
      }
 
     try {
-      const respuestaPago = await registrarPago(id, valorPago, factura.idSuscripcion, user.id);
+      const respuestaPago = await registrarPago(id, valorPago, factura.idSuscripcion, user.id, metodoPago, fechaPago);
       alert("Pago registrado con éxito.");
       navigate(`/pago/${respuestaPago.data.idPago}`);
     } catch (error) {
@@ -115,6 +117,29 @@ function PagarFacturaPage() {
         <p>
           <strong>Saldo total a pagar:</strong> ${valorPagar.toLocaleString()}
         </p>
+
+        <div>
+          <label className="block mb-2 font-semibold">Fecha de pago:</label>
+          <input
+            type="date"
+            value={fechaPago}
+            max={new Date().toISOString().split("T")[0]}
+            onChange={(e) => setFechaPago(e.target.value)}
+            className="bg-gray-800 text-white border border-gray-600 rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-semibold">Método de pago:</label>
+          <select
+            value={metodoPago}
+            onChange={(e) => setMetodoPago(e.target.value)}
+            className="bg-gray-800 text-white border border-gray-600 rounded-lg px-4 py-2 w-full"
+          >
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+          </select>
+        </div>
 
         <div>
           <label className="block mb-2 font-semibold">Valor a pagar:</label>

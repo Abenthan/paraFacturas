@@ -28,7 +28,7 @@ const PagoPage = () => {
 
   const handlePrint = useReactToPrint({
     contentRef,
-    documentTitle: `Pago_${pago?.codigoFactura || "sin_codigo"}`,
+    documentTitle: `Pago_${pago?.[0]?.codigoFactura || "sin_codigo"}`,
     onPrintError: (error) => {
       console.error("Error al imprimir:", error);
     },
@@ -37,140 +37,210 @@ const PagoPage = () => {
   if (!pago) return <div className="p-4 text-center">Cargando pago...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-800 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div>
-            <Link
-              to={`/Cliente/${pago[0].idCliente}`}
-              className="text-blue-400 hover:text-blue-300 text-sm"
-            >
-              Cliente
-            </Link>
-            <span className="mx-2 text-gray-400">|</span>
-            <Link
-              to={`/carteraSuscripcion/${pago[0].suscripcion_id}`}
-              className="text-green-500 hover:text-green-300 text-sm"
-            >
-              Suscripción
-            </Link>
-          </div>
-          <div className="flex gap-2 w-full md:w-auto">
-            <button
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 w-full justify-center md:w-auto"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Imprimir
-            </button>
-          </div>
+    <div className="container mx-auto p-6 text-white">
+
+      {/* Encabezado con botones — no se imprime */}
+      <div className="no-print flex justify-between items-center mb-6">
+        <div>
+          <Link
+            to={`/Cliente/${pago[0].idCliente}`}
+            className="text-blue-400 hover:text-blue-300 text-sm"
+          >
+            Cliente
+          </Link>
+          <span className="mx-2 text-gray-400">|</span>
+          <Link
+            to={`/carteraSuscripcion/${pago[0].suscripcion_id}`}
+            className="text-green-500 hover:text-green-300 text-sm"
+          >
+            Suscripción
+          </Link>
         </div>
-
-          {/* Zona de impresión */}
-        <div
-          ref={contentRef}
-          className="bg-white p-8 rounded-lg shadow-md border border-gray-300"
-        >
-          <div className="mb-8">
-            {/* Encabezado del Recibo */}
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h2 className="font-bold text-black">
-                  Recibo de Pago #{pago[0].idPago}
-                </h2>
-              </div>
-            </div>
-
-            {/* Información del Cliente y Detalles del Pago */}
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-gray-700">
-                  Información del Cliente
-                </h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-800">
-                    <span className="font-medium">Nombre:</span>{" "}
-                    {pago[0].nombreCliente}
-                  </p>
-                  <p className="text-gray-800">
-                    <span className="font-medium">Suscripcion:</span>{" "}
-                    {pago[0].suscripcion_id}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-semibold text-gray-700">
-                  Detalles del Pago
-                </h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-800">
-                    <span className="font-medium">Fecha de Pago:</span>{" "}
-                    {new Date(pago[0].fechaPago).toLocaleDateString()}
-                  </p>
-                  <p className="text-gray-800">
-                    <span className="font-medium">Valor Pagado:</span> $
-                    {Number(pago[0].valorPago).toLocaleString("es-CO")}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Resumen del Pago */}
-            <div className="border-t border-gray-200 pt-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Concepto
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Valor
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {pago.map((pagoAFactura) => (
-                      <tr key={pagoAFactura.idPagoFactura}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                          Pago a la factura # {pagoAFactura.codigoFactura},{" "}
-                          {pagoAFactura.estado}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                          $
-                          {Number(pagoAFactura.pagoFactura).toLocaleString(
-                            "es-CO"
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                    <tr className="bg-gray-50">
-                      <td className="px-6 py-4 font-bold text-gray-900">
-                        Total Pagado
-                      </td>
-                      <td className="px-6 py-4 font-bold text-gray-900">
-                        ${Number(pago[0].valorPago).toLocaleString("es-CO")}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+        <div className="flex gap-4 w-full md:w-auto">
+          <button
+            onClick={handlePrint}
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white transition-colors flex items-center gap-2 w-full justify-center md:w-auto"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Imprimir
+          </button>
         </div>
       </div>
+
+      {/* Zona imprimible */}
+      <div
+        ref={contentRef}
+        className="bg-white text-black p-6 rounded-lg border border-gray-300 max-w-4xl mx-auto"
+      >
+
+        {/* ── ENCABEZADO: nombre de la asociación ── */}
+        <div className="text-center mb-1.5">
+          <div className="font-bold text-[11pt] leading-[1.3]">
+            Asociación Municipal de Usuarios Campesinos
+          </div>
+          <div className="font-bold text-[13pt] tracking-[1px]">
+            Parabólica Comunitaria
+          </div>
+        </div>
+
+        {/* ── DATOS DE LA EMPRESA + No. RECIBO ── */}
+        <table className="w-full border-collapse text-[8.5pt] mb-1.5">
+          <tbody>
+            <tr>
+              <td className="align-top w-[65%] leading-[1.6]">
+                <div><strong>NIT:</strong> 811.010.539-2</div>
+                <div>Carrera Murillo Toro # 10-19</div>
+                <div>Dabeiba – Antioquia</div>
+                <div>Tel: (604) 232 8831 &nbsp;|&nbsp; Cel: 323 288 3100</div>
+                <div>Email: amucampesinos47@gmail.com</div>
+              </td>
+              <td className="align-top text-right leading-[1.6]">
+                <div className="border-[1.5px] border-black py-1 px-2 inline-block text-center">
+                  <div className="text-[7.5pt]">No. Recibo</div>
+                  <div className="font-bold text-[11pt]">
+                    {pago[0].idPago}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* ── SEPARADOR ── */}
+        <hr className="border-t-[1.5px] border-black my-1" />
+
+        {/* ── DATOS DEL CLIENTE ── */}
+        <table className="w-full border-collapse text-[8.5pt] my-1.5">
+          <tbody>
+            <tr>
+              <td className="w-1/2 pb-[3px]">
+                <strong>Nombre:</strong> {pago[0].nombreCliente}
+              </td>
+              <td className="w-1/2 pb-[3px] text-right">
+                <strong>Fecha de pago:</strong>{" "}
+                {new Date(pago[0].fechaPago).toLocaleDateString("es-CO", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </td>
+            </tr>
+            <tr>
+              <td className="pb-[3px]">
+                <strong>No. Suscripción:</strong> {pago[0].suscripcion_id}
+              </td>
+              <td className="text-right pb-[3px]">
+                <strong>Método de pago:</strong> {pago[0].metodoPago}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* ── SEPARADOR ── */}
+        <hr className="border-t-[1.5px] border-black my-1" />
+
+        {/* ── TABLA DE PAGOS A FACTURAS ── */}
+        <table className="w-full border-collapse text-[8.5pt] my-2 border border-black">
+          <thead>
+            <tr className="bg-[#d0d0d0]">
+              <th className="border border-black px-[6px] py-1 text-left">
+                Descripción
+              </th>
+              <th className="border border-black px-[6px] py-1 text-right whitespace-nowrap">
+                Valor
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {pago.map((pagoAFactura) => (
+              <tr key={pagoAFactura.idPagoFactura}>
+                <td className="border border-black px-[6px] py-1">
+                  Pago a la factura # {pagoAFactura.codigoFactura},{" "}
+                  {pagoAFactura.estado}
+                </td>
+                <td className="border border-black px-[6px] py-1 text-right">
+                  ${Number(pagoAFactura.pagoFactura).toLocaleString("es-CO")}
+                </td>
+              </tr>
+            ))}
+            <tr className="bg-[#d0d0d0]">
+              <td className="border border-black px-[6px] py-1 font-bold">
+                Total Pagado
+              </td>
+              <td className="border border-black px-[6px] py-1 text-right font-bold">
+                ${Number(pago[0].valorPago).toLocaleString("es-CO")}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* ── NOTAS ── */}
+        <div className="mt-3 text-[7.5pt] border border-black px-[7px] py-[5px] leading-[1.5]">
+          <div>
+            Puede realizar el pago de su factura mediante consignación o
+            transferencia a la cuenta corriente de Bancolombia N.°{" "}
+            <strong>240 482161 01</strong>, a nombre de la Asociación de
+            Usuarios Campesinos.
+          </div>
+          <hr className="border-t border-dashed border-[#888] my-2" />
+          <div>
+            <strong>IMPORTANTE:</strong> Estimado usuario, a partir de dos (2)
+            cuentas vencidas será suspendido su servicio de parabolica. La
+            tarifa de reconexion es de <strong>$13.000</strong>, traslados{" "}
+            <strong>$13.000</strong>.
+          </div>
+        </div>
+
+        {/* ── SEPARADOR COLILLA ── */}
+        <hr className="border-t border-dashed my-2" />
+
+        {/* COLILLA DE PAGO */}
+        <div className="flex justify-between items-start">
+          {/* Sección Usuario */}
+          <div>
+            <div className="text-[8.5pt]">
+              Nro. Suscripción: <strong>{pago[0].suscripcion_id}</strong>
+            </div>
+            <div className="text-[8.5pt]">
+              <strong>{pago[0].nombreCliente}</strong>
+            </div>
+          </div>
+          {/* Sección Valores */}
+          <div className="text-right">
+            <div className="text-[8.5pt]">
+              Nro. Recibo: <strong>{pago[0].idPago}</strong>
+            </div>
+            <div className="text-[8.5pt]">
+              Método: <strong>{pago[0].metodoPago}</strong>
+            </div>
+            {pago.map((pagoAFactura) => (
+              <div key={pagoAFactura.idPagoFactura} className="text-[8.5pt]">
+                Factura # {pagoAFactura.codigoFactura}:{" "}
+                <strong>${Number(pagoAFactura.pagoFactura).toLocaleString("es-CO")}</strong>
+              </div>
+            ))}
+            <div className="text-[8.5pt] border-t border-black mt-0.5 pt-0.5">
+              Total Pagado:{" "}
+              <strong>${Number(pago[0].valorPago).toLocaleString("es-CO")}</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {/* fin zona imprimible */}
+
     </div>
   );
 };

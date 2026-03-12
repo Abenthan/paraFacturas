@@ -348,6 +348,7 @@ export const getFactura = async (req, res) => {
         f.fechaFactura,
         c.idCliente,
         c.nombreCliente,
+        c.numeroId,
         p.nombreProducto,
         s.direccionServicio,
         s.idSuscripcion
@@ -400,11 +401,19 @@ export const getFactura = async (req, res) => {
 
     const saldoPendienteAnterior = saldoRows[0]?.saldoPendienteAnterior || 0;
 
+    // calcular fechaLimitePago que es el ultimo dia del mes de la factura
+    const fechaLimitePago = new Date(factura.year, factura.mes, 0);
+
+    // adicionar fecha limite de pago en objeto factura
+    factura.fechaLimitePago = fechaLimitePago.toISOString().slice(0, 10);
+
+    
     // respuesta
     res.json({
       factura,
       pagos,
       saldoPendienteAnterior,
+
     });
   } catch (error) {
     console.error("Error al obtener detalle de factura:", error);
@@ -414,7 +423,7 @@ export const getFactura = async (req, res) => {
 
 // Registrar pago
 export const registrarPago = async (req, res) => {
-  const { idFactura, valorPago, idSuscripcion, usuarioId } = req.body;
+  const { idFactura, valorPago, idSuscripcion, usuarioId, metodoPago, fechaPago } = req.body;
 
   if (!idFactura || !valorPago || valorPago <= 0) {
     return res
@@ -455,8 +464,8 @@ export const registrarPago = async (req, res) => {
 
     // registrar en pagos
     const [pagoRegistro] = await pool.query(
-      "INSERT INTO pagos (suscripcion_id, valorPago) VALUES (?, ?)",
-      [idSuscripcion, valorPago]
+      "INSERT INTO pagos (suscripcion_id, valorPago, metodoPago, fechaPago) VALUES (?, ?, ?, ?)",
+      [idSuscripcion, valorPago, metodoPago || "Efectivo", fechaPago || new Date()]
     );
 
     const pagosRealizados = [];
@@ -596,11 +605,12 @@ export const getPago = async (req, res) => {
       `
         SELECT 
           p.idPago,
-          c.idCliente,  
+          c.idCliente,
           c.nombreCliente,
             p.suscripcion_id,
             p.fechaPago,
             p.valorPago,
+            p.metodoPago,
             pf.idPagoFactura,
             pf.factura_id,
             pf.valorPago as pagoFactura,
