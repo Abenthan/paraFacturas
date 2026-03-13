@@ -5,7 +5,7 @@ function FacturacionPage() {
     <div className="min-h-screen bg-gray-900 p-8 flex flex-col items-center justify-center">
       <h1 className="text-3xl font-bold text-white mb-12 text-center">Módulo de Facturación</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
         {/* Botón Generar Facturación */}
         <Link 
           to="/prefacturacion" 
@@ -55,6 +55,23 @@ function FacturacionPage() {
             <p className="text-gray-400 text-center">Registro y seguimiento de pagos</p>
           </div>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-600 group-hover:bg-purple-500 transition-colors duration-300"></div>
+        </Link>
+
+        {/* Botón Cartera */}
+        <Link
+          to="/cartera"
+          className="group relative overflow-hidden bg-zinc-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:bg-zinc-700"
+        >
+          <div className="p-6 flex flex-col items-center h-full">
+            <div className="mb-4 p-4 bg-yellow-600 rounded-full group-hover:bg-yellow-500 transition-colors duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-white mb-2">Cartera</h2>
+            <p className="text-gray-400 text-center">Saldo pendiente por suscripción</p>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-yellow-600 group-hover:bg-yellow-500 transition-colors duration-300"></div>
         </Link>
       </div>
 

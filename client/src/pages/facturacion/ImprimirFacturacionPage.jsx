@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useFacturacion } from "../../context/FacturacionContext";
 
 function ImprimirFacturacionPage() {
   const { obtenerFacturas } = useFacturacion();
-  const reportRef = useRef(null);
+  const navigate = useNavigate();
 
   const [facturas, setFacturas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,111 +52,114 @@ function ImprimirFacturacionPage() {
     day: "numeric",
   });
 
-  // Solo imprime el área del informe
-  const handleImprimir = () => {
-    window.print();
-  };
-
   return (
-    <div className="p-8 bg-white text-black">
-      {/* Botón imprimir - fuera del área del informe */}
-      <div className="mb-6 text-right no-print">
+    <div className="p-4 bg-white text-black min-h-screen">
+      {/* Botones — no se imprimen */}
+      <div className="mb-4 flex gap-2 justify-end no-print">
         <button
-          onClick={handleImprimir}
+          onClick={() => navigate(-1)}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition"
+        >
+          Volver
+        </button>
+        <button
+          onClick={() => window.print()}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
           Imprimir
         </button>
       </div>
 
-      {/* Área del informe */}
-      <div ref={reportRef} className="print-area">
+      <div className="print-area">
         {/* Encabezado */}
-        <div className="text-center mb-8">
-          <h1 className="text-xl font-bold">Informe de Facturación</h1>
-          <p className="text-gray-700 text-sm">Generado el {fechaGeneracion}</p>
+        <div className="text-center mb-2">
+          <div className="font-bold text-sm">
+            Asociación Municipal de Usuarios Campesinos — Parabólica Comunitaria
+          </div>
+          <div className="font-bold text-base">Informe de Facturación</div>
+          <div className="text-xs text-gray-500">Generado el {fechaGeneracion}</div>
         </div>
 
         {loading ? (
-          <div className="text-center text-lg">Cargando facturas...</div>
+          <div className="text-center text-sm">Cargando facturas...</div>
         ) : facturas.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-400 text-xs">
-              <thead className="bg-gray-200 text-black uppercase">
+          <>
+            <table className="w-full border-collapse border border-gray-500 text-xs">
+              <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-1 border">Código</th>
-                  <th className="p-1 border">Suscripción</th>
-                  <th className="p-1 border">Cliente</th>
-                  <th className="p-1 border">Producto</th>
-                  <th className="p-1 border">Dirección</th>
-                  <th className="p-1 border">Valor</th>
-                  <th className="p-1 border">Pendiente</th>
-                  <th className="p-1 border">Total a Pagar</th>
-                  <th className="p-1 border">Estado</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-left">Código</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-center w-8">Susc.</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-left">Cliente</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-left">Dirección</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-right w-20">Valor</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-right w-20">Pendiente</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-right w-20">Total Pagar</th>
+                  <th className="border border-gray-400 px-1 py-0.5 text-center w-24">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {facturas.map((f) => (
-                  <tr key={f.idFactura} className="hover:bg-gray-100">
-                    <td className="p-1 border">{f.codigoFactura}</td>
-                    <td className="p-1 border">{f.suscripcion_id}</td>
-                    <td className="p-1 border">{f.nombreCliente}</td>
-                    <td className="p-1 border">{f.nombreProducto}</td>
-                    <td className="p-1 border">{f.direccionServicio}</td>
-                    <td className="p-1 border">
-                      ${f.valor.toLocaleString("es-CO")}
-                    </td>
-                    <td className="p-1 border">
-                      ${Number(f.valor_pendiente)?.toLocaleString("es-CO")}
-                    </td>
-                    <td className="p-1 border">
-                      ${Number(f.totalPagar)?.toLocaleString("es-CO")}
-                    </td>
-                    <td className="p-1 border">{f.estado}</td>
+                  <tr key={f.idFactura} className="odd:bg-white even:bg-gray-50">
+                    <td className="border border-gray-300 px-1 py-0">{f.codigoFactura}</td>
+                    <td className="border border-gray-300 px-1 py-0 text-center">{f.suscripcion_id}</td>
+                    <td className="border border-gray-300 px-1 py-0">{f.nombreCliente}</td>
+                    <td className="border border-gray-300 px-1 py-0">{f.direccionServicio}</td>
+                    <td className="border border-gray-300 px-1 py-0 text-right">${f.valor.toLocaleString("es-CO")}</td>
+                    <td className="border border-gray-300 px-1 py-0 text-right">${Number(f.valor_pendiente).toLocaleString("es-CO")}</td>
+                    <td className="border border-gray-300 px-1 py-0 text-right">${Number(f.totalPagar).toLocaleString("es-CO")}</td>
+                    <td className="border border-gray-300 px-1 py-0 text-center">{f.estado}</td>
                   </tr>
                 ))}
-              </tbody>
-
-              {/* Totales */}
-              <tfoot className="bg-gray-200 font-bold">
-                <tr>
-                  <td colSpan="5" className="p-2 border text-right">
-                    Totales:
+                <tr className="bg-gray-200 font-bold">
+                  <td colSpan={4} className="border border-gray-400 px-1 py-0.5 text-right">
+                    Total ({facturas.length} facturas):
                   </td>
-                  <td className="p-2 border">
-                    ${totalFacturasMes.toLocaleString("es-CO")}
-                  </td>
-                  <td className="p-2 border">
-                    ${totalPendiente.toLocaleString("es-CO")}
-                  </td>
-                  <td className="p-2 border">
-                    ${totalFacturacion.toLocaleString("es-CO")}
-                  </td>
-                  <td className="p-2 border"></td>
+                  <td className="border border-gray-400 px-1 py-0.5 text-right">${totalFacturasMes.toLocaleString("es-CO")}</td>
+                  <td className="border border-gray-400 px-1 py-0.5 text-right">${totalPendiente.toLocaleString("es-CO")}</td>
+                  <td className="border border-gray-400 px-1 py-0.5 text-right">${totalFacturacion.toLocaleString("es-CO")}</td>
+                  <td className="border border-gray-400 px-1 py-0.5"></td>
                 </tr>
-              </tfoot>
+              </tbody>
             </table>
-          </div>
+          </>
         ) : (
-          <div className="text-center text-lg">No se encontraron facturas.</div>
+          <div className="text-center text-sm">No se encontraron facturas.</div>
         )}
       </div>
 
-      {/* Estilos para impresión */}
-      <style>
-        {`
-          @media print {
-            nav, header, footer, .no-print { display: none; }
-            body { background: white; }
-            .print-area {
-              margin: 0;
-              padding: 0;
-              font-size: 10pt;
-            }
-            table { font-size: 9pt; }
+      <style>{`
+        @media print {
+          @page {
+            size: letter portrait;
+            margin: 10mm 8mm;
           }
-        `}
-      </style>
+          nav, header, footer, .no-print {
+            display: none !important;
+          }
+          body {
+            background: white;
+            margin: 0;
+          }
+          .print-area {
+            font-size: 8pt;
+          }
+          table {
+            font-size: 7pt;
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            padding: 1px 3px;
+            line-height: 1.25;
+          }
+          tr {
+            page-break-inside: avoid;
+          }
+          thead {
+            display: table-header-group;
+          }
+        }
+      `}</style>
     </div>
   );
 }
