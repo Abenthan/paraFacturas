@@ -38,6 +38,7 @@ import PagosPage from "./pages/facturacion/PagosPage.jsx";
 import PagoPage from "./pages/facturacion/PagoPage.jsx";
 import CarteraPage from "./pages/facturacion/CarteraPage.jsx";
 import CarteraSuscripcionPage from "./pages/facturacion/CarteraSuscripcionPage.jsx";
+import ImprimirCarteraPage from "./pages/facturacion/ImprimirCarteraPage.jsx";
 import EstadoCuentaCliente from "./pages/facturacion/EstadoCuentaClientePage.jsx";
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
                     <Route path="/pagos" element={<PagosPage />} />
                     <Route path="/pago/:id" element={<PagoPage />} />
                     <Route path="/cartera" element={<CarteraPage />} />
+                    <Route path="/cartera/imprimir" element={<ImprimirCarteraPage />} />
                     <Route path="/estadoCuentaCliente/:id" element={<EstadoCuentaCliente />} />
                     <Route path="/carteraSuscripcion/:id" element={<CarteraSuscripcionPage />} />
 

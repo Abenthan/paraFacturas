@@ -608,7 +608,7 @@ export const getPago = async (req, res) => {
   try {
     const [pagoRows] = await pool.query(
       `
-        SELECT 
+        SELECT
           p.idPago,
           c.idCliente,
           c.nombreCliente,
@@ -616,18 +616,22 @@ export const getPago = async (req, res) => {
             p.fechaPago,
             p.valorPago,
             p.metodoPago,
+            s.direccionServicio,
             pf.idPagoFactura,
             pf.factura_id,
             pf.valorPago as pagoFactura,
             f.codigoFactura,
             f.estado,
             f.year as facturaYear,
-            f.mes as facturaMes
+            f.mes as facturaMes,
+            f.producto_id as facturaProductoId,
+            pr.nombreProducto
         FROM pagofactura pf
         inner join pagos p on  pf.idPago = p.idPago
         inner join facturas f on pf.factura_id = f.idFactura
         inner join suscripciones s on p.suscripcion_id = s.idSuscripcion
         inner join clientes c on s.cliente_id = c.idCliente
+        inner join productos pr on f.producto_id = pr.idProducto
         where pf.idPago = ?
     `,
       [id]

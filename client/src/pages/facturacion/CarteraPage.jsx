@@ -66,6 +66,15 @@ function CarteraPage() {
   // Calcular total de la cartera (solo saldo pendiente)
   const totalCartera = cartera.reduce((acc, item) => acc + Number(item.saldoPendiente), 0);
 
+  // Navegar a impresión con los filtros activos como query params
+  const handleImprimir = () => {
+    const params = new URLSearchParams();
+    if (estadoSuscripcion) params.set("estado", estadoSuscripcion);
+    if (nombreCliente) params.set("cliente", nombreCliente);
+    if (idSuscripcion) params.set("idSuscripcion", idSuscripcion);
+    navigate(`/cartera/imprimir?${params.toString()}`);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-white">Cartera</h1>
@@ -105,6 +114,12 @@ function CarteraPage() {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
           Filtrar
+        </button>
+        <button
+          onClick={handleImprimir}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          Imprimir
         </button>
       </div>
 

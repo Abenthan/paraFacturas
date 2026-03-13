@@ -138,7 +138,9 @@ const PagoPage = () => {
               </td>
             </tr>
             <tr>
-              <td className="pb-[3px]"></td>
+              <td className="pb-[3px]">
+                <strong>Dirección:</strong> {pago[0].direccionServicio}
+              </td>
               <td className="text-right pb-[3px]">
                 <strong>Fecha límite de pago:</strong>{" "}
                 {(() => {
@@ -179,17 +181,22 @@ const PagoPage = () => {
             </tr>
           </thead>
           <tbody>
-            {pago.map((pagoAFactura) => (
+            {pago.map((pagoAFactura) => {
+              const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+              const descripcion = pagoAFactura.facturaProductoId === 1
+                ? `Pago a la factura # ${pagoAFactura.codigoFactura}, ${pagoAFactura.nombreProducto}, mes de ${MESES[pagoAFactura.facturaMes - 1]} de ${pagoAFactura.facturaYear}, ${pagoAFactura.estado}`
+                : `Pago a la factura # ${pagoAFactura.codigoFactura}, ${pagoAFactura.nombreProducto}, ${pagoAFactura.estado}`;
+              return (
               <tr key={pagoAFactura.idPagoFactura}>
                 <td className="border border-black px-[6px] py-1">
-                  Pago a la factura # {pagoAFactura.codigoFactura},{" "}
-                  {pagoAFactura.estado}
+                  {descripcion}
                 </td>
                 <td className="border border-black px-[6px] py-1 text-right">
                   ${Number(pagoAFactura.pagoFactura).toLocaleString("es-CO")}
                 </td>
               </tr>
-            ))}
+              );
+            })}
             <tr className="bg-[#d0d0d0]">
               <td className="border border-black px-[6px] py-1 font-bold">
                 Total Pagado
@@ -231,6 +238,7 @@ const PagoPage = () => {
             <div className="text-[8.5pt]">
               <strong>{pago[0].nombreCliente}</strong>
             </div>
+            <div className="text-[8.5pt]">{pago[0].direccionServicio}</div>
           </div>
           {/* Sección Valores */}
           <div className="text-right">
