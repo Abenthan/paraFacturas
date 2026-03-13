@@ -1,172 +1,223 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [dropdownAbierto, setDropdownAbierto] = useState(null);
+
+  const activeLinkClass = ({ isActive }) =>
+    isActive
+      ? "text-blue-400 font-semibold transition duration-300"
+      : "text-white hover:text-blue-400 transition duration-300";
+
+  const toggleDropdown = (nombre) => {
+    setDropdownAbierto((prev) => (prev === nombre ? null : nombre));
+  };
+
+  const cerrarTodo = () => {
+    setDropdownAbierto(null);
+    setMenuAbierto(false);
+  };
 
   return (
-    <nav className="bg-zinc-800 my-3 flex justify-between items-center py-4 px-8 rounded-lg shadow-lg">
-      <Link to="/">
-        <h1 className="text-2xl font-bold text-white hover:text-blue-500 transition duration-300">
-          paraFacturas
-        </h1>
-      </Link>
+    <nav className="bg-zinc-800 my-3 px-8 py-4 rounded-lg shadow-lg">
+      <div className="flex justify-between items-center">
+        {/* Logo */}
+        <NavLink to="/" onClick={cerrarTodo}>
+          <h1 className="text-2xl font-bold text-white hover:text-blue-400 transition duration-300">
+            paraFacturas
+          </h1>
+        </NavLink>
 
-      {/* Menú */}
-      <ul className="flex gap-x-6 items-center">
-        {isAuthenticated ? (
-          <>
-            {/* Link a Clientes */}
-            <li>
-              <Link
-                to="/clientes"
-                className="text-white hover:text-blue-500 transition duration-300"
-              >
-                Clientes
-              </Link>
-            </li>
+        {/* Menú desktop */}
+        {isAuthenticated && (
+          <ul className="hidden md:flex gap-x-6 items-center">
 
-            {/* Link a suscripciones */}
+            {/* Link directo: Suscripciones */}
             <li>
-              <Link
-                to="/suscripciones"
-                className="text-white hover:text-blue-500 transition duration-300"
-              >
+              <NavLink to="/suscripciones" className={activeLinkClass} onClick={cerrarTodo}>
                 Suscripciones
-              </Link>
+              </NavLink>
             </li>
-            {/* Link a Facturacion */}
+
+            {/* Link directo: Facturación */}
             <li>
-              <Link
-                to="/facturacion"
-                className="text-white hover:text-blue-500 transition duration-300"
-              >
+              <NavLink to="/facturacion" className={activeLinkClass} onClick={cerrarTodo}>
                 Facturación
-              </Link>
+              </NavLink>
             </li>
 
-
-            {/* Menú desplegable: Bases de datos */}
-            <li className="relative group">
-              <span className="text-white hover:text-blue-500 cursor-pointer transition duration-300">
+            {/* Dropdown: Bases de datos */}
+            <li className="relative">
+              <button
+                onClick={() => toggleDropdown("basedatos")}
+                className="flex items-center gap-1 text-white hover:text-blue-400 transition duration-300"
+              >
                 Bases de datos
-              </span>
-              <ul className="absolute hidden bg-zinc-700 rounded-lg py-2 px-4 space-y-2 group-hover:block">
-                <li>
-                  <Link
-                    to="/clientes"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Clientes
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/productos"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Productos
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/suscripciones"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Suscripciones
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    to="/novedades"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Novedades
-                  </Link>
-                </li>
-
-                <li>
-                  <Link
-                    to="/register"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Usuarios
-                  </Link>
-                </li>
-              </ul>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 transition-transform duration-200 ${dropdownAbierto === "basedatos" ? "rotate-180" : ""}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {dropdownAbierto === "basedatos" && (
+                <ul className="absolute top-full mt-2 left-0 bg-zinc-700 rounded-lg py-2 px-1 space-y-1 shadow-xl min-w-[160px] z-50">
+                  {[
+                    { to: "/clientes", label: "Clientes" },
+                    { to: "/productos", label: "Productos" },
+                    { to: "/suscripciones", label: "Suscripciones" },
+                    { to: "/novedades", label: "Novedades" },
+                    { to: "/register", label: "Usuarios" },
+                  ].map(({ to, label }) => (
+                    <li key={to}>
+                      <NavLink
+                        to={to}
+                        className={activeLinkClass}
+                        onClick={cerrarTodo}
+                      >
+                        <span className="block px-3 py-1 rounded hover:bg-zinc-600">{label}</span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
 
-            {/* Menú desplegable: Gestión */}
-            <li className="relative group">
-              <span className="text-white hover:text-blue-500 cursor-pointer transition duration-300">
+            {/* Dropdown: Gestión */}
+            <li className="relative">
+              <button
+                onClick={() => toggleDropdown("gestion")}
+                className="flex items-center gap-1 text-white hover:text-blue-400 transition duration-300"
+              >
                 Gestión
-              </span>
-              <ul className="absolute hidden bg-zinc-700 rounded-lg py-2 px-4 space-y-2 group-hover:block">
-                <li>
-                  <Link
-                    to="/facturacion"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Facturación
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/pagos"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Pagos
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cartera"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Cartera
-                  </Link>
-                </li>
-              </ul>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 transition-transform duration-200 ${dropdownAbierto === "gestion" ? "rotate-180" : ""}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {dropdownAbierto === "gestion" && (
+                <ul className="absolute top-full mt-2 left-0 bg-zinc-700 rounded-lg py-2 px-1 space-y-1 shadow-xl min-w-[150px] z-50">
+                  {[
+                    { to: "/facturacion", label: "Facturación" },
+                    { to: "/pagos", label: "Pagos" },
+                    { to: "/cartera", label: "Cartera" },
+                  ].map(({ to, label }) => (
+                    <li key={to}>
+                      <NavLink
+                        to={to}
+                        className={activeLinkClass}
+                        onClick={cerrarTodo}
+                      >
+                        <span className="block px-3 py-1 rounded hover:bg-zinc-600">{label}</span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
 
-            {/* Menú desplegable: Nombre de usuario */}
-            <li className="relative group">
-              <span className="text-white hover:text-blue-500 cursor-pointer transition duration-300">
+            {/* Dropdown: Usuario */}
+            <li className="relative">
+              <button
+                onClick={() => toggleDropdown("usuario")}
+                className="flex items-center gap-1 text-white hover:text-blue-400 transition duration-300"
+              >
                 {user.fullname}
-              </span>
-              <ul className="absolute hidden bg-zinc-700 rounded-lg py-2 px-4 space-y-2 group-hover:block min-w-[150px]">
-                <li>
-                  <Link
-                    to="/profile"
-                    className="text-white hover:text-blue-500 transition duration-300"
-                  >
-                    Perfil
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={logout}
-                    className="text-white hover:text-blue-500 transition duration-300 whitespace-nowrap"
-                  >
-                    Cerrar sesión
-                  </button>
-                </li>
-              </ul>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 transition-transform duration-200 ${dropdownAbierto === "usuario" ? "rotate-180" : ""}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {dropdownAbierto === "usuario" && (
+                <ul className="absolute top-full mt-2 right-0 bg-zinc-700 rounded-lg py-2 px-1 space-y-1 shadow-xl min-w-[150px] z-50">
+                  <li>
+                    <button
+                      onClick={() => { logout(); cerrarTodo(); }}
+                      className="block w-full text-left px-3 py-1 rounded text-white hover:text-blue-400 hover:bg-zinc-600 transition duration-300 whitespace-nowrap"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </li>
+                </ul>
+              )}
             </li>
-          </>
-        ) : (
-          // Menú para usuarios no autenticados
-          <li>
-            <Link
-              to="/login"
-              className="text-white hover:text-blue-500 transition duration-300"
-            >
-              Login
-            </Link>
-          </li>
+          </ul>
         )}
-      </ul>
+
+        {/* Login (no autenticado, desktop) */}
+        {!isAuthenticated && (
+          <ul className="hidden md:flex">
+            <li>
+              <NavLink to="/login" className={activeLinkClass}>
+                Login
+              </NavLink>
+            </li>
+          </ul>
+        )}
+
+        {/* Botón hamburguesa (móvil) */}
+        <button
+          className="md:hidden text-white hover:text-blue-400 transition duration-300"
+          onClick={() => setMenuAbierto((prev) => !prev)}
+          aria-label="Abrir menú"
+        >
+          {menuAbierto ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* Menú móvil */}
+      {menuAbierto && (
+        <div className="md:hidden mt-4 flex flex-col gap-2 border-t border-zinc-600 pt-4">
+          {isAuthenticated ? (
+            <>
+              <NavLink to="/suscripciones" className={activeLinkClass} onClick={cerrarTodo}>Suscripciones</NavLink>
+              <NavLink to="/facturacion" className={activeLinkClass} onClick={cerrarTodo}>Facturación</NavLink>
+              <div className="border-t border-zinc-600 pt-2 mt-1">
+                <p className="text-zinc-400 text-xs uppercase mb-1 px-1">Bases de datos</p>
+                <NavLink to="/clientes" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Clientes</span></NavLink>
+                <NavLink to="/productos" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Productos</span></NavLink>
+                <NavLink to="/suscripciones" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Suscripciones</span></NavLink>
+                <NavLink to="/novedades" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Novedades</span></NavLink>
+                <NavLink to="/register" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Usuarios</span></NavLink>
+              </div>
+              <div className="border-t border-zinc-600 pt-2 mt-1">
+                <p className="text-zinc-400 text-xs uppercase mb-1 px-1">Gestión</p>
+                <NavLink to="/facturacion" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Facturación</span></NavLink>
+                <NavLink to="/pagos" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Pagos</span></NavLink>
+                <NavLink to="/cartera" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Cartera</span></NavLink>
+              </div>
+              <div className="border-t border-zinc-600 pt-2 mt-1">
+                <button
+                  onClick={() => { logout(); cerrarTodo(); }}
+                  className="text-white hover:text-blue-400 transition duration-300 px-2 py-1"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            </>
+          ) : (
+            <NavLink to="/login" className={activeLinkClass} onClick={cerrarTodo}>Login</NavLink>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
