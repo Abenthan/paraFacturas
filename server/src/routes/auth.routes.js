@@ -7,7 +7,7 @@ import { registerSchema, loginSchema } from '../schemas/auth.schema.js';
 const router = Router();
 
 router.get('/', authRequired, home);
-router.post('/register',validateSchema(registerSchema) , register);
+router.post('/register', authRequired, validateSchema(registerSchema), register);
 router.post('/login',validateSchema(loginSchema), login);
 router.post('/logout', logout);
 router.get('/verify', verifyToken);
