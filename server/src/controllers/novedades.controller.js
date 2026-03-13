@@ -25,23 +25,42 @@ export const getNovedadesSuscripcion = async (req, res) => {
   }
 };
 
-// novedades de todas las suscripciones
+// novedades de todas las suscripciones con filtros opcionales
 export const getNovedades = async (req, res) => {
+  const { buscar, fechaDesde, fechaHasta } = req.query;
   try {
+    const condiciones = [];
+    const valores = [];
+
+    if (buscar) {
+      condiciones.push("(n.suscripcion_id LIKE ? OR c.nombreCliente LIKE ?)");
+      valores.push(`%${buscar}%`, `%${buscar}%`);
+    }
+    if (fechaDesde) {
+      condiciones.push("DATE(n.fechaNovedad) >= ?");
+      valores.push(fechaDesde);
+    }
+    if (fechaHasta) {
+      condiciones.push("DATE(n.fechaNovedad) <= ?");
+      valores.push(fechaHasta);
+    }
+
+    const where = condiciones.length > 0 ? "WHERE " + condiciones.join(" AND ") : "";
+
     const consulta = `
-        SELECT n.*,
-        c.nombreCliente 
-        FROM novedades n
-        LEFT JOIN suscripciones s ON n.suscripcion_id = s.idSuscripcion
-        LEFT JOIN clientes c ON s.cliente_id = c.idCliente
-        order by idNovedad DESC
+      SELECT n.*,
+        c.nombreCliente
+      FROM novedades n
+      LEFT JOIN suscripciones s ON n.suscripcion_id = s.idSuscripcion
+      LEFT JOIN clientes c ON s.cliente_id = c.idCliente
+      ${where}
+      ORDER BY n.idNovedad DESC
     `;
-    const [rows] = await pool.query(consulta);
+
+    const [rows] = await pool.query(consulta, valores);
 
     if (rows.length === 0) {
-      return res.status(204).json({
-        message: "No hay novedades",
-      });
+      return res.status(204).json({ message: "No hay novedades" });
     }
     return res.status(200).json(rows);
   } catch (error) {

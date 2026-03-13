@@ -71,7 +71,7 @@ function Navbar() {
                     { to: "/productos", label: "Productos" },
                     { to: "/suscripciones", label: "Suscripciones" },
                     { to: "/novedades", label: "Novedades" },
-                    { to: "/register", label: "Usuarios" },
+                    { to: "/usuarios", label: "Usuarios" },
                   ].map(({ to, label }) => (
                     <li key={to}>
                       <NavLink
@@ -196,7 +196,7 @@ function Navbar() {
                 <NavLink to="/productos" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Productos</span></NavLink>
                 <NavLink to="/suscripciones" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Suscripciones</span></NavLink>
                 <NavLink to="/novedades" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Novedades</span></NavLink>
-                <NavLink to="/register" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Usuarios</span></NavLink>
+                <NavLink to="/usuarios" className={activeLinkClass} onClick={cerrarTodo}><span className="block px-2 py-1">Usuarios</span></NavLink>
               </div>
               <div className="border-t border-zinc-600 pt-2 mt-1">
                 <p className="text-zinc-400 text-xs uppercase mb-1 px-1">Gestión</p>

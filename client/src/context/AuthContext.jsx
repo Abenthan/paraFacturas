@@ -5,7 +5,6 @@ export const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
@@ -18,27 +17,26 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const signup = async (user) => {
+  // #3 — signup ya no inicia sesión automáticamente
+  const signup = async (userData) => {
     try {
-      const res = await registerRequest(user);
-
-      setUser(res.data);
-
-      setIsAuthenticated(true);
+      const res = await registerRequest(userData);
+      return { ok: true, data: res.data };
     } catch (error) {
-      setErrors(error.response.data);
+      const msgs = error.response?.data;
+      const lista = Array.isArray(msgs) ? msgs : [msgs?.message || "Error al registrar usuario"];
+      setErrors(lista);
+      return { ok: false };
     }
   };
 
-  const signin = async (user) => {
+  const signin = async (userData) => {
     try {
-      const res = await loginRequest(user);
+      const res = await loginRequest(userData);
       setIsAuthenticated(true);
       setUser(res.data);
     } catch (error) {
-      console.log("Error signing in");
-      console.log(error.response.data);
-      setErrors(error.response.data);
+      setErrors(error.response?.data || ["Error al iniciar sesión"]);
     }
   };
 
@@ -55,9 +53,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (errors.length > 0) {
-      const timer = setTimeout(() => {
-        setErrors([]);
-      }, 5000);
+      const timer = setTimeout(() => setErrors([]), 5000);
       return () => clearTimeout(timer);
     }
   }, [errors]);
@@ -65,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function checkLogin() {
       try {
-        const res = await verifyTokenRequest(); // SIN pasar token
+        const res = await verifyTokenRequest();
         if (!res.data) {
           setIsAuthenticated(false);
           setUser(null);
@@ -73,14 +69,13 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
           setUser(res.data);
         }
-      } catch (error) {
+      } catch {
         setIsAuthenticated(false);
         setUser(null);
       } finally {
         setLoading(false);
       }
     }
-
     checkLogin();
   }, []);
 

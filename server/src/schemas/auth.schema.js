@@ -8,18 +8,15 @@ export const registerSchema = z.object({
     .string({ required_error: "Nombre de usuario es requerido" })
     .max(255),
   email: z
-    .string({
-      required_error: "Correo electrónico es requerido",
-    })
+    .string({ required_error: "Correo electrónico es requerido" })
     .email({ message: "Correo electrónico no es válido" }),
   password: z
-    .string({
-      required_error: "Contraseña es requerida",
-    })
-    .min(8, {
-      message: "Contraseña debe tener al menos 8 caracteres",
-    })
+    .string({ required_error: "Contraseña es requerida" })
+    .min(8, { message: "Contraseña debe tener al menos 8 caracteres" })
     .max(255),
+  rol: z
+    .enum(["admin", "operador"], { required_error: "El rol es requerido" })
+    .default("operador"),
 });
 
 export const loginSchema = z.object({

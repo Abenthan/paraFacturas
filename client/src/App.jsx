@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
+import UsuariosPage from "./pages/UsuariosPage";
+import CambiarPasswordPage from "./pages/CambiarPasswordPage";
 import Navbar from "./components/Navbar";
 import NuevoClientePage from "./pages/clientes/NuevoClientePage";
 import ClientesPage from "./pages/clientes/ClientesPage";
@@ -58,6 +60,8 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/nuevoCliente" element={<NuevoClientePage />} />
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/usuarios" element={<UsuariosPage />} />
+                    <Route path="/usuario/:id/password" element={<CambiarPasswordPage />} />
                     <Route path="/clientes" element={<ClientesPage />} />
                     <Route path="/cliente/:id" element={<ClientePage />} />
                     <Route path="/productos" element={<ProductosPage />} />
