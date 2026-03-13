@@ -138,6 +138,21 @@ const PagoPage = () => {
               </td>
             </tr>
             <tr>
+              <td className="pb-[3px]"></td>
+              <td className="text-right pb-[3px]">
+                <strong>Fecha límite de pago:</strong>{" "}
+                {(() => {
+                  const ultima = pago[pago.length - 1];
+                  const fecha = new Date(ultima.facturaYear, ultima.facturaMes, 0);
+                  return fecha.toLocaleDateString("es-CO", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  });
+                })()}
+              </td>
+            </tr>
+            <tr>
               <td className="pb-[3px]">
                 <strong>No. Suscripción:</strong> {pago[0].suscripcion_id}
               </td>

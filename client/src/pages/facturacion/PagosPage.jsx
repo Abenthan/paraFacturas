@@ -14,7 +14,8 @@ function PagosPage() {
     fechaDesde: "",
     fechaHasta: "",
     cliente: "",
-    codigoFactura: "",
+    suscripcion: "",
+    idPago: "",
   });
 
   // Estado para mostrar la tabla solo después de buscar
@@ -39,7 +40,8 @@ function PagosPage() {
       filtros.fechaDesde.trim() === "" &&
       filtros.fechaHasta.trim() === "" &&
       filtros.cliente.trim() === "" &&
-      filtros.suscripcion.trim() === ""
+      filtros.suscripcion.trim() === "" &&
+      filtros.idPago.trim() === ""
     ) {
       alert("Debe diligenciar al menos un campo en el filtro de busqueda.");
       return;
@@ -160,6 +162,19 @@ function PagosPage() {
           />
         </div>
 
+        <div>
+          <label className="block mb-1 text-sm">No. Recibo:</label>
+          <input
+            type="number"
+            placeholder="No. Recibo"
+            value={filtros.idPago}
+            onChange={(e) =>
+              setFiltros({ ...filtros, idPago: e.target.value })
+            }
+            className="bg-gray-800 text-white border border-gray-600 px-3 py-2 rounded w-32"
+          />
+        </div>
+
         <div className="flex items-end gap-2">
           <button
             onClick={cargarPagos}
@@ -193,6 +208,7 @@ function PagosPage() {
                     onChange={toggleSeleccionarTodas}
                   />
                 </th>
+                <th className="p-3 text-left">No. Recibo</th>
                 <th className="p-3 text-left">Cliente</th>
                 <th className="p-3 text-left">Suscripción</th>
                 <th className="p-3 text-left">Fecha</th>
@@ -215,6 +231,7 @@ function PagosPage() {
                       onChange={() => toggleSeleccion(pago.idPago)}
                     />
                   </td>
+                  <td className="p-3">{pago.idPago}</td>
                   <td className="p-3">{pago.nombreCliente}</td>
                   <td className="p-3">{pago.suscripcion_id}</td>
                   <td className="p-3">
@@ -233,7 +250,7 @@ function PagosPage() {
               ))}
               {pagos.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center text-gray-400 py-4">
+                  <td colSpan="7" className="text-center text-gray-400 py-4">
                     No se encontraron pagos.
                   </td>
                 </tr>

@@ -549,7 +549,7 @@ export const registrarPago = async (req, res) => {
 // obtener pagos
 export const getPagos = async (req, res) => {
   try {
-    const { fechaDesde, fechaHasta, cliente, suscripcion } = req.query;
+    const { fechaDesde, fechaHasta, cliente, suscripcion, idPago } = req.query;
 
     const condiciones = [];
     const valores = [];
@@ -572,6 +572,11 @@ export const getPagos = async (req, res) => {
     if (suscripcion) {
       condiciones.push("p.suscripcion_id = ?");
       valores.push(suscripcion);
+    }
+
+    if (idPago) {
+      condiciones.push("p.idPago = ?");
+      valores.push(idPago);
     }
 
     const sql = `
@@ -615,7 +620,9 @@ export const getPago = async (req, res) => {
             pf.factura_id,
             pf.valorPago as pagoFactura,
             f.codigoFactura,
-            f.estado
+            f.estado,
+            f.year as facturaYear,
+            f.mes as facturaMes
         FROM pagofactura pf
         inner join pagos p on  pf.idPago = p.idPago
         inner join facturas f on pf.factura_id = f.idFactura
