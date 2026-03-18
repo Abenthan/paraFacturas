@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getUsuariosRequest, deleteUsuarioRequest } from "../api/auth";
+import { getUsuariosRequest, deleteUsuarioRequest, backupRequest } from "../api/auth";
 
 function UsuariosPage() {
   const { user } = useAuth();
@@ -9,6 +9,26 @@ function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [backingUp, setBackingUp] = useState(false);
+
+  const handleBackup = async () => {
+    setBackingUp(true);
+    try {
+      const res = await backupRequest();
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/sql" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup_${new Date().toISOString().slice(0, 10)}.sql`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Error al generar el backup. Intente nuevamente.");
+    } finally {
+      setBackingUp(false);
+    }
+  };
 
   const cargarUsuarios = async () => {
     try {
@@ -45,12 +65,26 @@ function UsuariosPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Usuarios</h1>
         {user?.rol === "admin" && (
-          <Link
-            to="/register"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-          >
-            + Nuevo usuario
-          </Link>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBackup}
+              disabled={backingUp}
+              className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-4-4H6a2 2 0 0 0-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v4a1 1 0 0 0 1 1h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 12v5m0 0-2-2m2 2 2-2" />
+              </svg>
+              {backingUp ? "Generando..." : "Copia de seguridad"}
+            </button>
+            <Link
+              to="/register"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+            >
+              + Nuevo usuario
+            </Link>
+          </div>
         )}
       </div>
 

@@ -8,6 +8,7 @@ import productosRoutes from "./routes/productos.routes.js";
 import suscripcionesRoutes from "./routes/suscripciones.routes.js";
 import novedadesRoutes from "./routes/novedades.routes.js";
 import facturacionRoutes from "./routes/facturacion.routes.js";
+import backupRoutes from "./routes/backup.routes.js";
 
 const app = express();
 
@@ -41,5 +42,6 @@ app.use("/api", productosRoutes);
 app.use("/api", suscripcionesRoutes);
 app.use("/api", novedadesRoutes);
 app.use("/api", facturacionRoutes);
+app.use("/api", backupRoutes);
 
 export default app;
