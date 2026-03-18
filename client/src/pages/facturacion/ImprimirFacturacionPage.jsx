@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFacturacion } from "../../context/FacturacionContext";
+import * as XLSX from "xlsx";
 
 function ImprimirFacturacionPage() {
   const { obtenerFacturas } = useFacturacion();
@@ -46,6 +47,23 @@ function ImprimirFacturacionPage() {
     0
   );
 
+  const exportarExcel = () => {
+    const datos = facturas.map((f) => ({
+      Factura: f.codigoFactura,
+      Suscripción: f.suscripcion_id,
+      Cliente: f.nombreCliente,
+      Dirección: f.direccionServicio,
+      Valor: f.valor,
+      Pendiente: Number(f.valor_pendiente),
+      "Total a Pagar": Number(f.totalPagar),
+      Estado: f.estado,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Facturas");
+    XLSX.writeFile(wb, "facturas.xlsx");
+  };
+
   const fechaGeneracion = new Date().toLocaleDateString("es-CO", {
     year: "numeric",
     month: "long",
@@ -61,6 +79,12 @@ function ImprimirFacturacionPage() {
           className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition"
         >
           Volver
+        </button>
+        <button
+          onClick={exportarExcel}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          Exportar a Excel
         </button>
         <button
           onClick={() => window.print()}

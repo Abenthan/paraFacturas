@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFacturacion } from "../../context/FacturacionContext";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 function FacturasPage() {
   const navigate = useNavigate();
@@ -44,6 +45,24 @@ function FacturasPage() {
       campo,
       asc: prev.campo === campo ? !prev.asc : true,
     }));
+  };
+
+  const exportarExcel = () => {
+    const datos = facturasFiltradas.map((f) => ({
+      Factura: f.codigoFactura,
+      Suscripción: f.suscripcion_id,
+      Cliente: f.nombreCliente,
+      Producto: f.nombreProducto,
+      Dirección: f.direccionServicio,
+      Valor: f.valor,
+      Pendiente: Number(f.valor_pendiente),
+      "Total a Pagar": Number(f.totalPagar),
+      Estado: f.estado,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Facturas");
+    XLSX.writeFile(wb, "facturas.xlsx");
   };
 
   const facturasFiltradas = facturas
@@ -135,6 +154,13 @@ function FacturasPage() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
           >
             Buscar Facturas
+          </button>
+
+          <button
+            onClick={exportarExcel}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Exportar a Excel
           </button>
 
           {/* Botón imprimir */}

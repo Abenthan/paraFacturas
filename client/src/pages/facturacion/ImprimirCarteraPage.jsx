@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { obtenerCarteraRequest } from "../../api/facturacionApi";
+import * as XLSX from "xlsx";
 
 function ImprimirCarteraPage() {
   const [searchParams] = useSearchParams();
@@ -36,6 +37,21 @@ function ImprimirCarteraPage() {
     0
   );
 
+  const exportarExcel = () => {
+    const datos = cartera.map((item) => ({
+      "ID Suscripción": item.idSuscripcion,
+      Cliente: item.nombreCliente,
+      Dirección: item.direccionServicio,
+      Estado: item.estadoSuscripcion,
+      "Saldo Pendiente": Number(item.saldoPendiente),
+      "Cant. Facturas": item.cantidadFacturas,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Cartera");
+    XLSX.writeFile(wb, "cartera.xlsx");
+  };
+
   const tituloFiltro = [
     filtros.estado && `Estado: ${filtros.estado}`,
     filtros.cliente && `Cliente: ${filtros.cliente}`,
@@ -53,6 +69,12 @@ function ImprimirCarteraPage() {
           className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition"
         >
           Volver
+        </button>
+        <button
+          onClick={exportarExcel}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          Exportar a Excel
         </button>
         <button
           onClick={() => window.print()}

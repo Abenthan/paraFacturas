@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useFacturacion } from "../../context/FacturacionContext";
 import { useNavigate, Link } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 function CarteraPage() {
   const { obtenerCartera } = useFacturacion();
@@ -66,6 +67,24 @@ function CarteraPage() {
   // Calcular total de la cartera (solo saldo pendiente)
   const totalCartera = cartera.reduce((acc, item) => acc + Number(item.saldoPendiente), 0);
 
+  const exportarExcel = () => {
+    const datos = sortedData.map((item) => ({
+      "ID Suscripción": item.idSuscripcion,
+      Cliente: item.nombreCliente,
+      Producto: item.nombreProducto,
+      Dirección: item.direccionServicio,
+      Estado: item.estadoSuscripcion,
+      "Total Facturado": Number(item.totalFacturado),
+      "Total Pagado": Number(item.totalPagado),
+      Saldo: Number(item.saldoPendiente),
+      "Cant. Facturas": item.cantidadFacturas,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Cartera");
+    XLSX.writeFile(wb, "cartera.xlsx");
+  };
+
   // Navegar a impresión con los filtros activos como query params
   const handleImprimir = () => {
     const params = new URLSearchParams();
@@ -114,6 +133,12 @@ function CarteraPage() {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
           Filtrar
+        </button>
+        <button
+          onClick={exportarExcel}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          Exportar a Excel
         </button>
         <button
           onClick={handleImprimir}
