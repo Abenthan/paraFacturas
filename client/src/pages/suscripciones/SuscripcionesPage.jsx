@@ -1,6 +1,7 @@
 import { useSuscripciones } from "../../context/SuscripcionesContext";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 function SuscripcionesPage() {
   const { getSuscripciones, suscripciones } = useSuscripciones();
@@ -8,6 +9,7 @@ function SuscripcionesPage() {
   const [loading, setLoading] = useState(true);
   const [orden, setOrden] = useState({ campo: "idSuscripcion", direccion: "asc" });
   const [filtro, setFiltro] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("Todas");
 
   useEffect(() => {
     async function fetchData() {
@@ -30,11 +32,15 @@ function SuscripcionesPage() {
 
   const filtrarSuscripciones = () => {
     return suscripciones
-      .filter((s) =>
-        !filtro ||
-        s.idSuscripcion.toString().includes(filtro) ||
-        s.nombreCliente.toLowerCase().includes(filtro.toLowerCase())
-      )
+      .filter((s) => {
+        const coincideTexto =
+          !filtro ||
+          s.idSuscripcion.toString().includes(filtro) ||
+          s.nombreCliente.toLowerCase().includes(filtro.toLowerCase());
+        const coincideEstado =
+          filtroEstado === "Todas" || s.Estado === filtroEstado;
+        return coincideTexto && coincideEstado;
+      })
       .sort((a, b) => {
         let valorA = a[orden.campo];
         let valorB = b[orden.campo];
@@ -48,6 +54,27 @@ function SuscripcionesPage() {
 
   const suscripcionesFiltradas = filtrarSuscripciones();
 
+  const handleImprimir = () => {
+    const params = new URLSearchParams();
+    if (filtro) params.set("filtro", filtro);
+    if (filtroEstado !== "Todas") params.set("estado", filtroEstado);
+    navigate(`/suscripciones/imprimir?${params.toString()}`);
+  };
+
+  const exportarExcel = () => {
+    const datos = suscripcionesFiltradas.map((s) => ({
+      ID: s.idSuscripcion,
+      Cliente: s.nombreCliente,
+      Producto: s.nombreProducto,
+      "Dirección del Servicio": s.direccionServicio,
+      Estado: s.Estado,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Suscripciones");
+    XLSX.writeFile(wb, "suscripciones.xlsx");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
@@ -59,17 +86,35 @@ function SuscripcionesPage() {
   return (
     <div className="min-h-screen bg-gray-900 p-6 text-white">
       <div className="max-w-6xl mx-auto bg-zinc-800 p-8 rounded-lg shadow-lg">
-        <div className="flex items-center gap-3 mb-6">
-          <h1 className="text-2xl font-bold shrink-0">Suscripciones</h1>
+        <h1 className="text-2xl font-bold mb-4">Suscripciones</h1>
+
+        {/* Filtros */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           <input
             type="text"
             placeholder="Buscar por ID o nombre de cliente"
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="flex-1 px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+            className="flex-1 min-w-48 px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
           />
+          <select
+            value={filtroEstado}
+            onChange={(e) => setFiltroEstado(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="Todas">Todas las suscripciones</option>
+            <option value="Activo">Activo</option>
+            <option value="Suspendido">Suspendido</option>
+            <option value="Retiro">Retiro</option>
+          </select>
           <button
-            onClick={() => navigate("/suscripciones/imprimir")}
+            onClick={exportarExcel}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition text-sm shrink-0"
+          >
+            Exportar a Excel
+          </button>
+          <button
+            onClick={handleImprimir}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm shrink-0"
           >
             Imprimir

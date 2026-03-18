@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getSuscripcionesRequest } from "../../api/suscripcionesApi.js";
+import * as XLSX from "xlsx";
 
 function ImprimirSuscripcionesPage() {
   const [suscripciones, setSuscripciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const filtroTexto = searchParams.get("filtro") || "";
+  const filtroEstado = searchParams.get("estado") || "Todas";
 
   useEffect(() => {
     getSuscripcionesRequest()
@@ -17,17 +22,42 @@ function ImprimirSuscripcionesPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const suscripcionesFiltradas = suscripciones.filter((s) => {
+    const coincideTexto =
+      !filtroTexto ||
+      s.idSuscripcion.toString().includes(filtroTexto) ||
+      s.nombreCliente.toLowerCase().includes(filtroTexto.toLowerCase());
+    const coincideEstado =
+      filtroEstado === "Todas" || s.Estado === filtroEstado;
+    return coincideTexto && coincideEstado;
+  });
+
   const fechaGeneracion = new Date().toLocaleDateString("es-CO", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  const resumen = suscripciones.reduce((acc, s) => {
+  const resumen = suscripcionesFiltradas.reduce((acc, s) => {
     const estado = s.Estado || "Sin estado";
     acc[estado] = (acc[estado] || 0) + 1;
     return acc;
   }, {});
+
+  const exportarExcel = () => {
+    const datos = suscripcionesFiltradas.map((s) => ({
+      ID: s.idSuscripcion,
+      Cliente: s.nombreCliente,
+      "Dirección del Servicio": s.direccionServicio,
+      Estado: s.Estado,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Suscripciones");
+    XLSX.writeFile(wb, "suscripciones.xlsx");
+  };
+
+  const tituloFiltro = filtroEstado !== "Todas" ? ` — ${filtroEstado}` : "";
 
   return (
     <div className="p-4 bg-white text-black min-h-screen">
@@ -39,6 +69,12 @@ function ImprimirSuscripcionesPage() {
           Volver
         </button>
         <button
+          onClick={exportarExcel}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          Exportar a Excel
+        </button>
+        <button
           onClick={() => window.print()}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
         >
@@ -48,7 +84,7 @@ function ImprimirSuscripcionesPage() {
 
       <div className="print-area">
         <div className="text-center mb-3">
-          <h1 className="text-lg font-bold">Reporte de Suscripciones</h1>
+          <h1 className="text-lg font-bold">Reporte de Suscripciones{tituloFiltro}</h1>
           <p className="text-gray-600 text-xs">Generado el {fechaGeneracion}</p>
         </div>
 
@@ -66,7 +102,7 @@ function ImprimirSuscripcionesPage() {
                 </tr>
               </thead>
               <tbody>
-                {suscripciones.map((s) => (
+                {suscripcionesFiltradas.map((s) => (
                   <tr key={s.idSuscripcion} className="odd:bg-white even:bg-gray-50">
                     <td className="border border-gray-300 px-1 py-0">{s.idSuscripcion}</td>
                     <td className="border border-gray-300 px-1 py-0">{s.nombreCliente}</td>
@@ -78,7 +114,7 @@ function ImprimirSuscripcionesPage() {
             </table>
 
             <div className="mt-3 text-xs border-t border-gray-400 pt-2">
-              <span className="font-bold">Total: {suscripciones.length}</span>
+              <span className="font-bold">Total: {suscripcionesFiltradas.length}</span>
               {Object.entries(resumen).map(([estado, count]) => (
                 <span key={estado} className="ml-4">
                   {estado}: <span className="font-semibold">{count}</span>
