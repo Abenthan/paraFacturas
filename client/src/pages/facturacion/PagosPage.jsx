@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFacturacion } from "../../context/FacturacionContext";
+import * as XLSX from "xlsx";
 
 function PagosPage() {
   const { obtenerPagos } = useFacturacion(); // Función para consultar pagos desde el contexto
@@ -89,6 +90,25 @@ function PagosPage() {
     .filter((p) => seleccionados.includes(p.idPago))
     .reduce((sum, p) => sum + p.valorPago, 0);
 
+  const handleImprimir = () => {
+    localStorage.setItem("filtrosPagos", JSON.stringify(filtros));
+    navigate("/pagos/imprimir");
+  };
+
+  const exportarExcel = () => {
+    const datos = pagos.map((p) => ({
+      "No. Recibo": p.idPago,
+      Cliente: p.nombreCliente,
+      Suscripción: p.suscripcion_id,
+      Fecha: new Date(p.fechaPago).toLocaleDateString("es-CO"),
+      Valor: p.valorPago,
+    }));
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pagos");
+    XLSX.writeFile(wb, "pagos.xlsx");
+  };
+
   // Generar título de filtro para impresión
   const generarTituloFiltro = () => {
     const partes = [];
@@ -176,18 +196,52 @@ function PagosPage() {
         </div>
 
         <div className="flex items-end gap-2">
-          <button
-            onClick={cargarPagos}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            Buscar
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
-          >
-            Imprimir
-          </button>
+          {/* Buscar */}
+          <div className="relative group">
+            <button
+              onClick={cargarPagos}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
+            </button>
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+              Buscar
+            </span>
+          </div>
+
+          {/* Exportar a Excel */}
+          <div className="relative group">
+            <button
+              onClick={exportarExcel}
+              disabled={!buscado || pagos.length === 0}
+              className="bg-green-600 hover:bg-green-700 text-white p-2 rounded disabled:opacity-40"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0-3.5-3.5M12 15l3.5-3.5M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2" />
+              </svg>
+            </button>
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+              Exportar a Excel
+            </span>
+          </div>
+
+          {/* Imprimir */}
+          <div className="relative group">
+            <button
+              onClick={handleImprimir}
+              disabled={!buscado || pagos.length === 0}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white p-2 rounded disabled:opacity-40"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-2 0H8v4h8v-4z" />
+              </svg>
+            </button>
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-700 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+              Imprimir
+            </span>
+          </div>
         </div>
       </div>
 
